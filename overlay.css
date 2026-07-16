@@ -1,0 +1,165 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+/* Isolated Shadow DOM context resetting */
+:host {
+  all: initial;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
+}
+
+/* 100% Fullscreen Overlay with Tailwind Slate-900 look */
+.focus-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(15, 23, 42, 0.97); /* Tailwind Slate-900 color at 97% opacity */
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 2147483647; /* Absolute maximum z-index priority */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.focus-overlay.visible {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Elegant Slate-800 Glassmorphic Dialog Card */
+.focus-card {
+  background: rgba(30, 41, 59, 0.7); /* Tailwind Slate-800 translucent base */
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 40px 32px;
+  width: 420px;
+  max-width: 90%;
+  text-align: center;
+  box-shadow: 
+    0 20px 50px rgba(0, 0, 0, 0.5), 
+    0 0 40px rgba(99, 102, 241, 0.08);
+  transform: translateY(16px) scale(0.96);
+  transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.focus-overlay.visible .focus-card {
+  transform: translateY(0) scale(1);
+}
+
+/* Soft alerting icon container */
+.focus-icon-container {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(99, 102, 241, 0.1);
+  border: 1px solid rgba(99, 102, 241, 0.25);
+  margin-bottom: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #818cf8; /* Slate-400-indigo */
+  animation: subtle-pulse 3s infinite ease-in-out;
+}
+
+.focus-icon-container svg {
+  width: 26px;
+  height: 26px;
+}
+
+/* Titles and content descriptions */
+.focus-title {
+  margin: 0 0 10px 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #f8fafc; /* Slate-50 */
+  letter-spacing: -0.5px;
+}
+
+.focus-description {
+  margin: 0 0 32px 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: #94a3b8; /* Slate-400 */
+}
+
+/* Button columns */
+.focus-actions {
+  display: flex;
+  gap: 12px;
+  width: 100%;
+}
+
+.focus-btn {
+  flex: 1;
+  padding: 13px 20px;
+  border-radius: 12px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  border: none;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Yes, I am working button */
+.btn-working {
+  background: #4f46e5; /* Indigo-600 */
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+
+.btn-working:hover {
+  background: #4338ca; /* Indigo-700 */
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+}
+
+.btn-working:active {
+  transform: translateY(0);
+}
+
+/* No, get me out button */
+.btn-exit {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #cbd5e1; /* Slate-300 */
+}
+
+.btn-exit:hover {
+  background: rgba(239, 68, 68, 0.08); /* Transparent Red-500 */
+  border-color: rgba(239, 68, 68, 0.25);
+  color: #fca5a5; /* Red-300 */
+  transform: translateY(-1px);
+}
+
+.btn-exit:active {
+  transform: translateY(0);
+}
+
+/* Soft pulsing animation for indicator icon */
+@keyframes subtle-pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.15);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+  }
+}

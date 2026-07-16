@@ -1,0 +1,28 @@
+{
+  "manifest_version": 3,
+  "name": "ADHD Standalone Focus Check",
+  "version": "1.0.0",
+  "description": "A standalone client-side browser sensor that detects doomscrolling and intervenes with soft-block overlays.",
+  "permissions": [
+    "activeTab",
+    "scripting",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": ["http://*/*", "https://*/*"],
+      "js": ["content.js"],
+      "run_at": "document_start"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["overlay.css"],
+      "matches": ["http://*/*", "https://*/*"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "ADHD Standalone Focus Check"
+  }
+}
