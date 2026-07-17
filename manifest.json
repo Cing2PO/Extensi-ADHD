@@ -8,21 +8,25 @@
     "scripting",
     "storage"
   ],
+  "background": {
+    "service_worker": "src/background.js",
+    "type": "module"
+  },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["content.js"],
+      "js": ["src/content.js"],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["overlay.css"],
+      "resources": ["src/overlay.css"],
       "matches": ["http://*/*", "https://*/*"]
     }
   ],
   "action": {
-    "default_popup": "popup.html",
+    "default_popup": "src/popup.html",
     "default_title": "ADHD Standalone Focus Check"
   }
 }

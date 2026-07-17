@@ -128,7 +128,7 @@
 
     const linkElement = document.createElement('link');
     linkElement.rel = 'stylesheet';
-    linkElement.href = chrome.runtime.getURL('overlay.css');
+    linkElement.href = chrome.runtime.getURL('src/overlay.css');
     shadowRootNode.appendChild(linkElement);
 
     const overlayMarkup = document.createElement('div');
@@ -173,6 +173,7 @@
       .replace(/'/g, "&#039;");
   }
 
+  // Check visibility inside shadow DOM
   function isOverlayVisible() {
     if (!rootContainer || !shadowRootNode) return false;
     const overlay = shadowRootNode.querySelector('.focus-overlay');
@@ -191,12 +192,30 @@
       }
     }
 
+    // Trigger animation
     setTimeout(() => {
       if (shadowRootNode) {
         const overlay = shadowRootNode.querySelector('.focus-overlay');
         if (overlay) overlay.classList.add('visible');
       }
     }, 50);
+
+    // Send event alert to background service worker (which forwards it to WebSocket)
+    if (isContextValid()) {
+      console.log(`[Content Script] Distraction threshold reached (${Math.round(distractionScore)} >= ${doomscrollThreshold}). Sending event to background service worker...`);
+      chrome.runtime.sendMessage({
+        action: 'doomscrollDetected',
+        domain: window.location.hostname,
+        score: Math.round(distractionScore),
+        currentTask: currentTask
+      }, (response) => {
+        if (chrome.runtime.lastError) {
+          console.warn("[Content Script] Failed to send message to background script:", chrome.runtime.lastError.message);
+        } else {
+          console.log("[Content Script] Message successfully delivered to background. Sync status:", response?.status);
+        }
+      });
+    }
   }
 
   function handleKeepWorking(e) {
@@ -298,7 +317,6 @@
       let storedList = items.blacklist;
       let blacklist = [];
       if (storedList) {
-        // Upgrade legacy flat string formats if encountered
         blacklist = storedList.map(item => {
           if (typeof item === 'string') {
             return { domain: item, enabled: true };
@@ -331,6 +349,15 @@
     if (changes.blacklist || changes.isProtectionActive || changes.sensitivity || changes.currentTask) {
       checkAndSetEngine();
     }
+  }
+
+  // Listen for simulated socket broadcasts from background.js
+  if (isContextValid()) {
+    chrome.runtime.onMessage.addListener((message) => {
+      if (message.type === 'DOOMSCROLL_SERVER_ACK') {
+        console.log(`%c[Content Script] Simulated Cross-Platform Sync Received for Domain: ${message.domain}`, "color: #10b981; font-weight: bold;");
+      }
+    });
   }
 
   checkAndSetEngine();
