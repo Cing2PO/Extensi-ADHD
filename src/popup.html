@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ADHD Focus Coach</title>
   <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
     * {
       box-sizing: border-box;
@@ -14,19 +14,74 @@
       padding: 0;
     }
 
+    :root {
+      --bg-gradient: radial-gradient(circle at top right, rgba(20, 184, 166, 0.15), transparent 60%),
+                     radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.08), transparent 60%),
+                     #090d16;
+      --text-primary: #f1f5f9;
+      --text-secondary: #94a3b8;
+      --text-muted: #64748b;
+      --card-bg: rgba(17, 24, 39, 0.45);
+      --card-border: rgba(255, 255, 255, 0.06);
+      --input-bg: rgba(10, 15, 30, 0.6);
+      --input-border: rgba(255, 255, 255, 0.1);
+      --nav-bg: rgba(10, 15, 30, 0.85);
+      --tab-unselected: #64748b;
+      --tab-hover: #cbd5e1;
+      --accent-label: #2dd4bf;
+      --accent-text: #cbd5e1;
+      --switch-bg: rgba(255, 255, 255, 0.08);
+      --switch-slider: #94a3b8;
+      --item-bg: rgba(255, 255, 255, 0.02);
+      --item-border: rgba(255, 255, 255, 0.04);
+      --shadow-color: rgba(0, 0, 0, 0.2);
+      --focus-card-bg: linear-gradient(135deg, rgba(17, 24, 39, 0.6) 0%, rgba(10, 15, 30, 0.7) 100%);
+      --active-site-bg: rgba(20, 184, 166, 0.02);
+      --scroll-thumb: rgba(255, 255, 255, 0.12);
+      --scroll-thumb-hover: rgba(255, 255, 255, 0.2);
+      --border-header: rgba(255, 255, 255, 0.04);
+    }
+
+    body.light-theme {
+      --bg-gradient: radial-gradient(circle at top right, rgba(20, 184, 166, 0.12), transparent 60%),
+                     radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.08), transparent 60%),
+                     #f8fafc;
+      --text-primary: #0f172a;
+      --text-secondary: #475569;
+      --text-muted: #94a3b8;
+      --card-bg: rgba(255, 255, 255, 0.65);
+      --card-border: rgba(20, 184, 166, 0.12);
+      --input-bg: rgba(255, 255, 255, 0.95);
+      --input-border: rgba(20, 184, 166, 0.15);
+      --nav-bg: rgba(255, 255, 255, 0.85);
+      --tab-unselected: #64748b;
+      --tab-hover: #0d9488;
+      --accent-label: #0d9488;
+      --accent-text: #1e293b;
+      --switch-bg: rgba(0, 0, 0, 0.08);
+      --switch-slider: #64748b;
+      --item-bg: rgba(0, 0, 0, 0.02);
+      --item-border: rgba(0, 0, 0, 0.05);
+      --shadow-color: rgba(31, 38, 135, 0.08);
+      --focus-card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.8) 0%, rgba(241, 245, 249, 0.9) 100%);
+      --active-site-bg: rgba(20, 184, 166, 0.04);
+      --scroll-thumb: rgba(0, 0, 0, 0.12);
+      --scroll-thumb-hover: rgba(0, 0, 0, 0.22);
+      --border-header: rgba(0, 0, 0, 0.06);
+    }
+
     body {
-      font-family: 'Inter', sans-serif;
-      background-color: #0f172a;
-      /* Tailwind Slate-900 */
-      color: #f8fafc;
-      /* Slate-50 */
+      font-family: 'Outfit', sans-serif;
+      background: var(--bg-gradient);
+      color: var(--text-primary);
       width: 320px;
-      height: 380px;
+      height: 440px;
       /* Fixed height for consistent layout */
       display: flex;
       flex-direction: column;
       overflow: hidden;
       position: relative;
+      transition: background 0.3s ease, color 0.3s ease;
     }
 
     /* Top Branding Row */
@@ -34,9 +89,10 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      border-bottom: 1px solid var(--border-header);
       padding: 16px 20px 10px 20px;
       flex-shrink: 0;
+      transition: border-bottom 0.3s ease;
     }
 
     .brand {
@@ -48,15 +104,15 @@
     .brand-logo {
       width: 20px;
       height: 20px;
-      color: #60a5fa;
-      /* Calming Blue */
+      color: var(--accent-label);
     }
 
     .brand-title {
       font-size: 15px;
       font-weight: 700;
-      color: #f8fafc;
+      color: var(--text-primary);
       letter-spacing: -0.5px;
+      transition: color 0.3s ease;
     }
 
     /* Main Scrollable View Area */
@@ -71,38 +127,47 @@
       /* Leave space for bottom tab bar */
     }
 
-    /* Custom thin scrollbars for lists */
-    main::-webkit-scrollbar {
+    /* Custom thin scrollbars globally */
+    ::-webkit-scrollbar {
       width: 4px;
+      height: 4px;
     }
 
-    main::-webkit-scrollbar-track {
+    ::-webkit-scrollbar-track {
       background: transparent;
     }
 
-    main::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.08);
-      border-radius: 2px;
+    ::-webkit-scrollbar-thumb {
+      background: var(--scroll-thumb);
+      border-radius: 4px;
+    }
+    
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--scroll-thumb-hover);
     }
 
     /* Component cards */
     .card {
-      background: rgba(30, 41, 59, 0.45);
-      /* Slate-800 translucent */
-      border: 1px solid rgba(255, 255, 255, 0.04);
-      border-radius: 14px;
-      padding: 12px;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
-      gap: 6px;
+      gap: 8px;
+      box-shadow: 0 4px 20px 0 var(--shadow-color);
+      transition: background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
     }
 
     .card-label {
-      font-size: 10px;
-      font-weight: 600;
-      color: #60a5fa;
+      font-size: 9px;
+      font-weight: 700;
+      color: var(--accent-label);
       text-transform: uppercase;
-      letter-spacing: 0.5px;
+      letter-spacing: 0.8px;
+      transition: color 0.3s ease;
     }
 
     /* INPUT FIELDS */
@@ -112,20 +177,21 @@
 
     .task-input {
       width: 100%;
-      background: rgba(15, 23, 42, 0.5);
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      border-radius: 8px;
-      padding: 8px 10px;
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      border-radius: 10px;
+      padding: 9px 12px;
       font-size: 12px;
-      color: #f8fafc;
+      color: var(--text-primary);
       outline: none;
       font-family: inherit;
-      transition: all 0.2s ease;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
     }
 
     .task-input:focus {
-      border-color: #60a5fa;
-      background: rgba(15, 23, 42, 0.8);
+      border-color: #8b5cf6;
+      box-shadow: 0 0 10px rgba(139, 92, 246, 0.25);
+      background: var(--input-bg);
     }
 
     .task-input::placeholder {
@@ -136,6 +202,33 @@
     .switch-container {
       display: inline-flex;
       align-items: center;
+    }
+
+    /* THEME TOGGLE BUTTON */
+    .theme-btn {
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 5px;
+      border-radius: 50%;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      margin-right: 10px;
+      outline: none;
+    }
+
+    .theme-btn:hover {
+      color: var(--tab-hover);
+      background: var(--item-bg);
+      transform: rotate(15deg) scale(1.1);
+    }
+
+    .theme-btn svg {
+      width: 15px;
+      height: 15px;
     }
 
     .switch {
@@ -158,8 +251,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: rgba(255, 255, 255, 0.08);
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      background-color: var(--switch-bg);
+      border: 1px solid var(--card-border);
       transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 20px;
     }
@@ -171,20 +264,20 @@
       width: 14px;
       left: 3px;
       bottom: 3px;
-      background-color: #94a3b8;
+      background-color: var(--switch-slider);
       transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
       border-radius: 50%;
     }
 
     input:checked+.slider {
-      background-color: rgba(59, 130, 246, 0.15);
-      border-color: rgba(59, 130, 246, 0.35);
+      background-color: rgba(20, 184, 166, 0.18);
+      border-color: rgba(20, 184, 166, 0.45);
     }
 
     input:checked+.slider:before {
       transform: translateX(18px);
-      background-color: #60a5fa;
-      box-shadow: 0 0 6px rgba(96, 165, 250, 0.4);
+      background-color: #2dd4bf;
+      box-shadow: 0 0 8px rgba(45, 212, 191, 0.6);
     }
 
     /* SENSITIVITY SLIDER */
@@ -204,11 +297,11 @@
     .slider-value {
       font-size: 11px;
       font-weight: 600;
-      color: #60a5fa;
-      background: rgba(96, 165, 250, 0.08);
+      color: var(--accent-label);
+      background: rgba(20, 184, 166, 0.08);
       padding: 2px 8px;
       border-radius: 6px;
-      border: 1px solid rgba(96, 165, 250, 0.15);
+      border: 1px solid rgba(20, 184, 166, 0.15);
     }
 
     input[type="range"] {
@@ -227,9 +320,9 @@
       width: 14px;
       height: 14px;
       border-radius: 50%;
-      background: #60a5fa;
+      background: var(--accent-label);
       cursor: pointer;
-      box-shadow: 0 0 4px rgba(96, 165, 250, 0.4);
+      box-shadow: 0 0 6px rgba(20, 184, 166, 0.6);
       transition: transform 0.1s ease;
     }
 
@@ -247,8 +340,8 @@
 
     /* BLACKLIST / ZONES TAB STYLES */
     .active-site-box {
-      border: 1px solid rgba(96, 165, 250, 0.15);
-      background: rgba(96, 165, 250, 0.02);
+      border: 1px solid rgba(20, 184, 166, 0.2);
+      background: var(--active-site-bg);
     }
 
     .active-site-info {
@@ -289,12 +382,12 @@
     }
 
     .btn-quick-toggle.is-allowed {
-      color: #60a5fa;
-      border-color: rgba(96, 165, 250, 0.25);
+      color: #2dd4bf;
+      border-color: rgba(45, 212, 191, 0.25);
     }
 
     .btn-quick-toggle.is-allowed:hover {
-      background: rgba(96, 165, 250, 0.05);
+      background: rgba(45, 212, 191, 0.05);
     }
 
     /* List Add Form inside Zones */
@@ -306,8 +399,8 @@
 
     .add-row input {
       flex: 1;
-      background: rgba(15, 23, 42, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.06);
+      background: rgba(10, 15, 30, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.08);
       border-radius: 8px;
       padding: 6px 10px;
       font-size: 11px;
@@ -316,23 +409,26 @@
     }
 
     .add-row input:focus {
-      border-color: #60a5fa;
+      border-color: #14b8a6;
     }
 
     .btn-add {
-      background: #2563eb;
+      background: linear-gradient(135deg, #0d9488, #0891b2);
       color: #ffffff;
       border: none;
       border-radius: 8px;
-      padding: 0 10px;
+      padding: 0 12px;
       font-size: 11px;
       font-weight: 600;
       cursor: pointer;
-      transition: background 0.15s ease;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 8px rgba(13, 148, 136, 0.25);
     }
 
     .btn-add:hover {
-      background: #1d4ed8;
+      background: linear-gradient(135deg, #14b8a6, #06b6d4);
+      box-shadow: 0 4px 12px rgba(13, 148, 136, 0.4);
+      transform: translateY(-0.5px);
     }
 
     /* Zones Scroll list with expanded height */
@@ -355,90 +451,33 @@
       border-radius: 1.5px;
     }
 
-    /* EXPANDABLE ACCORDION CARD STYLES */
-    .blacklist-item {
-      display: flex;
-      flex-direction: column;
-      background: rgba(255, 255, 255, 0.01);
-      border: 1px solid rgba(255, 255, 255, 0.02);
-      border-radius: 8px;
-      overflow: hidden;
-      transition: background 0.2s ease, border-color 0.2s ease;
-      flex-shrink: 0;
-      /* CRITICAL: Prevents flex layout from compressing list cards */
-    }
-
-    .blacklist-item:hover {
-      background: rgba(255, 255, 255, 0.02);
-      border-color: rgba(255, 255, 255, 0.04);
-    }
-
-    .blacklist-item-header {
+    /* CLEAN restricted zones item styles */
+    .blacklist-item-clean {
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 8px 10px;
-      cursor: pointer;
-      user-select: none;
+      background: var(--item-bg);
+      border: 1px solid var(--item-border);
+      border-radius: 8px;
+      padding: 6px 10px;
+      transition: all 0.2s ease;
+      flex-shrink: 0;
+    }
+
+    .blacklist-item-clean:hover {
+      background: var(--switch-bg);
+      border-color: var(--item-border);
     }
 
     .domain-name {
-      font-size: 12px;
-      color: #cbd5e1;
+      font-size: 11px;
+      color: var(--accent-text);
       font-weight: 500;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
       flex: 1;
       margin-right: 8px;
-      transition: opacity 0.2s ease;
-    }
-
-    .chevron-icon {
-      width: 14px;
-      height: 14px;
-      color: #475569;
-      transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), color 0.2s ease;
-      flex-shrink: 0;
-    }
-
-    /* Rotation & coloration when expanded */
-    .blacklist-item.expanded {
-      background: rgba(255, 255, 255, 0.03);
-      border-color: rgba(96, 165, 250, 0.15);
-    }
-
-    .blacklist-item.expanded .chevron-icon {
-      transform: rotate(180deg);
-      color: #60a5fa;
-    }
-
-    /* Details Drawer Panel */
-    .blacklist-item-body {
-      background: rgba(15, 23, 42, 0.2);
-      overflow: hidden;
-      transition: max-height 0.25s ease-out;
-    }
-
-    .item-menu {
-      padding: 8px 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      border-top: 1px solid rgba(255, 255, 255, 0.04);
-      /* Shifted border inside wrapper to prevent line leaks when collapsed */
-    }
-
-    .menu-row {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .menu-row span {
-      font-size: 10px;
-      color: #94a3b8;
-      font-weight: 500;
     }
 
     /* Symmetrical switch styles */
@@ -461,8 +500,8 @@
       left: 0;
       right: 0;
       bottom: 0;
-      background-color: rgba(255, 255, 255, 0.06);
-      border: 1px solid rgba(255, 255, 255, 0.04);
+      background-color: var(--switch-bg);
+      border: 1px solid var(--card-border);
       transition: .2s ease;
       border-radius: 16px;
     }
@@ -474,44 +513,39 @@
       width: 10px;
       left: 2px;
       bottom: 2px;
-      background-color: #64748b;
+      background-color: var(--switch-slider);
       transition: .2s ease;
       border-radius: 50%;
     }
 
     input:checked+.slider-small {
-      background-color: rgba(59, 130, 246, 0.12);
-      border-color: rgba(59, 130, 246, 0.25);
+      background-color: rgba(20, 184, 166, 0.18);
+      border-color: rgba(20, 184, 166, 0.35);
     }
 
     input:checked+.slider-small:before {
       transform: translateX(12px);
-      background-color: #60a5fa;
-      box-shadow: 0 0 4px rgba(96, 165, 250, 0.3);
+      background-color: #2dd4bf;
+      box-shadow: 0 0 4px rgba(20, 184, 166, 0.4);
     }
 
-    /* Calm Delete button inside drawer */
-    .btn-remove-small {
+    .btn-delete-zone {
       background: transparent;
-      border: 1px solid rgba(239, 68, 68, 0.15);
-      color: rgba(252, 165, 165, 0.85);
-      border-radius: 6px;
-      padding: 3px 8px;
-      font-size: 10px;
-      font-weight: 600;
+      border: none;
       cursor: pointer;
-      display: inline-flex;
+      color: #fca5a5;
+      opacity: 0.6;
+      display: flex;
       align-items: center;
-      gap: 4px;
+      justify-content: center;
+      padding: 2px;
       transition: all 0.2s ease;
-      outline: none;
     }
 
-    .btn-remove-small:hover {
-      background: rgba(239, 68, 68, 0.08); /* Transparent Red-500 */
-      border-color: rgba(239, 68, 68, 0.35);
-      color: #fca5a5;
-      transform: translateY(-0.5px);
+    .btn-delete-zone:hover {
+      opacity: 1 !important;
+      color: #ef4444 !important;
+      transform: scale(1.15);
     }
 
     .btn-remove-small svg {
@@ -521,8 +555,8 @@
 
     /* Encouragement Card */
     .analytics-card {
-      background: linear-gradient(135deg, rgba(59, 130, 246, 0.06) 0%, rgba(99, 102, 241, 0.06) 100%);
-      border: 1px dashed rgba(96, 165, 250, 0.15);
+      background: linear-gradient(135deg, rgba(20, 184, 166, 0.06) 0%, rgba(99, 102, 241, 0.06) 100%);
+      border: 1px dashed rgba(20, 184, 166, 0.2);
       text-align: center;
       padding: 10px;
       border-radius: 14px;
@@ -534,7 +568,7 @@
     .analytics-number {
       font-size: 18px;
       font-weight: 700;
-      color: #60a5fa;
+      color: var(--accent-label);
       letter-spacing: -0.5px;
     }
 
@@ -551,28 +585,29 @@
       left: 0;
       width: 100%;
       height: 56px;
-      background: #1e293b;
-      /* Slate-800 */
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
+      background: var(--nav-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-top: 1px solid var(--border-header);
       display: flex;
       justify-content: space-around;
       align-items: center;
       flex-shrink: 0;
       z-index: 10;
+      transition: background 0.3s ease, border-top 0.3s ease;
     }
 
     .tab-btn {
       background: transparent;
       border: none;
-      color: #64748b;
-      /* unselected tab Slate-500 */
+      color: var(--text-muted);
       cursor: pointer;
       display: flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       gap: 4px;
-      width: 33.33%;
+      flex: 1;
       height: 100%;
       font-size: 9px;
       font-weight: 600;
@@ -588,17 +623,264 @@
     }
 
     .tab-btn:hover {
-      color: #94a3b8;
+      color: var(--tab-hover);
     }
 
     .tab-btn.active {
-      color: #60a5fa;
-      /* Calming active Blue */
+      color: var(--accent-label);
     }
 
     /* Page Toggling Utility */
     .hidden {
       display: none !important;
+    }
+
+    /* Magic To-Do custom styles */
+    .magic-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 24px 0;
+      text-align: center;
+    }
+
+    .magic-spinner {
+      width: 28px;
+      height: 28px;
+      border: 3px dashed var(--accent-label);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .magic-steps-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 8px;
+      list-style-type: none;
+    }
+
+    .magic-step-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: var(--item-bg);
+      border: 1px solid var(--item-border);
+      border-radius: 8px;
+      padding: 8px 10px;
+      transition: all 0.2s ease;
+    }
+
+    .magic-step-item:hover {
+      background: var(--switch-bg);
+      border-color: var(--item-border);
+    }
+
+    .magic-step-item.checked {
+      background: rgba(16, 185, 129, 0.05);
+      border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    .magic-step-text {
+      font-size: 11px;
+      color: var(--text-primary);
+      flex: 1;
+      line-height: 1.4;
+      transition: all 0.2s ease;
+    }
+
+    .magic-step-item.checked .magic-step-text {
+      color: #64748b;
+      text-decoration: line-through;
+    }
+
+    .magic-progress-container {
+      background: rgba(255, 255, 255, 0.06);
+      border-radius: 4px;
+      height: 6px;
+      width: 100%;
+      overflow: hidden;
+      margin: 6px 0;
+    }
+
+    .magic-progress-bar {
+      background: linear-gradient(90deg, #0d9488 0%, #10b981 100%);
+      height: 100%;
+      width: 0%;
+      transition: width 0.3s ease;
+    }
+
+    .magic-step-cb {
+      cursor: pointer;
+      width: 14px;
+      height: 14px;
+      accent-color: var(--accent-label);
+    }
+
+    .btn-sync-focus {
+      background: transparent;
+      border: 1px dashed rgba(20, 184, 166, 0.3);
+      color: var(--accent-label);
+      border-radius: 6px;
+      padding: 2px 6px;
+      font-size: 9px;
+      cursor: pointer;
+      font-weight: 500;
+      transition: all 0.2s ease;
+    }
+
+    .btn-sync-focus:hover {
+      background: rgba(20, 184, 166, 0.08);
+      border-color: var(--accent-label);
+    }
+
+    .congrats-card {
+      text-align: center;
+      background: rgba(16, 185, 129, 0.06);
+      border: 1px dashed rgba(16, 185, 129, 0.3);
+      border-radius: 12px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      animation: popIn 0.3s ease;
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.95); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    /* Active Focus Dashboard styles */
+    .focus-dashboard-card {
+      background: var(--focus-card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 8px 32px 0 var(--shadow-color);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      transition: background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    .focus-status-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .focus-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #34d399;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-size: 9px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background-color: #10b981;
+      border-radius: 50%;
+      box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      animation: pulse 1.2s infinite;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      }
+      70% {
+        transform: scale(1);
+        box-shadow: 0 0 0 5px rgba(16, 185, 129, 0);
+      }
+      100% {
+        transform: scale(0.95);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+    }
+
+    .focus-task-title {
+      font-size: 13px;
+      font-weight: 600;
+      color: #f8fafc;
+      line-height: 1.4;
+      margin: 4px 0;
+    }
+
+    .focus-sub-label {
+      font-size: 10px;
+      color: #94a3b8;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-dashboard-action {
+      padding: 6px 12px;
+      border-radius: 8px;
+      font-size: 10px;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 4px;
+    }
+
+    .btn-dashboard-complete {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-dashboard-complete:hover {
+      background: linear-gradient(135deg, #34d399, #059669);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.4);
+      transform: translateY(-0.5px);
+    }
+
+    .btn-dashboard-cancel {
+      background: transparent;
+      border: none;
+      color: #cbd5e1;
+    }
+
+    .btn-dashboard-cancel:hover {
+      color: #f8fafc;
+      text-decoration: underline;
+    }
+
+    .milestone-badge {
+      display: inline-flex;
+      background: rgba(20, 184, 166, 0.08);
+      border: 1px solid rgba(20, 184, 166, 0.25);
+      color: #2dd4bf;
+      border-radius: 4px;
+      padding: 1px 6px;
+      font-size: 8px;
+      font-weight: 700;
+      text-transform: uppercase;
     }
   </style>
 </head>
@@ -613,6 +895,16 @@
       <span class="brand-title">Focus Coach</span>
     </div>
     <div class="switch-container">
+      <button id="theme-toggle" class="theme-btn" title="Toggle Light/Dark Theme">
+        <!-- Moon Icon (visible in light mode, click to go dark) -->
+        <svg class="moon-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+        </svg>
+        <!-- Sun Icon (visible in dark mode, click to go light) -->
+        <svg class="sun-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m0 13.5V21M3 12h2.25m13.5 0H21M5.75 5.75l1.591 1.591M16.659 16.659l1.591 1.591M5.75 18.25l1.591-1.591M16.659 7.341l1.591-1.591M12 18.75a6.75 6.75 0 1 0 0-13.5 6.75 6.75 0 0 0 0 13.5Z" />
+        </svg>
+      </button>
       <label class="switch">
         <input type="checkbox" id="protection-toggle" checked>
         <span class="slider"></span>
@@ -624,24 +916,113 @@
   <main>
     <!-- PAGE 1: FOCUS -->
     <section id="tab-focus-page" class="subpage">
-      <div class="card">
+      <!-- Input Mode -->
+      <div id="focus-input-container" class="card">
         <span class="card-label">My Current Focus</span>
         <div class="task-input-container">
           <input type="text" id="task-input" class="task-input" placeholder="e.g. Finish writing report"
             autocomplete="off" spellcheck="false">
         </div>
       </div>
+
+      <!-- Active Dashboard Mode -->
+      <div id="focus-active-container" class="focus-dashboard-card hidden">
+        <div class="focus-status-bar">
+          <span class="focus-badge">
+            <span class="pulse-dot"></span>
+            Fokus Aktif
+          </span>
+          <span id="focus-step-badge" class="milestone-badge hidden">Langkah 1 dari 4</span>
+        </div>
+        
+        <!-- Master Task Title -->
+        <div style="display: flex; flex-direction: column; gap: 2px;">
+          <span class="focus-sub-label" style="font-size: 8px; color: #60a5fa;">Tugas Utama</span>
+          <div id="focus-master-display" style="font-size: 11px; font-weight: 700; color: #cbd5e1; text-transform: uppercase; letter-spacing: 0.3px;">Nama Tugas</div>
+        </div>
+        
+        <!-- Active Milestone Step Display -->
+        <div class="card" style="background: rgba(15, 23, 42, 0.4); border-color: rgba(96, 165, 250, 0.15); padding: 10px; margin: 4px 0;">
+          <span class="focus-sub-label" style="font-size: 8px; color: #94a3b8;">Target Saat Ini</span>
+          <div id="focus-task-display" class="focus-task-title" style="font-size: 12px; margin-top: 4px; font-weight: 500; color: #f8fafc;">No active step</div>
+        </div>
+        
+        <!-- Embedded Magic To-Do progress bar -->
+        <div id="focus-magic-addon" class="hidden" style="margin-top: 2px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span class="focus-sub-label" style="font-size: 8px;">Progress Milestone</span>
+            <span id="focus-magic-percent" style="font-size: 8px; color: #60a5fa; font-weight: bold;">0%</span>
+          </div>
+          <div class="magic-progress-container" style="margin-top: 4px; height: 5px;">
+            <div class="magic-progress-bar" id="focus-magic-bar"></div>
+          </div>
+        </div>
+
+        <div style="display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
+          <button id="btn-dashboard-complete" class="btn-dashboard-action btn-dashboard-complete" style="width: 100%; height: 32px; font-size: 11px;">Selesai Langkah Ini ✓</button>
+          <button id="btn-dashboard-cancel" class="btn-dashboard-action btn-dashboard-cancel" style="width: 100%; height: 26px; font-size: 9px; padding: 4px 8px; border: none; background: transparent; opacity: 0.5;">Batal Fokus</button>
+        </div>
+      </div>
+
       <div class="analytics-card" style="margin-top: 10px;">
         <span class="analytics-number" id="refocus-counter">0</span>
         <span class="analytics-text">Encouraged refocuses completed today!</span>
       </div>
     </section>
 
-    <!-- PAGE 2: SENSITIVITY -->
-    <section id="tab-sensitivity-page" class="subpage hidden">
+    <!-- PAGE 2: MAGIC TO-DO -->
+    <section id="tab-magic-page" class="subpage hidden">
+      <!-- Form Input Panel -->
+      <div class="card" id="magic-input-panel">
+        <span class="card-label">Task Deconstructor</span>
+        <div class="task-input-container" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
+          <input type="text" id="magic-task-input" class="task-input" placeholder="What is your giant task?" autocomplete="off" spellcheck="false">
+          <input type="number" id="magic-time-input" class="task-input" placeholder="Available time (minutes)" min="5" max="480" autocomplete="off">
+          <button id="btn-negotiate" class="btn-add" style="margin-top: 4px; width: 100%; height: 32px;">Break It Down (AI)</button>
+        </div>
+      </div>
+
+      <!-- Loading Panel -->
+      <div class="card hidden" id="magic-loading-panel">
+        <div class="magic-loading">
+          <div class="magic-spinner"></div>
+          <span class="card-label" style="animation: subtle-pulse 2s infinite ease-in-out;">Negotiating with AI...</span>
+          <span style="font-size: 11px; color: #64748b;">Deconstructing task paralysis...</span>
+        </div>
+      </div>
+
+      <!-- Results Panel -->
+      <div class="card hidden" id="magic-results-panel">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+          <span class="card-label">Micro-Steps Pathway</span>
+          <span id="magic-progress-label" style="font-size: 10px; font-weight: 600; color: #a78bfa;">0% Done</span>
+        </div>
+        <div class="magic-progress-container">
+          <div class="magic-progress-bar" id="magic-progress-bar"></div>
+        </div>
+        <div class="magic-steps-list" id="magic-steps-list">
+          <!-- Populated by JavaScript -->
+        </div>
+        <div style="display: flex; gap: 8px; margin-top: 12px;">
+          <button id="btn-reset-magic" class="btn-quick-toggle is-restricted" style="flex: 1; padding: 6px;">Reset Task</button>
+        </div>
+      </div>
+
+      <!-- Congratulations Banner -->
+      <div class="congrats-card hidden" id="magic-congrats-panel">
+        <span style="font-size: 24px;">🎉</span>
+        <span class="card-label" style="color: #10b981; font-size: 13px;">Task Completed!</span>
+        <span style="font-size: 11px; color: #94a3b8; line-height: 1.4;">You successfully negotiated your ADHD paralysis and crossed off every single micro-milestone!</span>
+        <button id="btn-new-magic" class="btn-add" style="margin-top: 6px; width: 100%; height: 32px;">Start New Pathway</button>
+      </div>
+    </section>
+
+    <!-- PAGE 3: RULES & ZONES -->
+    <section id="tab-rules-zones-page" class="subpage hidden">
+      <!-- Sensitivity (Rules) -->
       <div class="card slider-group">
         <div class="slider-header">
-          <span class="card-label">Sensitivity</span>
+          <span class="card-label" style="color: #cbd5e1;">Sensitivity</span>
           <span id="slider-val-label" class="slider-value">Balanced</span>
         </div>
         <input type="range" id="sensitivity-slider" min="1" max="3" value="2" step="1">
@@ -651,25 +1032,24 @@
           <span>Strict</span>
         </div>
       </div>
-    </section>
 
-    <!-- PAGE 3: ZONES (BLACKLIST) -->
-    <section id="tab-zones-page" class="subpage hidden">
-      <div class="card active-site-box">
-        <span class="card-label" id="active-site-label">Checking Current Page...</span>
+      <!-- Active Page Check -->
+      <div class="card active-site-box" style="margin-top: 4px;">
+        <span class="card-label" id="active-site-label" style="color: #cbd5e1;">Checking Current Page...</span>
         <div class="active-site-info">
           <span class="active-host" id="active-host">No active page</span>
           <button class="btn-quick-toggle is-restricted" id="btn-quick-toggle" style="display: none;">Restrict</button>
         </div>
       </div>
 
-      <div class="card" style="padding-top: 10px;">
-        <span class="card-label">Restricted Zones</span>
+      <!-- Restricted Zones (Blacklist) -->
+      <div class="card" style="margin-top: 4px; padding: 10px;">
+        <span class="card-label" style="color: #cbd5e1;">Restricted Zones</span>
         <form id="add-form" class="add-row">
           <input type="text" id="manual-domain-input" placeholder="e.g. reddit.com" required autocomplete="off">
           <button type="submit" class="btn-add">Add</button>
         </form>
-        <div class="blacklist-scroll-area" id="blacklist-scroll-area">
+        <div class="blacklist-scroll-area" id="blacklist-scroll-area" style="max-height: 135px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
           <!-- Injected programmatically -->
         </div>
       </div>
@@ -685,22 +1065,24 @@
       </svg>
       Focus
     </button>
-    <button class="tab-btn" data-page="tab-sensitivity-page">
+    <button class="tab-btn" data-page="tab-magic-page">
+      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round"
+          d="M9.813 15.904 9 21l8.982-11.795h-6.282L12.5 3 3.518 14.805H9.813Z" />
+      </svg>
+      Magic To-Do
+    </button>
+    <button class="tab-btn" data-page="tab-rules-zones-page">
       <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round"
           d="M10.5 6h9.75M10.5 6a1.5 1.5 0 1 1-3 0m3 0a1.5 1.5 0 1 0-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 0 1-3 0m3 0a1.5 1.5 0 0 0-3 0m-9.75 0h9.75" />
       </svg>
-      Rules
-    </button>
-    <button class="tab-btn" data-page="tab-zones-page">
-      <svg fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M12 9v3.75m0-10.036A11.959 11.959 0 0 1 3.598 6 11.99 11.99 0 0 0 3 9.75c0 5.592 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.57-.598-3.75h-.152c-3.196 0-6.1-1.249-8.25-3.286Zm0 13.036h.008v.008H12v-.008Z" />
-      </svg>
-      Zones
+      Rules & Zones
     </button>
   </nav>
 
+  <script src="lib/sweetalert2.js"></script>
+  <script src="lib/confetti.js"></script>
   <script src="popup.js"></script>
 </body>
 
