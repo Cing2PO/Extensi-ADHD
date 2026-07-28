@@ -17,7 +17,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Input / Control Elements
   const protectionToggle = document.getElementById('protection-toggle');
-  const taskInput = document.getElementById('task-input');
   const sensitivitySlider = document.getElementById('sensitivity-slider');
   const sliderValLabel = document.getElementById('slider-val-label');
 
@@ -37,25 +36,21 @@ document.addEventListener('DOMContentLoaded', () => {
   const magicCongratsPanel = document.getElementById('magic-congrats-panel');
 
   const magicTaskInput = document.getElementById('magic-task-input');
-  const magicTimeInput = document.getElementById('magic-time-input');
   const btnNegotiate = document.getElementById('btn-negotiate');
   const magicStepsList = document.getElementById('magic-steps-list');
-  const magicProgressBar = document.getElementById('magic-progress-bar');
-  const magicProgressLabel = document.getElementById('magic-progress-label');
+  const magicStepCountLabel = document.getElementById('magic-step-count-label');
+  const btnAddMagicItem = document.getElementById('btn-add-magic-item');
   const btnResetMagic = document.getElementById('btn-reset-magic');
   const btnNewMagic = document.getElementById('btn-new-magic');
 
   // Focus Dashboard Elements
-  const focusInputContainer = document.getElementById('focus-input-container');
   const focusActiveContainer = document.getElementById('focus-active-container');
-  const focusStepBadge = document.getElementById('focus-step-badge');
-  const focusMasterDisplay = document.getElementById('focus-master-display');
+  const focusEmptyState = document.getElementById('focus-empty-state');
+  const focusActiveContent = document.getElementById('focus-active-content');
   const focusTaskDisplay = document.getElementById('focus-task-display');
-  const focusMagicAddon = document.getElementById('focus-magic-addon');
-  const focusMagicBar = document.getElementById('focus-magic-bar');
-  const focusMagicPercent = document.getElementById('focus-magic-percent');
   const btnDashboardComplete = document.getElementById('btn-dashboard-complete');
   const btnDashboardCancel = document.getElementById('btn-dashboard-cancel');
+  const btnGoToMagic = document.getElementById('btn-go-to-magic');
 
   let magicTaskState = null;
 
@@ -153,22 +148,14 @@ document.addEventListener('DOMContentLoaded', () => {
         moonIcon.classList.add('hidden');
       }
 
-      // 0. Restore Magic To-Do State (Pre-populate with mock if empty)
+// 0. Restore Magic To-Do State
       if (!items.magicTaskState) {
-        magicTaskState = {
-          taskName: "Menulis Laporan Akhir Proyek",
-          totalMinutes: 45,
-          steps: [
-            { text: "Persiapkan dokumen referensi & buka editor word", minutes: 5, checked: false },
-            { text: "Bikin kerangka outline/konsep kasar isi dari Laporan Akhir", minutes: 10, checked: false },
-            { text: "Fokus penuh kerjakan inti tugas Laporan (pasang Brown Noise!)", minutes: 25, checked: false },
-            { text: "Merapikan hasil kerja akhir dan ekspor ke PDF", minutes: 5, checked: false }
-          ],
-          completed: false
-        };
-        chrome.storage.local.set({ magicTaskState: magicTaskState });
+        magicTaskState = null;
       } else {
         magicTaskState = items.magicTaskState;
+        if (magicTaskState.steps && magicTaskState.currentStepIndex == null) {
+          magicTaskState.currentStepIndex = 0;
+        }
       }
       renderMagicStateUI();
 
@@ -178,7 +165,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // 2. Current Task Input & Active Dashboard Rendering
       const currentTaskText = items.currentTask || '';
-      taskInput.value = currentTaskText;
       renderFocusTab(currentTaskText);
 
       // 3. Sensitivity Slider
@@ -218,22 +204,6 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  taskInput.addEventListener('input', () => {
-    chrome.storage.local.set({ currentTask: taskInput.value }, () => {
-      console.log(`[Storage Sync] Task prompt updated: "${taskInput.value}"`);
-    });
-  });
-
-  taskInput.addEventListener('keydown', (e) => {
-    if (e.key === 'Enter') {
-      const val = taskInput.value.trim();
-      if (val) {
-        chrome.storage.local.set({ currentTask: val }, () => {
-          renderFocusTab(val);
-        });
-      }
-    }
-  });
 
   sensitivitySlider.addEventListener('input', () => {
     const step = parseInt(sensitivitySlider.value, 10);
@@ -482,7 +452,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // --- LOGIC PART 6: MAGIC TO-DO CONTROLLER ---
 
   function renderMagicStateUI() {
-    // Hide all panels by default
     magicInputPanel.classList.add('hidden');
     magicLoadingPanel.classList.add('hidden');
     magicResultsPanel.classList.add('hidden');
@@ -498,31 +467,50 @@ document.addEventListener('DOMContentLoaded', () => {
     } else {
       magicResultsPanel.classList.remove('hidden');
       renderMagicSteps();
-      updateMagicProgress();
     }
   }
 
-  function generateMockSteps(taskText, minutes) {
-    const cleanTask = taskText.trim() || "tugas Anda";
-    const totalMin = parseInt(minutes, 10) || 30;
+  function getMagicStepIndexForTask(taskText) {
+    if (!magicTaskState || !magicTaskState.steps?.length) return -1;
+    if (typeof magicTaskState.currentStepIndex === 'number' && magicTaskState.steps[magicTaskState.currentStepIndex]?.text === taskText) {
+      return magicTaskState.currentStepIndex;
+    }
+    const matchIndex = magicTaskState.steps.findIndex(step => step.text === taskText);
+    if (matchIndex !== -1) return matchIndex;
+    return typeof magicTaskState.currentStepIndex === 'number' ? magicTaskState.currentStepIndex : 0;
+  }
 
-    // Proportional breakdown based on total minutes
-    const t1 = Math.max(1, Math.round(totalMin * 0.1));
-    const t2 = Math.max(2, Math.round(totalMin * 0.25));
-    const t3 = Math.max(5, Math.round(totalMin * 0.5));
-    const t4 = Math.max(1, totalMin - (t1 + t2 + t3));
+  function advanceMagicStep(currentTaskText) {
+    if (!magicTaskState || !magicTaskState.steps?.length) return '';
+    const currentIndex = getMagicStepIndexForTask(currentTaskText);
+    const nextIndex = currentIndex + 1;
+
+    if (nextIndex < magicTaskState.steps.length) {
+      magicTaskState.currentStepIndex = nextIndex;
+      magicTaskState.completed = false;
+      chrome.storage.local.set({ magicTaskState });
+      return magicTaskState.steps[nextIndex].text;
+    }
+
+    magicTaskState.currentStepIndex = magicTaskState.steps.length;
+    magicTaskState.completed = true;
+    chrome.storage.local.set({ magicTaskState });
+    return '';
+  }
+
+  function generateMockSteps(taskText) {
+    const cleanTask = taskText.trim() || "tugas Anda";
 
     return [
-      { text: `Persiapkan ruang kerja & buka aplikasi penunjang untuk "${cleanTask}"`, minutes: t1, checked: false },
-      { text: `Bikin kerangka outline/konsep kasar isi dari "${cleanTask}"`, minutes: t2, checked: false },
-      { text: `Fokus penuh kerjakan inti tugas "${cleanTask}" (pasang Brown Noise!)`, minutes: t3, checked: false },
-      { text: `Merapikan hasil kerja akhir "${cleanTask}" dan simpan progress Anda`, minutes: t4, checked: false }
+      { text: `Persiapkan ruang kerja & buka aplikasi penunjang untuk "${cleanTask}"`, minutes: 5 },
+      { text: `Bikin kerangka outline/konsep kasar isi dari "${cleanTask}"`, minutes: 10 },
+      { text: `Fokus penuh kerjakan inti tugas "${cleanTask}" (pasang Brown Noise!)`, minutes: 15 },
+      { text: `Merapikan hasil kerja akhir "${cleanTask}" dan simpan progress Anda`, minutes: 5 }
     ];
   }
 
   btnNegotiate.addEventListener('click', () => {
     const taskText = magicTaskInput.value.trim();
-    const timeVal = magicTimeInput.value;
 
     if (!taskText) {
       Swal.fire({
@@ -535,35 +523,24 @@ document.addEventListener('DOMContentLoaded', () => {
       });
       return;
     }
-    if (!timeVal || parseInt(timeVal, 10) <= 0) {
-      Swal.fire({
-        title: 'Waktu Tidak Valid',
-        text: 'Masukkan estimasi waktu minimal 5 menit!',
-        icon: 'warning',
-        ...getSwalTheme()
-      });
-      return;
-    }
 
-    // Hide inputs, show spinner
     magicInputPanel.classList.add('hidden');
     magicLoadingPanel.classList.remove('hidden');
 
-    // Simulate AI negotiations with a premium loader experience
     setTimeout(() => {
-      const generatedSteps = generateMockSteps(taskText, timeVal);
+      const generatedSteps = generateMockSteps(taskText);
       magicTaskState = {
         taskName: taskText,
-        totalMinutes: parseInt(timeVal, 10),
         steps: generatedSteps,
+        currentStepIndex: 0,
         completed: false
       };
 
-      chrome.storage.local.set({ magicTaskState: magicTaskState }, () => {
+      chrome.storage.local.set({ magicTaskState: magicTaskState, currentTask: generatedSteps[0].text }, () => {
         magicLoadingPanel.classList.add('hidden');
         renderMagicStateUI();
       });
-    }, 1500); // 1.5 seconds loading state
+    }, 1500);
   });
 
   function renderMagicSteps() {
@@ -573,95 +550,81 @@ document.addEventListener('DOMContentLoaded', () => {
     magicTaskState.steps.forEach((step, index) => {
       const li = document.createElement('li');
       li.className = 'magic-step-item';
-      if (step.checked) {
-        li.classList.add('checked');
-      }
 
-      li.innerHTML = `
-        <input type="checkbox" class="magic-step-cb" ${step.checked ? 'checked' : ''}>
-        <span class="magic-step-text">${step.text} (${step.minutes}m)</span>
-        <button class="btn-sync-focus" title="Set sebagai fokus aktif sekarang">Fokus</button>
-      `;
+      const content = document.createElement('div');
+      content.className = 'magic-step-content';
 
-      // Checkbox event
-      const cb = li.querySelector('.magic-step-cb');
-      cb.addEventListener('change', () => {
-        magicTaskState.steps[index].checked = cb.checked;
-        if (cb.checked) {
-          li.classList.add('checked');
-          // Dopaminergic trigger: confetti!
-          if (typeof confetti === 'function') {
-            confetti({
-              particleCount: 30,
-              spread: 40,
-              origin: { y: 0.85 }
-            });
-          }
-        } else {
-          li.classList.remove('checked');
-        }
+      const textarea = document.createElement('textarea');
+      textarea.className = 'magic-step-textarea';
+      textarea.spellcheck = false;
+      textarea.value = step.text;
 
-        // Verify if all steps are completed
-        const allCompleted = magicTaskState.steps.every(s => s.checked);
-        if (allCompleted) {
-          magicTaskState.completed = true;
-          if (typeof confetti === 'function') {
-            confetti({
-              particleCount: 150,
-              spread: 80,
-              origin: { y: 0.7 }
-            });
-          }
-        }
+      const meta = document.createElement('span');
+      meta.className = 'magic-step-meta';
+      meta.textContent = `${step.minutes}m`;
 
+      content.appendChild(textarea);
+      content.appendChild(meta);
+
+      const deleteBtn = document.createElement('button');
+      deleteBtn.type = 'button';
+      deleteBtn.className = 'btn-delete-step';
+      deleteBtn.title = 'Hapus to-do ini';
+      deleteBtn.textContent = '×';
+
+      const syncBtn = document.createElement('button');
+      syncBtn.type = 'button';
+      syncBtn.className = 'btn-sync-focus';
+      syncBtn.title = 'Set sebagai fokus aktif sekarang';
+      syncBtn.textContent = 'Fokus';
+
+      textarea.addEventListener('input', () => {
+        magicTaskState.steps[index].text = textarea.value;
+        chrome.storage.local.set({ magicTaskState: magicTaskState });
+      });
+
+      deleteBtn.addEventListener('click', () => {
+        magicTaskState.steps.splice(index, 1);
         chrome.storage.local.set({ magicTaskState: magicTaskState }, () => {
-          updateMagicProgress();
-          if (allCompleted) {
-            renderMagicStateUI();
-          }
+          renderMagicStateUI();
         });
       });
 
-      // Focus synchronization event
-      const syncBtn = li.querySelector('.btn-sync-focus');
       syncBtn.addEventListener('click', () => {
-        // Sync active step to Current Task in chrome storage and UI
-        const stepFocusText = `[Milestone ${index + 1}] ${step.text}`;
-        chrome.storage.local.set({ currentTask: stepFocusText }, () => {
-          taskInput.value = stepFocusText;
+        const stepFocusText = step.text;
+        magicTaskState.currentStepIndex = index;
+        magicTaskState.completed = false;
+        chrome.storage.local.set({ magicTaskState: magicTaskState, currentTask: stepFocusText }, () => {
           console.log(`[Magic To-Do Sync] Sync active focus to: "${stepFocusText}"`);
-          
-          // Micro animation feedback
-          syncBtn.textContent = "Synced! ✓";
-          syncBtn.style.color = "#10b981";
-          syncBtn.style.borderColor = "#10b981";
-          
+          renderFocusTab(stepFocusText);
+          syncBtn.textContent = 'Synced! ✓';
+          syncBtn.style.color = '#10b981';
+          syncBtn.style.borderColor = '#10b981';
           setTimeout(() => {
-            syncBtn.textContent = "Fokus";
-            syncBtn.style.color = "";
-            syncBtn.style.borderColor = "";
+            syncBtn.textContent = 'Fokus';
+            syncBtn.style.color = '';
+            syncBtn.style.borderColor = '';
           }, 1500);
         });
       });
 
+      li.appendChild(content);
+      li.appendChild(deleteBtn);
+      li.appendChild(syncBtn);
       magicStepsList.appendChild(li);
     });
+    magicStepCountLabel.textContent = `${magicTaskState.steps.length} item`;
   }
 
   function updateMagicProgress() {
     if (!magicTaskState || !magicTaskState.steps) return;
     const totalSteps = magicTaskState.steps.length;
-    const completedSteps = magicTaskState.steps.filter(s => s.checked).length;
-    const percentage = Math.round((completedSteps / totalSteps) * 100);
-
-    magicProgressBar.style.width = `${percentage}%`;
-    magicProgressLabel.textContent = `${percentage}% Selesai`;
+    magicStepCountLabel.textContent = `${totalSteps} item`;
   }
 
   function resetMagicState() {
     magicTaskState = null;
     magicTaskInput.value = '';
-    magicTimeInput.value = '';
     chrome.storage.local.set({ magicTaskState: null }, () => {
       renderMagicStateUI();
     });
@@ -670,7 +633,7 @@ document.addEventListener('DOMContentLoaded', () => {
   btnResetMagic.addEventListener('click', () => {
     Swal.fire({
       title: 'Reset Tugas?',
-      text: 'Progress langkah mikro Anda saat ini akan dihapus!',
+      text: 'Daftar to-do Anda akan dihapus.',
       icon: 'warning',
       showCancelButton: true,
       confirmButtonText: 'Ya, reset!',
@@ -681,7 +644,7 @@ document.addEventListener('DOMContentLoaded', () => {
         resetMagicState();
         Swal.fire({
           title: 'Direset!',
-          text: 'Tugas Anda telah dibersihkan.',
+          text: 'Daftar to-do baru dapat dibuat.',
           icon: 'success',
           timer: 1500,
           showConfirmButton: false,
@@ -693,20 +656,24 @@ document.addEventListener('DOMContentLoaded', () => {
   
   btnNewMagic.addEventListener('click', resetMagicState);
 
+  btnAddMagicItem.addEventListener('click', () => {
+    if (!magicTaskState) return;
+    magicTaskState.steps.push({ text: 'New To-Do item', minutes: 5 });
+    chrome.storage.local.set({ magicTaskState: magicTaskState }, () => {
+      renderMagicStateUI();
+    });
+  });
+
   // Sync back when currentTask or magicTaskState is changed
   chrome.storage.onChanged.addListener((changes, namespace) => {
     if (namespace === 'local') {
       if (changes.currentTask) {
         const newVal = changes.currentTask.newValue || '';
-        taskInput.value = newVal;
         renderFocusTab(newVal);
       }
       if (changes.magicTaskState) {
         magicTaskState = changes.magicTaskState.newValue || null;
         renderMagicStateUI();
-        if (!focusActiveContainer.classList.contains('hidden')) {
-          renderFocusTab(taskInput.value);
-        }
       }
     }
   });
@@ -715,130 +682,68 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function renderFocusTab(currentTaskText) {
     if (!currentTaskText) {
-      focusInputContainer.classList.remove('hidden');
-      focusActiveContainer.classList.add('hidden');
+      focusEmptyState.classList.remove('hidden');
+      focusActiveContent.classList.add('hidden');
+      updateFocusProgress(0, 0);
       return;
     }
 
-    focusInputContainer.classList.add('hidden'); // Ensure input is hidden
-    focusActiveContainer.classList.remove('hidden');
+    focusEmptyState.classList.add('hidden');
+    focusActiveContent.classList.remove('hidden');
+    focusTaskDisplay.textContent = currentTaskText;
+    updateFocusProgressFromState(currentTaskText);
+  }
 
-    // Check if the current task belongs to the active Magic To-Do task
-    const isMilestone = currentTaskText.startsWith('[Milestone ') || (magicTaskState && currentTaskText.includes(magicTaskState.taskName));
+  function updateFocusProgress(completedCount, totalCount) {
+    const fill = document.getElementById('focus-progress-fill');
+    const label = document.getElementById('focus-progress-label');
+    const percent = totalCount === 0 ? 0 : Math.round((completedCount / totalCount) * 100);
+    if (fill) fill.style.width = `${percent}%`;
+    if (label) label.textContent = `${completedCount} / ${totalCount}`;
+  }
 
-    if (isMilestone && magicTaskState && magicTaskState.steps) {
-      // Show milestone badges & progress bar
-      focusStepBadge.classList.remove('hidden');
-      focusMagicAddon.classList.remove('hidden');
-      focusMasterDisplay.textContent = magicTaskState.taskName;
-
-      // Parse step index from currentTaskText, e.g. "[Milestone X]"
-      let activeIndex = -1;
-      const match = currentTaskText.match(/^\[Milestone (\d+)\]/);
-      if (match) {
-        activeIndex = parseInt(match[1], 10) - 1;
-      } else {
-        // Fallback to first unchecked step
-        activeIndex = magicTaskState.steps.findIndex(s => !s.checked);
-      }
-
-      // If activeIndex is valid, show details of that specific step
-      if (activeIndex >= 0 && activeIndex < magicTaskState.steps.length) {
-        const step = magicTaskState.steps[activeIndex];
-        focusTaskDisplay.textContent = `${step.text} (${step.minutes}m)`;
-        focusStepBadge.textContent = `Langkah ${activeIndex + 1} dari ${magicTaskState.steps.length}`;
-      } else {
-        // Fallback if index out of bounds
-        focusTaskDisplay.textContent = currentTaskText;
-        focusStepBadge.classList.add('hidden');
-      }
-
-      // Calculate and display progress bar
-      const totalSteps = magicTaskState.steps.length;
-      const completedSteps = magicTaskState.steps.filter(s => s.checked).length;
-      const percentage = Math.round((completedSteps / totalSteps) * 100);
-      focusMagicBar.style.width = `${percentage}%`;
-      focusMagicPercent.textContent = `${percentage}%`;
-    } else {
-      // Normal manual task
-      focusStepBadge.classList.add('hidden');
-      focusMagicAddon.classList.add('hidden');
-      focusMasterDisplay.textContent = "FOKUS MANDIRI";
-      focusTaskDisplay.textContent = currentTaskText;
+  function updateFocusProgressFromState(currentTaskText) {
+    if (!magicTaskState || !magicTaskState.steps?.length) {
+      updateFocusProgress(0, 0);
+      return;
     }
+
+    const total = magicTaskState.steps.length;
+    const currentIndex = getMagicStepIndexForTask(currentTaskText);
+    const completed = currentIndex < 0 ? 0 : currentIndex + 1;
+    updateFocusProgress(completed, total);
   }
 
   // Dashboard Button Handlers
   btnDashboardComplete.addEventListener('click', () => {
-    const currentTaskText = taskInput.value;
-    const isMilestone = currentTaskText.startsWith('[Milestone ') || (magicTaskState && currentTaskText.includes(magicTaskState.taskName));
+    chrome.storage.local.get(['currentTask', 'refocusCount'], (items) => {
+      const currentCount = items.refocusCount || 0;
+      const nextTaskText = advanceMagicStep(items.currentTask || '');
+      const storagePayload = { refocusCount: currentCount + 1, currentTask: nextTaskText };
 
-    if (isMilestone && magicTaskState && magicTaskState.steps) {
-      // Parse active index
-      let activeIndex = -1;
-      const match = currentTaskText.match(/^\[Milestone (\d+)\]/);
-      if (match) {
-        activeIndex = parseInt(match[1], 10) - 1;
-      } else {
-        activeIndex = magicTaskState.steps.findIndex(s => !s.checked);
-      }
-
-      if (activeIndex >= 0 && activeIndex < magicTaskState.steps.length) {
-        // Mark current step as checked
-        magicTaskState.steps[activeIndex].checked = true;
-
-        // Check if all steps are completed
-        const allCompleted = magicTaskState.steps.every(s => s.checked);
-        if (allCompleted) {
-          magicTaskState.completed = true;
-          
-          // Clear currentTask focus, update magic state, fire big confetti
-          chrome.storage.local.set({ currentTask: '', magicTaskState: magicTaskState }, () => {
-            taskInput.value = '';
-            renderFocusTab('');
-            if (typeof confetti === 'function') {
-              confetti({ particleCount: 150, spread: 80, origin: { y: 0.6 } });
-            }
-          });
-        } else {
-          // Advance to next unchecked step
-          const nextIndex = magicTaskState.steps.findIndex((s, idx) => idx > activeIndex && !s.checked);
-          const finalNextIndex = nextIndex !== -1 ? nextIndex : magicTaskState.steps.findIndex(s => !s.checked);
-          
-          const nextStep = magicTaskState.steps[finalNextIndex];
-          const nextTaskText = `[Milestone ${finalNextIndex + 1}] ${nextStep.text}`;
-          
-          chrome.storage.local.set({ currentTask: nextTaskText, magicTaskState: magicTaskState }, () => {
-            taskInput.value = nextTaskText;
-            renderFocusTab(nextTaskText);
-            if (typeof confetti === 'function') {
-              confetti({ particleCount: 40, spread: 45, origin: { y: 0.8 } });
-            }
-          });
+      chrome.storage.local.set(storagePayload, () => {
+        refocusCounter.textContent = currentCount + 1;
+        renderFocusTab(nextTaskText);
+        if (typeof confetti === 'function') {
+          confetti({ particleCount: 50, spread: 50, origin: { y: 0.7 } });
         }
-      }
-    } else {
-      // Completed manual task
-      chrome.storage.local.get(['refocusCount'], (items) => {
-        const currentCount = items.refocusCount || 0;
-        chrome.storage.local.set({ refocusCount: currentCount + 1, currentTask: '' }, () => {
-          refocusCounter.textContent = currentCount + 1;
-          taskInput.value = '';
-          renderFocusTab('');
-          if (typeof confetti === 'function') {
-            confetti({ particleCount: 50, spread: 50, origin: { y: 0.7 } });
-          }
-        });
       });
-    }
+    });
   });
 
   btnDashboardCancel.addEventListener('click', () => {
     chrome.storage.local.set({ currentTask: '' }, () => {
-      taskInput.value = '';
       renderFocusTab('');
-      console.log("[Focus Dashboard] Focus cancelled.");
+      console.log("[Focus Dashboard] Focus skipped.");
     });
+  });
+
+  btnGoToMagic.addEventListener('click', () => {
+    document.querySelector('.tab-btn.active')?.classList.remove('active');
+    const magicTab = document.querySelector('.tab-btn[data-page="tab-magic-page"]');
+    magicTab?.classList.add('active');
+    document.querySelectorAll('.subpage').forEach(page => page.classList.add('hidden'));
+    document.getElementById('tab-magic-page')?.classList.remove('hidden');
   });
 
   // Launch initial settings load
