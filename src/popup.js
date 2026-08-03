@@ -55,6 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const floatingPomodoroToggle = document.getElementById('floating-pomodoro-toggle');
   const btnStartQuickPomodoro = document.getElementById('btn-start-quick-pomodoro');
   const btnStartPomodoroRules = document.getElementById('btn-start-pomodoro-rules');
+  const btnStartMagicFocus = document.getElementById('btn-start-magic-focus');
 
   // Focus Dashboard Elements
   const focusActiveContainer = document.getElementById('focus-active-container');
@@ -719,8 +720,24 @@ document.addEventListener('DOMContentLoaded', () => {
         taskName: taskText,
         steps: generatedSteps,
         currentStepIndex: 0,
-        completed: false
+        completed: false,
+        totalMinutes: totalMinutes
       };
+
+      chrome.storage.local.set({
+        magicTaskState: magicTaskState
+      }, () => {
+        magicLoadingPanel.classList.add('hidden');
+        renderMagicStateUI();
+      });
+    }, 1500);
+  });
+
+  if (btnStartMagicFocus) {
+    btnStartMagicFocus.addEventListener('click', () => {
+      if (!magicTaskState || !magicTaskState.steps?.length) return;
+      const firstTaskText = magicTaskState.steps[magicTaskState.currentStepIndex || 0]?.text || magicTaskState.steps[0].text;
+      const totalMinutes = magicTaskState.totalMinutes || Number(magicDurationInput.value) || 60;
 
       const plan = buildPomodoroPlan(totalMinutes);
       const firstBlockMin = plan[0]?.minutes || 25;
@@ -733,16 +750,39 @@ document.addEventListener('DOMContentLoaded', () => {
         phase: plan[0]?.type || 'work',
         targetTimestamp: Date.now() + (firstBlockMin * 60 * 1000),
         pausedRemainingSeconds: null,
-        showFloatingWidget: floatingPomodoroToggle ? floatingPomodoroToggle.checked : true
+        showFloatingWidget: true
       };
 
-      chrome.storage.local.set({ magicTaskState: magicTaskState, currentTask: generatedSteps[0].text, pomodoroSession: pomodoroSession }, () => {
-        magicLoadingPanel.classList.add('hidden');
-        renderMagicStateUI();
+      if (floatingPomodoroToggle) {
+        floatingPomodoroToggle.checked = true;
+      }
+
+      chrome.storage.local.set({
+        currentTask: firstTaskText,
+        pomodoroSession: pomodoroSession,
+        showFloatingWidget: true
+      }, () => {
+        renderFocusTab(firstTaskText);
         startPomodoroTimer();
+
+        // Switch active tab to Focus Page
+        document.querySelector('.tab-btn.active')?.classList.remove('active');
+        const focusTabBtn = document.querySelector('.tab-btn[data-page="tab-focus-page"]');
+        focusTabBtn?.classList.add('active');
+        document.querySelectorAll('.subpage').forEach(page => page.classList.add('hidden'));
+        document.getElementById('tab-focus-page')?.classList.remove('hidden');
+
+        Swal.fire({
+          title: 'Fokus Dimulai! 🚀',
+          text: `Target: "${firstTaskText}". Floating Timer sekarang aktif di halaman web Anda!`,
+          icon: 'success',
+          timer: 1800,
+          showConfirmButton: false,
+          ...getSwalTheme()
+        });
       });
-    }, 1500);
-  });
+    });
+  }
 
   function renderMagicSteps() {
     magicStepsList.innerHTML = '';
@@ -997,13 +1037,53 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Dashboard Button Handlers
   btnDashboardComplete.addEventListener('click', () => {
-    chrome.storage.local.get(['currentTask', 'refocusCount'], (items) => {
-      const currentCount = items.refocusCount || 0;
-      const nextTaskText = advanceMagicStep(items.currentTask || '');
-      const storagePayload = { refocusCount: currentCount + 1, currentTask: nextTaskText };
+    chrome.storage.local.get(['magicTaskState', 'pomodoroSession', 'refocusCount', 'pomodoroWorkMinutes', 'pomodoroBreakMinutes', 'currentTask'], (items) => {
+      const state = items.magicTaskState;
+      let session = items.pomodoroSession;
+      const count = items.refocusCount || 0;
+
+      let nextTaskText = '';
+      let nextDurationMinutes = items.pomodoroWorkMinutes || 25;
+      let isFinishedAll = false;
+
+      if (state && state.steps && state.steps.length) {
+        const curIdx = typeof state.currentStepIndex === 'number' ? state.currentStepIndex : 0;
+        const nxtIdx = curIdx + 1;
+
+        if (nxtIdx < state.steps.length) {
+          state.currentStepIndex = nxtIdx;
+          nextTaskText = state.steps[nxtIdx].text;
+          nextDurationMinutes = state.steps[nxtIdx].minutes || items.pomodoroWorkMinutes || 25;
+        } else {
+          state.completed = true;
+          state.currentStepIndex = state.steps.length;
+          isFinishedAll = true;
+          nextTaskText = '';
+        }
+      }
+
+      if (session && session.isActive) {
+        if (isFinishedAll) {
+          const breakM = items.pomodoroBreakMinutes || 5;
+          session.phase = 'break';
+          session.targetTimestamp = session.isRunning ? (Date.now() + breakM * 60 * 1000) : null;
+          session.pausedRemainingSeconds = session.isRunning ? null : (breakM * 60);
+        } else {
+          session.phase = 'work';
+          session.targetTimestamp = session.isRunning ? (Date.now() + nextDurationMinutes * 60 * 1000) : null;
+          session.pausedRemainingSeconds = session.isRunning ? null : (nextDurationMinutes * 60);
+        }
+      }
+
+      const storagePayload = {
+        magicTaskState: state,
+        refocusCount: count + 1,
+        currentTask: nextTaskText,
+        pomodoroSession: session
+      };
 
       chrome.storage.local.set(storagePayload, () => {
-        if (refocusCounter) refocusCounter.textContent = currentCount + 1;
+        if (refocusCounter) refocusCounter.textContent = count + 1;
         renderFocusTab(nextTaskText);
         if (typeof confetti === 'function') {
           confetti({ particleCount: 50, spread: 50, origin: { y: 0.7 } });

@@ -392,7 +392,7 @@
     if (changes.blacklist || changes.isProtectionActive || changes.sensitivity || changes.currentTask || changes.pomodoroSession) {
       checkAndSetEngine();
     }
-    if (changes.pomodoroSession || changes.showFloatingWidget) {
+    if (changes.pomodoroSession || changes.showFloatingWidget || changes.isProtectionActive) {
       renderPomodoroFloatingState();
     }
   }
@@ -634,12 +634,13 @@
   function renderPomodoroFloatingState() {
     if (!isContextValid()) return;
 
-    chrome.storage.local.get(['pomodoroSession', 'showFloatingWidget', 'currentTask'], (items) => {
+    chrome.storage.local.get(['pomodoroSession', 'showFloatingWidget', 'currentTask', 'isProtectionActive'], (items) => {
       if (chrome.runtime.lastError) return;
+      const isProtectionActive = items.isProtectionActive !== false;
       const session = items.pomodoroSession;
       const showWidget = items.showFloatingWidget !== false;
 
-      const shouldDisplay = showWidget && !isPomoHiddenByUser && session && session.isActive;
+      const shouldDisplay = isProtectionActive && showWidget && !isPomoHiddenByUser && session && session.isActive;
 
       if (!shouldDisplay) {
         if (pomoRootContainer) {
@@ -771,29 +772,52 @@
 
   function handlePomoDoneClick() {
     if (!isContextValid()) return;
-    chrome.storage.local.get(['magicTaskState', 'currentTask', 'refocusCount'], (items) => {
+    chrome.storage.local.get(['magicTaskState', 'pomodoroSession', 'refocusCount', 'pomodoroWorkMinutes', 'pomodoroBreakMinutes', 'currentTask'], (items) => {
       const state = items.magicTaskState;
+      let session = items.pomodoroSession;
       const count = items.refocusCount || 0;
 
-      let nextTask = '';
+      let nextTaskText = '';
+      let nextDurationMinutes = items.pomodoroWorkMinutes || 25;
+      let isFinishedAll = false;
+
       if (state && state.steps && state.steps.length) {
-        const curIdx = state.currentStepIndex || 0;
+        const curIdx = typeof state.currentStepIndex === 'number' ? state.currentStepIndex : 0;
         const nxtIdx = curIdx + 1;
+
         if (nxtIdx < state.steps.length) {
           state.currentStepIndex = nxtIdx;
-          nextTask = state.steps[nxtIdx].text;
+          nextTaskText = state.steps[nxtIdx].text;
+          nextDurationMinutes = state.steps[nxtIdx].minutes || items.pomodoroWorkMinutes || 25;
         } else {
           state.completed = true;
           state.currentStepIndex = state.steps.length;
+          isFinishedAll = true;
+          nextTaskText = '';
+        }
+      }
+
+      if (session && session.isActive) {
+        if (isFinishedAll) {
+          const breakM = items.pomodoroBreakMinutes || 5;
+          session.phase = 'break';
+          session.targetTimestamp = session.isRunning ? (Date.now() + breakM * 60 * 1000) : null;
+          session.pausedRemainingSeconds = session.isRunning ? null : (breakM * 60);
+        } else {
+          session.phase = 'work';
+          session.targetTimestamp = session.isRunning ? (Date.now() + nextDurationMinutes * 60 * 1000) : null;
+          session.pausedRemainingSeconds = session.isRunning ? null : (nextDurationMinutes * 60);
         }
       }
 
       chrome.storage.local.set({
         magicTaskState: state,
-        currentTask: nextTask,
+        currentTask: nextTaskText,
+        pomodoroSession: session,
         refocusCount: count + 1
       }, () => {
         refreshTaskTextInModal();
+        renderPomodoroFloatingState();
       });
     });
   }
