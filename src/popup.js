@@ -36,12 +36,22 @@ document.addEventListener('DOMContentLoaded', () => {
   const magicCongratsPanel = document.getElementById('magic-congrats-panel');
 
   const magicTaskInput = document.getElementById('magic-task-input');
+  const magicDurationInput = document.getElementById('magic-duration-input');
   const btnNegotiate = document.getElementById('btn-negotiate');
   const magicStepsList = document.getElementById('magic-steps-list');
   const magicStepCountLabel = document.getElementById('magic-step-count-label');
   const btnAddMagicItem = document.getElementById('btn-add-magic-item');
   const btnResetMagic = document.getElementById('btn-reset-magic');
   const btnNewMagic = document.getElementById('btn-new-magic');
+  const magicPomodoroPanel = document.getElementById('magic-pomodoro-panel');
+  const magicPomodoroStatus = document.getElementById('magic-pomodoro-status');
+  const magicPomodoroTimer = document.getElementById('magic-pomodoro-timer');
+  const btnPausePomodoro = document.getElementById('btn-pause-pomodoro');
+  const btnResetPomodoro = document.getElementById('btn-reset-pomodoro');
+
+  // Pomodoro Settings Inputs (in Rules & Zones page)
+  const pomodoroWorkInput = document.getElementById('pomodoro-work-input');
+  const pomodoroBreakInput = document.getElementById('pomodoro-break-input');
 
   // Focus Dashboard Elements
   const focusActiveContainer = document.getElementById('focus-active-container');
@@ -53,6 +63,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const btnGoToMagic = document.getElementById('btn-go-to-magic');
 
   let magicTaskState = null;
+  let pomodoroSession = null;
+  let pomodoroTimerInterval = null;
 
   // Local state cache
   let blacklist = [];
@@ -132,7 +144,10 @@ document.addEventListener('DOMContentLoaded', () => {
       'blacklist',
       'refocusCount',
       'magicTaskState',
-      'theme'
+      'pomodoroSession',
+      'theme',
+      'pomodoroWorkMinutes',
+      'pomodoroBreakMinutes'
     ], (items) => {
       if (chrome.runtime.lastError) return;
 
@@ -157,7 +172,15 @@ document.addEventListener('DOMContentLoaded', () => {
           magicTaskState.currentStepIndex = 0;
         }
       }
+
+      if (items.pomodoroSession) {
+        pomodoroSession = items.pomodoroSession;
+      } else {
+        pomodoroSession = null;
+      }
+
       renderMagicStateUI();
+      startPomodoroTimer();
 
       // 1. Protection Toggle
       const isProtectionActive = items.isProtectionActive !== false;
@@ -190,6 +213,12 @@ document.addEventListener('DOMContentLoaded', () => {
       // 5. Positive Analytics Counter
       refocusCounter.textContent = items.refocusCount || 0;
 
+      // 6. Pomodoro Settings
+      const savedWorkMin = items.pomodoroWorkMinutes || 25;
+      const savedBreakMin = items.pomodoroBreakMinutes || 5;
+      pomodoroWorkInput.value = savedWorkMin;
+      pomodoroBreakInput.value = savedBreakMin;
+
       // Render zones and check tab domain
       renderBlacklistArea();
       detectActiveTabDomain();
@@ -202,6 +231,20 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.set({ isProtectionActive: protectionToggle.checked }, () => {
       console.log(`[Storage Sync] Protection state toggled: ${protectionToggle.checked}`);
     });
+  });
+
+
+  // --- Pomodoro Settings Auto-Save ---
+  pomodoroWorkInput.addEventListener('change', () => {
+    const val = Math.max(1, Math.min(90, parseInt(pomodoroWorkInput.value, 10) || 25));
+    pomodoroWorkInput.value = val;
+    chrome.storage.local.set({ pomodoroWorkMinutes: val });
+  });
+
+  pomodoroBreakInput.addEventListener('change', () => {
+    const val = Math.max(1, Math.min(30, parseInt(pomodoroBreakInput.value, 10) || 5));
+    pomodoroBreakInput.value = val;
+    chrome.storage.local.set({ pomodoroBreakMinutes: val });
   });
 
 
@@ -459,14 +502,17 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (!magicTaskState) {
       magicInputPanel.classList.remove('hidden');
+      renderPomodoroPanel();
       return;
     }
 
     if (magicTaskState.completed) {
       magicCongratsPanel.classList.remove('hidden');
+      renderPomodoroPanel();
     } else {
       magicResultsPanel.classList.remove('hidden');
       renderMagicSteps();
+      renderPomodoroPanel();
     }
   }
 
@@ -509,8 +555,119 @@ document.addEventListener('DOMContentLoaded', () => {
     ];
   }
 
+  function buildPomodoroPlan(totalMinutes) {
+    const plan = [];
+    const workMin = Math.max(1, parseInt(pomodoroWorkInput.value, 10) || 25);
+    const breakMin = Math.max(1, parseInt(pomodoroBreakInput.value, 10) || 5);
+    let remaining = Math.max(workMin, Number(totalMinutes) || 60);
+
+    while (remaining > 0) {
+      const workMinutes = Math.min(workMin, remaining);
+      plan.push({ type: 'work', minutes: workMinutes });
+      remaining -= workMinutes;
+
+      if (remaining <= 0) break;
+
+      const breakMinutes = Math.min(breakMin, remaining);
+      if (breakMinutes > 0) {
+        plan.push({ type: 'break', minutes: breakMinutes });
+        remaining -= breakMinutes;
+      }
+    }
+
+    return plan;
+  }
+
+  function formatPomodoroTime(totalSeconds) {
+    const safeSeconds = Math.max(0, Math.floor(totalSeconds));
+    const minutes = String(Math.floor(safeSeconds / 60)).padStart(2, '0');
+    const seconds = String(safeSeconds % 60).padStart(2, '0');
+    return `${minutes}:${seconds}`;
+  }
+
+  function savePomodoroSession() {
+    chrome.storage.local.set({ pomodoroSession: pomodoroSession }, () => {
+      renderPomodoroPanel();
+    });
+  }
+
+  function renderPomodoroPanel() {
+    if (!pomodoroSession || !pomodoroSession.isActive) {
+      magicPomodoroPanel.classList.add('hidden');
+      return;
+    }
+
+    magicPomodoroPanel.classList.remove('hidden');
+
+    const currentBlock = pomodoroSession.plan?.[pomodoroSession.currentIndex] || null;
+    const phaseLabel = pomodoroSession.phase === 'break' ? 'Istirahat' : 'Kerja';
+    const timerText = pomodoroSession.remainingSeconds != null ? formatPomodoroTime(pomodoroSession.remainingSeconds) : '00:00';
+
+    if (magicPomodoroStatus) {
+      magicPomodoroStatus.textContent = `${phaseLabel} • ${currentBlock?.minutes || 0} menit`;
+    }
+
+    if (magicPomodoroTimer) {
+      magicPomodoroTimer.textContent = timerText;
+    }
+
+    if (btnPausePomodoro) {
+      btnPausePomodoro.textContent = pomodoroSession.isRunning ? 'Pause' : 'Lanjut';
+    }
+  }
+
+  function startPomodoroTimer() {
+    if (pomodoroTimerInterval) {
+      clearInterval(pomodoroTimerInterval);
+    }
+
+    pomodoroTimerInterval = setInterval(() => {
+      if (!pomodoroSession || !pomodoroSession.isActive || !pomodoroSession.isRunning) return;
+
+      if (pomodoroSession.remainingSeconds > 0) {
+        pomodoroSession.remainingSeconds -= 1;
+        savePomodoroSession();
+        return;
+      }
+
+      if (pomodoroSession.currentIndex + 1 < (pomodoroSession.plan || []).length) {
+        pomodoroSession.currentIndex += 1;
+        const nextBlock = pomodoroSession.plan[pomodoroSession.currentIndex];
+        pomodoroSession.phase = nextBlock.type;
+        pomodoroSession.remainingSeconds = nextBlock.minutes * 60;
+        savePomodoroSession();
+      } else {
+        pomodoroSession.isActive = false;
+        pomodoroSession.isRunning = false;
+        pomodoroSession.phase = 'done';
+        pomodoroSession.remainingSeconds = 0;
+        savePomodoroSession();
+        Swal.fire({
+          title: 'Pomodoro selesai!',
+          text: 'Sesi fokus Anda telah rampung. Istirahatlah sejenak atau mulai lagi.',
+          icon: 'success',
+          timer: 1800,
+          showConfirmButton: false,
+          ...getSwalTheme()
+        });
+      }
+    }, 1000);
+  }
+
+  function resetPomodoroSession() {
+    if (pomodoroTimerInterval) {
+      clearInterval(pomodoroTimerInterval);
+      pomodoroTimerInterval = null;
+    }
+    pomodoroSession = null;
+    chrome.storage.local.set({ pomodoroSession: null }, () => {
+      renderPomodoroPanel();
+    });
+  }
+
   btnNegotiate.addEventListener('click', () => {
     const taskText = magicTaskInput.value.trim();
+    const totalMinutes = Math.max(15, Number(magicDurationInput.value) || 60);
 
     if (!taskText) {
       Swal.fire({
@@ -536,9 +693,21 @@ document.addEventListener('DOMContentLoaded', () => {
         completed: false
       };
 
-      chrome.storage.local.set({ magicTaskState: magicTaskState, currentTask: generatedSteps[0].text }, () => {
+      const plan = buildPomodoroPlan(totalMinutes);
+      pomodoroSession = {
+        isActive: true,
+        isRunning: true,
+        totalMinutes,
+        plan,
+        currentIndex: 0,
+        phase: plan[0]?.type || 'work',
+        remainingSeconds: (plan[0]?.minutes || 25) * 60
+      };
+
+      chrome.storage.local.set({ magicTaskState: magicTaskState, currentTask: generatedSteps[0].text, pomodoroSession: pomodoroSession }, () => {
         magicLoadingPanel.classList.add('hidden');
         renderMagicStateUI();
+        startPomodoroTimer();
       });
     }, 1500);
   });
@@ -625,7 +794,9 @@ document.addEventListener('DOMContentLoaded', () => {
   function resetMagicState() {
     magicTaskState = null;
     magicTaskInput.value = '';
-    chrome.storage.local.set({ magicTaskState: null }, () => {
+    magicDurationInput.value = '60';
+    chrome.storage.local.set({ magicTaskState: null, pomodoroSession: null, currentTask: '' }, () => {
+      pomodoroSession = null;
       renderMagicStateUI();
     });
   }
@@ -654,7 +825,21 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
   
-  btnNewMagic.addEventListener('click', resetMagicState);
+  btnNewMagic.addEventListener('click', () => {
+    resetPomodoroSession();
+    resetMagicState();
+  });
+
+  btnPausePomodoro.addEventListener('click', () => {
+    if (!pomodoroSession) return;
+    pomodoroSession.isRunning = !pomodoroSession.isRunning;
+    savePomodoroSession();
+    startPomodoroTimer();
+  });
+
+  btnResetPomodoro.addEventListener('click', () => {
+    resetPomodoroSession();
+  });
 
   btnAddMagicItem.addEventListener('click', () => {
     if (!magicTaskState) return;
@@ -674,6 +859,11 @@ document.addEventListener('DOMContentLoaded', () => {
       if (changes.magicTaskState) {
         magicTaskState = changes.magicTaskState.newValue || null;
         renderMagicStateUI();
+      }
+      if (changes.pomodoroSession) {
+        pomodoroSession = changes.pomodoroSession.newValue || null;
+        renderPomodoroPanel();
+        startPomodoroTimer();
       }
     }
   });

@@ -45,6 +45,7 @@
   let isProtectionActive = true;
   let currentTask = "";
   let doomscrollThreshold = 8000;
+  let pomodoroSession = null;
 
   // --- PRIVACY & CONTEXT GUARDRAIL ---
   function isContextValid() {
@@ -180,6 +181,35 @@
     return overlay && overlay.classList.contains('visible');
   }
 
+  // --- FIX 3: Block scroll when overlay is visible ---
+  function blockScroll(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    return false;
+  }
+
+  function enableScrollBlock() {
+    document.addEventListener('wheel', blockScroll, { passive: false, capture: true });
+    document.addEventListener('touchmove', blockScroll, { passive: false, capture: true });
+    document.addEventListener('keydown', blockScrollKeys, { capture: true });
+    document.body.style.overflow = 'hidden';
+  }
+
+  function disableScrollBlock() {
+    document.removeEventListener('wheel', blockScroll, { capture: true });
+    document.removeEventListener('touchmove', blockScroll, { capture: true });
+    document.removeEventListener('keydown', blockScrollKeys, { capture: true });
+    document.body.style.overflow = '';
+  }
+
+  function blockScrollKeys(e) {
+    const scrollKeys = ['ArrowDown', 'ArrowUp', ' ', 'PageDown', 'PageUp', 'Home', 'End'];
+    if (scrollKeys.includes(e.key)) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
+  }
+
   function triggerIntervention() {
     injectOverlay();
 
@@ -192,11 +222,14 @@
       }
     }
 
-    // Trigger animation
+    // Trigger animation and enable scroll block
     setTimeout(() => {
       if (shadowRootNode) {
         const overlay = shadowRootNode.querySelector('.focus-overlay');
-        if (overlay) overlay.classList.add('visible');
+        if (overlay) {
+          overlay.classList.add('visible');
+          enableScrollBlock(); // Block scrolling while overlay is shown
+        }
       }
     }, 50);
 
@@ -226,6 +259,7 @@
         overlay.classList.remove('visible');
       }
     }
+    disableScrollBlock(); // Re-enable scrolling
     distractionScore = 0;
     accumulatedScrollInTick = 0;
     lastInteractionTime = performance.now();
@@ -243,6 +277,7 @@
 
   function handleGetMeOut(e) {
     e.stopPropagation();
+    disableScrollBlock(); // Re-enable scrolling before redirecting
     window.location.href = 'about:blank';
   }
 
@@ -299,21 +334,19 @@
       'blacklist',
       'isProtectionActive',
       'sensitivity',
-      'currentTask'
+      'currentTask',
+      'pomodoroSession'
     ], (items) => {
       if (chrome.runtime.lastError) return;
 
       isProtectionActive = items.isProtectionActive !== false;
       currentTask = items.currentTask || '';
+      pomodoroSession = items.pomodoroSession || null;
 
       const sensitivity = items.sensitivity || 'balanced';
       doomscrollThreshold = SENSITIVITY_MAP[sensitivity] || 8000;
 
-      if (!isProtectionActive) {
-        cleanup();
-        return;
-      }
-
+      // --- FIX 1: Parse blacklist FIRST before using it ---
       let storedList = items.blacklist;
       let blacklist = [];
       if (storedList) {
@@ -328,14 +361,24 @@
         chrome.storage.local.set({ blacklist: DEFAULT_BLACKLIST });
       }
 
-      const currentHost = window.location.hostname;
-
-      // Target matches if domain matches AND domain is set to active (enabled === true)
+      const isPomodoroWorkBlock = !!(pomodoroSession?.isActive && pomodoroSession.isRunning && pomodoroSession.phase === 'work');
       const isBlacklisted = blacklist.some(item =>
-        (currentHost === item.domain || currentHost.endsWith('.' + item.domain)) && item.enabled === true
+        (window.location.hostname === item.domain || window.location.hostname.endsWith('.' + item.domain)) && item.enabled === true
       );
 
-      if (isBlacklisted) {
+      // --- FIX 2: Pomodoro work phase blocks ALL sites, not just blacklist ---
+      // If protection is off, never run. Otherwise:
+      // - If no pomodoro: only block blacklisted sites
+      // - If pomodoro work phase active: block ALL sites (full focus mode)
+      // - If pomodoro break/paused: only block blacklisted sites
+      if (!isProtectionActive) {
+        cleanup();
+        return;
+      }
+
+      const shouldRun = isPomodoroWorkBlock || isBlacklisted;
+
+      if (shouldRun) {
         init();
       } else {
         cleanup();
@@ -346,7 +389,7 @@
   function handleStorageChanges(changes, namespace) {
     if (namespace !== 'local') return;
 
-    if (changes.blacklist || changes.isProtectionActive || changes.sensitivity || changes.currentTask) {
+    if (changes.blacklist || changes.isProtectionActive || changes.sensitivity || changes.currentTask || changes.pomodoroSession) {
       checkAndSetEngine();
     }
   }

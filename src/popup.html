@@ -57,6 +57,18 @@
               <span id="focus-progress-label" class="focus-progress-label">0 / 0</span>
             </div>
 
+            <div id="magic-pomodoro-panel" class="hidden" style="margin-top: 14px; padding: 10px; border: 1px solid rgba(129, 140, 248, 0.16); border-radius: 12px; background: rgba(15, 23, 42, 0.55);">
+              <div style="display: flex; justify-content: space-between; align-items: center; gap: 8px;">
+                <span class="card-label">Pomodoro Session</span>
+                <span id="magic-pomodoro-status" style="font-size: 11px; color: #a78bfa;">Belum dimulai</span>
+              </div>
+              <div id="magic-pomodoro-timer" style="margin-top: 8px; font-size: 24px; font-weight: 700; color: #f8fafc;">00:00</div>
+              <div style="display: flex; gap: 8px; margin-top: 8px;">
+                <button id="btn-pause-pomodoro" class="btn-quick-toggle is-allowed" style="flex: 1; padding: 6px;">Pause</button>
+                <button id="btn-reset-pomodoro" class="btn-quick-toggle is-restricted" style="flex: 1; padding: 6px;">Stop</button>
+              </div>
+            </div>
+
             <div style="margin-top: 14px; padding: 12px; background: rgba(15, 23, 42, 0.65); border: 1px solid rgba(129, 140, 248, 0.2); border-radius: 14px;">
               <span class="focus-sub-label">Target Saat Ini</span>
               <div id="focus-task-display" class="focus-task-title" style="font-size: 13px; margin-top: 8px; font-weight: 700; color: #f8fafc;">No active task</div>
@@ -78,6 +90,10 @@
         <span class="card-label">Generate To-Do</span>
         <div class="task-input-container" style="display: flex; flex-direction: column; gap: 8px; margin-top: 4px;">
           <input type="text" id="magic-task-input" class="task-input" placeholder="Describe the task you want to turn into a to-do list" autocomplete="off" spellcheck="false">
+          <div style="display: flex; flex-direction: column; gap: 6px;">
+            <label for="magic-duration-input" style="font-size: 11px; color: #94a3b8;">Durasi kerja total (menit)</label>
+            <input type="number" id="magic-duration-input" class="task-input" min="15" step="5" value="60" placeholder="Contoh: 60">
+          </div>
           <button id="btn-negotiate" class="btn-add" style="margin-top: 4px; width: 100%; height: 32px;">Generate To-Do</button>
         </div>
       </div>
@@ -129,6 +145,29 @@
           <span>Balanced</span>
           <span>Strict</span>
         </div>
+      </div>
+
+      <!-- Pomodoro Timer Settings -->
+      <div class="card" style="margin-top: 4px;">
+        <span class="card-label" style="color: #cbd5e1;">Pomodoro Timer</span>
+        <div style="display: flex; gap: 10px; margin-top: 10px;">
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+            <label for="pomodoro-work-input" style="font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 4px;">
+              <svg style="width:11px;height:11px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6l4 2m6-2a10 10 0 1 1-20 0 10 10 0 0 1 20 0Z"/></svg>
+              Kerja (menit)
+            </label>
+            <input type="number" id="pomodoro-work-input" class="task-input" min="1" max="90" step="1" value="25" style="text-align:center; font-size:15px; font-weight:700; padding: 6px; height:36px;">
+          </div>
+          <div style="display:flex; align-items:center; padding-top:18px; color:#64748b; font-size:13px;">⇄</div>
+          <div style="flex: 1; display: flex; flex-direction: column; gap: 5px;">
+            <label for="pomodoro-break-input" style="font-size: 11px; color: #94a3b8; display: flex; align-items: center; gap: 4px;">
+              <svg style="width:11px;height:11px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/></svg>
+              Istirahat (menit)
+            </label>
+            <input type="number" id="pomodoro-break-input" class="task-input" min="1" max="30" step="1" value="5" style="text-align:center; font-size:15px; font-weight:700; padding: 6px; height:36px;">
+          </div>
+        </div>
+        <p style="margin-top: 8px; font-size: 10px; color: #475569; line-height: 1.5;">Pengaturan ini berlaku untuk Pomodoro session berikutnya.</p>
       </div>
 
       <!-- Active Page Check -->
