@@ -163,3 +163,225 @@
     box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
   }
 }
+
+/* ==========================================
+   ADHD FLOATING POMODORO PILL & MODAL POPUP
+   ========================================== */
+
+.adhd-pomo-wrapper {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 2147483646;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  user-select: none;
+}
+
+/* Minimalist Floating Pill Badge */
+.adhd-pomo-pill {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 16px;
+  background: rgba(15, 23, 42, 0.92);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(129, 140, 248, 0.35);
+  border-radius: 999px;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
+  color: #f8fafc;
+  cursor: grab;
+  transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.adhd-pomo-pill:active {
+  cursor: grabbing;
+}
+
+.adhd-pomo-pill:hover {
+  transform: translateY(-2px);
+  border-color: rgba(129, 140, 248, 0.6);
+  box-shadow: 0 14px 30px -5px rgba(0, 0, 0, 0.6);
+}
+
+.adhd-pomo-pill-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #34d399;
+  box-shadow: 0 0 10px #34d399;
+  animation: pomo-pulse 2s infinite ease-in-out;
+}
+
+.adhd-pomo-pill-dot.break {
+  background: #818cf8;
+  box-shadow: 0 0 10px #818cf8;
+}
+
+@keyframes pomo-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.4; transform: scale(0.85); }
+}
+
+.adhd-pomo-pill-phase {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #94a3b8;
+}
+
+.adhd-pomo-pill-time {
+  font-size: 14px;
+  font-weight: 800;
+  color: #ffffff;
+  font-variant-numeric: tabular-nums;
+}
+
+/* Glassmorphic Modal Popover */
+.adhd-pomo-modal {
+  position: absolute;
+  bottom: 48px;
+  right: 0;
+  width: 270px;
+  background: rgba(15, 23, 42, 0.96);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(129, 140, 248, 0.35);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(129, 140, 248, 0.1);
+  color: #f8fafc;
+  animation: pomo-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  transform-origin: bottom right;
+}
+
+@keyframes pomo-pop {
+  from { opacity: 0; transform: scale(0.9) translateY(10px); }
+  to { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.adhd-pomo-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.adhd-pomo-status-badge {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.adhd-pomo-status-badge.work {
+  color: #34d399;
+}
+
+.adhd-pomo-status-badge.break {
+  color: #818cf8;
+}
+
+.adhd-pomo-task-box {
+  margin-top: 10px;
+  padding: 10px;
+  background: rgba(30, 41, 59, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+}
+
+.adhd-pomo-task-label {
+  font-size: 10px;
+  font-weight: 700;
+  color: #818cf8;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  display: block;
+}
+
+.adhd-pomo-task-text {
+  font-size: 12px;
+  font-weight: 600;
+  color: #f1f5f9;
+  margin-top: 4px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.adhd-pomo-timer-display {
+  font-size: 32px;
+  font-weight: 800;
+  text-align: center;
+  color: #ffffff;
+  margin: 12px 0;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.5px;
+}
+
+.adhd-pomo-modal-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.adhd-pomo-ctrl-btn {
+  padding: 7px 12px;
+  border-radius: 10px;
+  border: none;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: transform 0.1s active, background 0.15s, opacity 0.15s;
+}
+
+.adhd-pomo-ctrl-btn:hover {
+  opacity: 0.9;
+}
+
+.adhd-pomo-ctrl-btn:active {
+  transform: scale(0.97);
+}
+
+.adhd-pomo-ctrl-btn.btn-toggle-run {
+  background: rgba(13, 148, 136, 0.9);
+  color: #ffffff;
+}
+
+.adhd-pomo-ctrl-btn.btn-skip-phase {
+  background: rgba(148, 163, 184, 0.15);
+  color: #cbd5e1;
+}
+
+.adhd-pomo-btn-icon {
+  background: transparent;
+  border: none;
+  color: #94a3b8;
+  width: 22px;
+  height: 22px;
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  transition: background 0.15s, color 0.15s;
+}
+
+.adhd-pomo-btn-icon:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: #f8fafc;
+}
+
+.adhd-pomo-btn-icon svg {
+  width: 14px;
+  height: 14px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+

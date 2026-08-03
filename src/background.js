@@ -106,3 +106,51 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     return true; // Keep response channel open for async execution
   }
 });
+
+// --- POMODORO BACKGROUND ENGINE ---
+let pomodoroCheckInterval = null;
+
+function startPomodoroBackgroundTicker() {
+  if (pomodoroCheckInterval) return;
+  pomodoroCheckInterval = setInterval(() => {
+    chrome.storage.local.get(['pomodoroSession'], (items) => {
+      if (chrome.runtime.lastError || !items.pomodoroSession) return;
+      const session = items.pomodoroSession;
+      if (!session.isActive || !session.isRunning || !session.targetTimestamp) return;
+
+      const remainingSeconds = Math.ceil((session.targetTimestamp - Date.now()) / 1000);
+      if (remainingSeconds <= 0) {
+        // Advance session phase
+        const nextIndex = session.currentIndex + 1;
+        if (session.plan && nextIndex < session.plan.length) {
+          const nextBlock = session.plan[nextIndex];
+          const newTarget = Date.now() + (nextBlock.minutes * 60 * 1000);
+          const updatedSession = {
+            ...session,
+            currentIndex: nextIndex,
+            phase: nextBlock.type,
+            targetTimestamp: newTarget,
+            pausedRemainingSeconds: null
+          };
+          chrome.storage.local.set({ pomodoroSession: updatedSession });
+          console.log(`[Pomodoro Engine] Advanced to phase: ${nextBlock.type}`);
+        } else {
+          // Completed all blocks
+          const finishedSession = {
+            ...session,
+            isActive: false,
+            isRunning: false,
+            phase: 'done',
+            targetTimestamp: null,
+            pausedRemainingSeconds: 0
+          };
+          chrome.storage.local.set({ pomodoroSession: finishedSession });
+          console.log('[Pomodoro Engine] Pomodoro session completed!');
+        }
+      }
+    });
+  }, 1000);
+}
+
+startPomodoroBackgroundTicker();
+

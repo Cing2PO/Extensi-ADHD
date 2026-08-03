@@ -43,8 +43,11 @@
       <div id="focus-active-container" class="focus-dashboard-card">
         <div id="focus-empty-state" class="focus-empty-state hidden" style="display:flex; flex-direction:column; gap:8px; text-align:center; padding:16px;">
           <span style="font-size:13px; color:#cbd5e1;">Belum ada to do aktif.</span>
-          <span style="font-size:11px; color:#94a3b8;">Mulai bikin di Magic To-Do untuk membuat daftar tugas.</span>
-          <button id="btn-go-to-magic" class="btn-add" style="width: 100%; height: 34px;">Buka Magic To-Do</button>
+          <span style="font-size:11px; color:#94a3b8;">Mulai bikin di Magic To-Do atau jalankan Pomodoro Timer langsung.</span>
+          <div style="display:flex; gap:8px; margin-top:4px;">
+            <button id="btn-start-quick-pomodoro" class="btn-add" style="flex:1; height:34px; font-size:11px;">⏱️ Mulai Pomodoro</button>
+            <button id="btn-go-to-magic" class="btn-quick-toggle is-allowed" style="flex:1; height:34px; font-size:11px;">Magic To-Do</button>
+          </div>
         </div>
         <div id="focus-active-content" class="hidden">
 
@@ -168,6 +171,14 @@
           </div>
         </div>
         <p style="margin-top: 8px; font-size: 10px; color: #475569; line-height: 1.5;">Pengaturan ini berlaku untuk Pomodoro session berikutnya.</p>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 8px; border-top: 1px solid rgba(148, 163, 184, 0.1);">
+          <span style="font-size: 11px; color: #cbd5e1;">Floating Timer di Web</span>
+          <label class="switch-small">
+            <input type="checkbox" id="floating-pomodoro-toggle" checked>
+            <span class="slider-small"></span>
+          </label>
+        </div>
+        <button id="btn-start-pomodoro-rules" class="btn-add" style="margin-top: 10px; width: 100%; height: 32px; font-size: 11px;">⏱️ Mulai Sesi Pomodoro Baru</button>
       </div>
 
       <!-- Active Page Check -->
