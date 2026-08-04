@@ -19,13 +19,21 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["src/content.js"],
+      "js": ["src/content_loader.js"],
       "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [
     {
-      "resources": ["src/overlay.css"],
+      "resources": [
+        "src/overlay.css",
+        "src/config.js",
+        "src/content.js",
+        "src/content/modules/domainMatcher.js",
+        "src/content/modules/heuristicsEngine.js",
+        "src/content/modules/overlayManager.js",
+        "src/content/modules/storageSync.js"
+      ],
       "matches": ["http://*/*", "https://*/*"]
     }
   ],
