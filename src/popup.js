@@ -5,6 +5,19 @@
  * range sensitivity mappings, and accordion list renders.
  */
 
+// --- CONFIGURATION & API ENDPOINTS ---
+const API_CONFIG = {
+  get MAGIC_TODO_URL() {
+    return (window.ENV_CONFIG && window.ENV_CONFIG.MAGIC_TODO_URL) 
+      ? window.ENV_CONFIG.MAGIC_TODO_URL 
+      : 'https://extensi-adhd-backend.vercel.app/api/generate-todos';
+  },
+  TIMEOUT_MS: (window.ENV_CONFIG && window.ENV_CONFIG.API_TIMEOUT_MS) || 8000,
+  USE_MOCK_FALLBACK: (window.ENV_CONFIG && window.ENV_CONFIG.USE_MOCK_FALLBACK !== undefined) 
+    ? window.ENV_CONFIG.USE_MOCK_FALLBACK 
+    : true
+};
+
 document.addEventListener('DOMContentLoaded', () => {
   // Navigation Elements
   const tabButtons = document.querySelectorAll('.tab-btn');
@@ -167,7 +180,7 @@ document.addEventListener('DOMContentLoaded', () => {
         moonIcon.classList.add('hidden');
       }
 
-// 0. Restore Magic To-Do State
+      // 0. Restore Magic To-Do State
       if (!items.magicTaskState) {
         magicTaskState = null;
       } else {
@@ -695,7 +708,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  btnNegotiate.addEventListener('click', () => {
+  btnNegotiate.addEventListener('click', async () => {
     const taskText = magicTaskInput.value.trim();
     const totalMinutes = Math.max(15, Number(magicDurationInput.value) || 60);
 
@@ -714,23 +727,61 @@ document.addEventListener('DOMContentLoaded', () => {
     magicInputPanel.classList.add('hidden');
     magicLoadingPanel.classList.remove('hidden');
 
-    setTimeout(() => {
-      const generatedSteps = generateMockSteps(taskText);
-      magicTaskState = {
-        taskName: taskText,
-        steps: generatedSteps,
-        currentStepIndex: 0,
-        completed: false,
-        totalMinutes: totalMinutes
-      };
+    let generatedSteps = null;
 
-      chrome.storage.local.set({
-        magicTaskState: magicTaskState
-      }, () => {
-        magicLoadingPanel.classList.add('hidden');
-        renderMagicStateUI();
-      });
-    }, 1500);
+    try {
+      if (API_CONFIG.MAGIC_TODO_URL) {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), API_CONFIG.TIMEOUT_MS || 5000);
+
+        const response = await fetch(API_CONFIG.MAGIC_TODO_URL, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/json'
+          },
+          body: JSON.stringify({
+            prompt: taskText
+          }),
+          signal: controller.signal
+        });
+
+        clearTimeout(timeoutId);
+
+        if (response.ok) {
+          const data = await response.json();
+          const rawSteps = data.todos || data.steps || data.milestones || data.data;
+          if (Array.isArray(rawSteps) && rawSteps.length > 0) {
+            const perTaskMinutes = Math.max(5, Math.round(totalMinutes / rawSteps.length));
+            generatedSteps = rawSteps.map(item => ({
+              text: typeof item === 'string' ? item : (item.task || item.text || item.title || item.name),
+              minutes: typeof item === 'object' ? (item.minutes || item.estimated_minutes || perTaskMinutes) : perTaskMinutes
+            }));
+          }
+        }
+      }
+    } catch (err) {
+      console.warn("[Magic To-Do API Notice] Fallback to local decomposer:", err.message);
+    }
+
+    if (!generatedSteps || !generatedSteps.length) {
+      generatedSteps = generateMockSteps(taskText);
+    }
+
+    magicTaskState = {
+      taskName: taskText,
+      steps: generatedSteps,
+      currentStepIndex: 0,
+      completed: false,
+      totalMinutes: totalMinutes
+    };
+
+    chrome.storage.local.set({
+      magicTaskState: magicTaskState
+    }, () => {
+      magicLoadingPanel.classList.add('hidden');
+      renderMagicStateUI();
+    });
   });
 
   if (btnStartMagicFocus) {
@@ -896,7 +947,7 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
   });
-  
+
   btnNewMagic.addEventListener('click', () => {
     resetPomodoroSession();
     resetMagicState();

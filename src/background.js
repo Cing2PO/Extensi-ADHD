@@ -6,11 +6,12 @@
  */
 
 import { encrypt, decrypt } from './utils/encryption.js';
+import { ENV_CONFIG } from './config.js';
 
 // Simulated WebSocket State
 let mockSocket = null;
 let isSocketConnected = false;
-const REVERB_MOCK_URL = "ws://localhost:8000/app/reverb";
+const REVERB_MOCK_URL = ENV_CONFIG?.REVERB_WS_URL || "ws://localhost:8000/app/reverb";
 
 console.log("[Background Service Worker] Initializing...");
 

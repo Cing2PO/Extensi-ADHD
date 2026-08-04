@@ -8,6 +8,10 @@
     "scripting",
     "storage"
   ],
+  "host_permissions": [
+    "https://*/*",
+    "http://*/*"
+  ],
   "background": {
     "service_worker": "src/background.js",
     "type": "module"

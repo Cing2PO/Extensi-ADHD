@@ -1,0 +1,4 @@
+# Environment & local secret configs
+.env
+.env.local
+src/config.local.js
