@@ -14,10 +14,12 @@ export const VELOCITY_WEIGHT = 2.5;
 export const INTERACTION_TIMEOUT_MS = 8000;
 
 export class HeuristicsEngine {
-  constructor({ onThresholdReached }) {
+  constructor({ onThresholdReached, onTick }) {
     this.onThresholdReached = onThresholdReached;
+    this.onTick = onTick;
     this.distractionScore = 0;
     this.accumulatedScrollInTick = 0;
+    this.totalScrollDistance = 0;
     this.maxScrollYReached = typeof window !== 'undefined' ? window.scrollY : 0;
     this.lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
     this.lastTickTime = performance.now();
@@ -41,6 +43,7 @@ export class HeuristicsEngine {
     const delta = Math.abs(currentScrollY - this.lastScrollY);
 
     this.accumulatedScrollInTick += delta;
+    this.totalScrollDistance += delta;
     this.lastScrollY = currentScrollY;
 
     if (currentScrollY > this.maxScrollYReached) {
@@ -78,6 +81,16 @@ export class HeuristicsEngine {
       this.accumulatedScrollInTick = 0;
     } else {
       this.distractionScore = Math.max(0, this.distractionScore - SCORE_DECAY);
+    }
+
+    if (this.onTick) {
+      this.onTick({
+        domain: typeof window !== 'undefined' ? window.location.hostname : '',
+        scrollY: typeof window !== 'undefined' ? Math.round(window.scrollY) : 0,
+        totalScrollPx: Math.round(this.totalScrollDistance),
+        score: Math.round(this.distractionScore),
+        threshold: this.doomscrollThreshold
+      });
     }
 
     if (this.distractionScore >= this.doomscrollThreshold) {

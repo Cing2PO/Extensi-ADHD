@@ -53,6 +53,17 @@ import { getStorageData, setStorageData, parseBlacklist } from './content/module
           });
         }
       }
+    },
+    onTick: (metrics) => {
+      overlayManager.updatePomoFloatingDebug(metrics);
+      if (isContextValid()) {
+        setStorageData({
+          debugMetrics: {
+            ...metrics,
+            updatedAt: Date.now()
+          }
+        });
+      }
     }
   });
 

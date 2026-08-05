@@ -225,6 +225,17 @@ export class OverlayManager {
 
           <div class="adhd-pomo-timer-display" id="adhd-pomo-modal-time">25:00</div>
 
+          <div class="adhd-pomo-debug-box" style="margin-bottom: 10px; padding: 8px 10px; background: rgba(20, 184, 166, 0.08); border: 1px dashed rgba(45, 212, 191, 0.3); border-radius: 10px; font-size: 11px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; color: #2dd4bf; font-weight: 700;">
+              <span>🔍 Sensor Website</span>
+              <span id="adhd-pomo-debug-domain" style="color: #f1f5f9; font-weight: 600;">mendeteksi...</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; color: #94a3b8; margin-top: 4px; font-size: 10px;">
+              <span>📜 Scroll / Swipe:</span>
+              <span id="adhd-pomo-debug-scroll" style="color: #34d399; font-weight: 700;">0 px</span>
+            </div>
+          </div>
+
           <div class="adhd-pomo-modal-actions">
             <div style="display: flex; gap: 6px;">
               <button class="adhd-pomo-ctrl-btn btn-toggle-run" id="adhd-pomo-btn-toggle" style="flex: 1;">Pause</button>
@@ -408,6 +419,18 @@ export class OverlayManager {
 
     if (btnToggle) {
       btnToggle.textContent = session.isRunning ? 'Pause' : 'Lanjut';
+    }
+  }
+
+  updatePomoFloatingDebug(metrics) {
+    if (!this.pomoShadowRootNode || !metrics) return;
+    const domainEl = this.pomoShadowRootNode.getElementById('adhd-pomo-debug-domain');
+    const scrollEl = this.pomoShadowRootNode.getElementById('adhd-pomo-debug-scroll');
+    if (domainEl && metrics.domain) {
+      domainEl.textContent = metrics.domain;
+    }
+    if (scrollEl && metrics.totalScrollPx !== undefined) {
+      scrollEl.textContent = `${metrics.totalScrollPx.toLocaleString()} px (pos: ${metrics.scrollY || 0}px)`;
     }
   }
 
