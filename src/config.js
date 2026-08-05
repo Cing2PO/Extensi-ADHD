@@ -15,10 +15,7 @@ const DEFAULT_CONFIG = {
   REVERB_WS_URL: 'ws://localhost:8000/app/reverb',
 
   // Network Timeout in MS
-  API_TIMEOUT_MS: 8000,
-
-  // Fallback to local mock data if API call fails
-  USE_MOCK_FALLBACK: true
+  API_TIMEOUT_MS: 8000
 };
 
 // Derived helper properties

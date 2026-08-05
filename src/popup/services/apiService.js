@@ -7,61 +7,61 @@ import { ENV_CONFIG } from '../../config.js';
 export function getApiConfig() {
   return {
     MAGIC_TODO_URL: (window.ENV_CONFIG && window.ENV_CONFIG.MAGIC_TODO_URL) || ENV_CONFIG.MAGIC_TODO_URL,
-    TIMEOUT_MS: (window.ENV_CONFIG && window.ENV_CONFIG.API_TIMEOUT_MS) || 8000,
-    USE_MOCK_FALLBACK: (window.ENV_CONFIG && window.ENV_CONFIG.USE_MOCK_FALLBACK !== undefined) ? window.ENV_CONFIG.USE_MOCK_FALLBACK : true
+    TIMEOUT_MS: (window.ENV_CONFIG && window.ENV_CONFIG.API_TIMEOUT_MS) || 8000
   };
 }
 
-export function generateMockSteps(taskText) {
-  const cleanTask = taskText.trim() || "tugas Anda";
-  return [
-    { text: `Persiapkan ruang kerja & buka aplikasi penunjang untuk "${cleanTask}"`, minutes: 5 },
-    { text: `Bikin kerangka outline/konsep kasar isi dari "${cleanTask}"`, minutes: 10 },
-    { text: `Fokus penuh kerjakan inti tugas "${cleanTask}" (pasang Brown Noise!)`, minutes: 15 },
-    { text: `Merapikan hasil kerja akhir "${cleanTask}" dan simpan progress Anda`, minutes: 5 }
-  ];
-}
-
-export async function fetchMagicTodos(taskText, totalMinutes) {
+export async function fetchMagicTodos(taskText, totalMinutes, options = {}) {
   const config = getApiConfig();
-  let generatedSteps = null;
+
+  if (!config.MAGIC_TODO_URL) {
+    throw new Error('URL Backend API tidak dikonfigurasi.');
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), config.TIMEOUT_MS || 8000);
 
   try {
-    if (config.MAGIC_TODO_URL) {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), config.TIMEOUT_MS || 5000);
+    const response = await fetch(config.MAGIC_TODO_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({
+        userId: options.userId || 1,
+        prompt: taskText,
+        availableMinutes: Number(totalMinutes) || 60,
+        workMinutes: options.workMinutes || 25,
+        breakMinutes: options.breakMinutes || 5
+      }),
+      signal: controller.signal
+    });
 
-      const response = await fetch(config.MAGIC_TODO_URL, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json'
-        },
-        body: JSON.stringify({ prompt: taskText }),
-        signal: controller.signal
-      });
+    clearTimeout(timeoutId);
 
-      clearTimeout(timeoutId);
+    const data = await response.json();
 
-      if (response.ok) {
-        const data = await response.json();
-        const rawSteps = data.todos || data.steps || data.milestones || data.data;
-        if (Array.isArray(rawSteps) && rawSteps.length > 0) {
-          const perTaskMinutes = Math.max(5, Math.round(totalMinutes / rawSteps.length));
-          generatedSteps = rawSteps.map(item => ({
-            text: typeof item === 'string' ? item : (item.task || item.text || item.title || item.name),
-            minutes: typeof item === 'object' ? (item.minutes || item.estimated_minutes || perTaskMinutes) : perTaskMinutes
-          }));
-        }
-      }
+    if (!response.ok || !data.success) {
+      const errorMsg = data.message || `Gagal menghubungi API Backend (HTTP ${response.status})`;
+      throw new Error(errorMsg);
     }
+
+    const rawSteps = data.todos || data.steps || data.milestones || data.data;
+    if (!Array.isArray(rawSteps) || rawSteps.length === 0) {
+      throw new Error('API tidak mengembalikan langkah tugas yang valid.');
+    }
+
+    const perTaskMinutes = Math.max(5, Math.round(totalMinutes / rawSteps.length));
+    return rawSteps.map(item => ({
+      text: typeof item === 'string' ? item : (item.task || item.text || item.title || item.name),
+      minutes: typeof item === 'object' ? (item.estimated_minutes || item.minutes || perTaskMinutes) : perTaskMinutes
+    }));
   } catch (err) {
-    console.warn("[Magic To-Do API Notice] Fallback to local decomposer:", err.message);
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      throw new Error('Request ke API Backend mengalami RTO (Request Timeout).');
+    }
+    throw err;
   }
-
-  if (!generatedSteps || !generatedSteps.length) {
-    generatedSteps = generateMockSteps(taskText);
-  }
-
-  return generatedSteps;
 }

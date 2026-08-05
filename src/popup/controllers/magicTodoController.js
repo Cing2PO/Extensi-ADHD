@@ -284,23 +284,45 @@ export function initMagicTodoController({ onStartFocusTab }) {
         return;
       }
 
-      if (magicInputPanel) magicInputPanel.classList.add('hidden');
-      if (magicLoadingPanel) magicLoadingPanel.classList.remove('hidden');
+      try {
+        if (magicInputPanel) magicInputPanel.classList.add('hidden');
+        if (magicLoadingPanel) magicLoadingPanel.classList.remove('hidden');
 
-      const generatedSteps = await fetchMagicTodos(taskText, totalMinutes);
+        const workMin = parseInt(pomodoroWorkInput?.value, 10) || 25;
+        const breakMin = parseInt(pomodoroBreakInput?.value, 10) || 5;
 
-      magicTaskState = {
-        taskName: taskText,
-        steps: generatedSteps,
-        currentStepIndex: 0,
-        completed: false,
-        totalMinutes: totalMinutes
-      };
+        const generatedSteps = await fetchMagicTodos(taskText, totalMinutes, {
+          workMinutes: workMin,
+          breakMinutes: breakMin
+        });
 
-      setStorage({ magicTaskState }).then(() => {
+        magicTaskState = {
+          taskName: taskText,
+          steps: generatedSteps,
+          currentStepIndex: 0,
+          completed: false,
+          totalMinutes: totalMinutes
+        };
+
+        await setStorage({ magicTaskState });
         if (magicLoadingPanel) magicLoadingPanel.classList.add('hidden');
         renderMagicStateUI();
-      });
+      } catch (err) {
+        if (magicLoadingPanel) magicLoadingPanel.classList.add('hidden');
+        if (magicInputPanel) magicInputPanel.classList.remove('hidden');
+
+        console.error('[Magic To-Do Error]', err);
+        if (window.Swal) {
+          window.Swal.fire({
+            title: 'Gagal Negosiasi AI',
+            text: err.message || 'Gagal terhubung ke API backend Gemini.',
+            icon: 'error',
+            ...getSwalTheme()
+          });
+        } else {
+          alert('Gagal Negosiasi AI: ' + (err.message || 'Gagal terhubung ke API backend Gemini.'));
+        }
+      }
     });
   }
 
