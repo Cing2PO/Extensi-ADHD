@@ -15,13 +15,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initialize Controllers
   const focusController = initFocusController({
-    onGoToMagic: () => switchToTab('tab-magic-page')
+    onGoToMagic: () => switchToTab('tab-magic-page'),
+    onStartPomodoro: () => magicTodoController.startNewPomodoroSession()
   });
 
   const magicTodoController = initMagicTodoController({
     onStartFocusTab: (taskText) => {
-      focusController.renderFocusTab(taskText, null);
-      switchToTab('tab-focus-page');
+      getStorage(['magicTaskState']).then((items) => {
+        focusController.renderFocusTab(taskText, items.magicTaskState || null);
+        switchToTab('tab-focus-page');
+      });
     }
   });
 
@@ -72,12 +75,11 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.onChanged.addListener((changes, namespace) => {
       if (namespace === 'local') {
         getStorage(['magicTaskState', 'currentTask', 'pomodoroSession']).then((items) => {
-          if (changes.currentTask || changes.magicTaskState) {
-            focusController.renderFocusTab(items.currentTask || '', items.magicTaskState || null);
-          }
-          if (changes.magicTaskState || changes.pomodoroSession) {
-            magicTodoController.renderMagicStateUI();
-          }
+          magicTodoController.setInitialStates({
+            magicState: items.magicTaskState || null,
+            pomoSession: items.pomodoroSession || null
+          });
+          focusController.renderFocusTab(items.currentTask || '', items.magicTaskState || null);
         });
       }
     });

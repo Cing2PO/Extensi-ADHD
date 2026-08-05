@@ -680,6 +680,12 @@
       width: 100%;
     }
 
+    .magic-step-item.active-focus-step {
+      border-color: rgba(16, 185, 129, 0.6) !important;
+      background: rgba(16, 185, 129, 0.08) !important;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.12);
+    }
+
     .magic-step-item:hover {
       background: var(--switch-bg);
       border-color: var(--item-border);

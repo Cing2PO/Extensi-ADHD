@@ -216,9 +216,16 @@ import { getStorageData, setStorageData, parseBlacklist } from './content/module
     });
   }
 
-  // Initial Run
-  checkAndSetEngine();
-  renderPomodoroFloatingState();
+  // Initial Run with DOM Readiness Check
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => {
+      checkAndSetEngine();
+      renderPomodoroFloatingState();
+    });
+  } else {
+    checkAndSetEngine();
+    renderPomodoroFloatingState();
+  }
 
   // Storage Sync Listener
   if (isContextValid() && chrome.storage && chrome.storage.onChanged) {

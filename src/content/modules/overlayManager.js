@@ -169,11 +169,21 @@ export class OverlayManager {
 
   // --- FLOATING POMODORO WIDGET ---
   injectPomodoroFloatingWidget() {
-    if (!document.body) return;
+    const targetParent = document.body || document.documentElement;
+    if (!targetParent) return;
     if (this.pomoRootContainer && this.pomoRootContainer.isConnected) return;
 
     if (!this.pomoRootContainer) {
       this.pomoRootContainer = document.createElement('adhd-pomodoro-floating-root');
+      this.pomoRootContainer.style.position = 'fixed';
+      this.pomoRootContainer.style.top = '0';
+      this.pomoRootContainer.style.left = '0';
+      this.pomoRootContainer.style.width = '0';
+      this.pomoRootContainer.style.height = '0';
+      this.pomoRootContainer.style.zIndex = '2147483646';
+      this.pomoRootContainer.style.display = 'block';
+      this.pomoRootContainer.style.pointerEvents = 'none';
+
       this.pomoShadowRootNode = this.pomoRootContainer.attachShadow({ mode: 'closed' });
 
       const linkElement = document.createElement('link');
@@ -184,6 +194,11 @@ export class OverlayManager {
       const wrapper = document.createElement('div');
       wrapper.className = 'adhd-pomo-wrapper';
       wrapper.id = 'adhd-pomo-wrapper';
+      wrapper.style.position = 'fixed';
+      wrapper.style.bottom = '32px';
+      wrapper.style.right = '32px';
+      wrapper.style.zIndex = '2147483646';
+      wrapper.style.pointerEvents = 'auto';
 
       wrapper.innerHTML = `
         <div class="adhd-pomo-pill" id="adhd-pomo-pill" title="Klik untuk membuka menu Pomodoro & Target Task">
@@ -253,7 +268,7 @@ export class OverlayManager {
     }
 
     if (!this.pomoRootContainer.isConnected) {
-      document.body.appendChild(this.pomoRootContainer);
+      targetParent.appendChild(this.pomoRootContainer);
     }
   }
 
@@ -287,12 +302,16 @@ export class OverlayManager {
       const savedPos = localStorage.getItem('adhd_pomo_floating_pos');
       if (savedPos) {
         const { left, top } = JSON.parse(savedPos);
-        wrapperEl.style.left = `${left}px`;
-        wrapperEl.style.top = `${top}px`;
-        wrapperEl.style.right = 'auto';
-        wrapperEl.style.bottom = 'auto';
+        if (typeof left === 'number' && typeof top === 'number' && left >= 0 && top >= 0 && left < (window.innerWidth - 60) && top < (window.innerHeight - 30)) {
+          wrapperEl.style.left = `${left}px`;
+          wrapperEl.style.top = `${top}px`;
+          wrapperEl.style.right = 'auto';
+          wrapperEl.style.bottom = 'auto';
+        } else {
+          localStorage.removeItem('adhd_pomo_floating_pos');
+        }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     const onMouseDown = (e) => {
       if (e.target.closest('button')) return;
@@ -339,7 +358,7 @@ export class OverlayManager {
         const rect = wrapperEl.getBoundingClientRect();
         try {
           localStorage.setItem('adhd_pomo_floating_pos', JSON.stringify({ left: Math.round(rect.left), top: Math.round(rect.top) }));
-        } catch (e) {}
+        } catch (e) { }
       } else {
         this.togglePomoModal();
       }

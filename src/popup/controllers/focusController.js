@@ -4,17 +4,22 @@
 
 import { setStorage, getStorage } from '../services/storageService.js';
 
-export function initFocusController({ onGoToMagic }) {
+export function initFocusController({ onGoToMagic, onStartPomodoro }) {
   const focusEmptyState = document.getElementById('focus-empty-state');
   const focusActiveContent = document.getElementById('focus-active-content');
   const focusTaskDisplay = document.getElementById('focus-task-display');
   const btnDashboardComplete = document.getElementById('btn-dashboard-complete');
   const btnDashboardCancel = document.getElementById('btn-dashboard-cancel');
   const btnGoToMagic = document.getElementById('btn-go-to-magic');
+  const btnStartQuickPomodoro = document.getElementById('btn-start-quick-pomodoro');
   const refocusCounter = document.getElementById('refocus-counter');
 
   if (btnGoToMagic && onGoToMagic) {
     btnGoToMagic.addEventListener('click', onGoToMagic);
+  }
+
+  if (btnStartQuickPomodoro && onStartPomodoro) {
+    btnStartQuickPomodoro.addEventListener('click', onStartPomodoro);
   }
 
   if (btnDashboardCancel) {
