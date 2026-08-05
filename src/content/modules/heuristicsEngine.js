@@ -5,13 +5,15 @@
 export const SENSITIVITY_MAP = {
   'lenient': 14000,
   'balanced': 8000,
-  'strict': 1000
+  'strict': 3000
 };
 
 export const TICK_RATE_MS = 500;
 export const SCORE_DECAY = 250;
 export const VELOCITY_WEIGHT = 2.5;
 export const INTERACTION_TIMEOUT_MS = 8000;
+export const SWIPE_PENALTY_SCORE = 1500; // Penalizes each short-video swipe directly
+export const SWIPE_COOLDOWN_MS = 800; // 800ms guard to prevent double-counting
 
 export class HeuristicsEngine {
   constructor({ onThresholdReached, onTick }) {
@@ -20,10 +22,15 @@ export class HeuristicsEngine {
     this.distractionScore = 0;
     this.accumulatedScrollInTick = 0;
     this.totalScrollDistance = 0;
+    this.swipeCount = 0;
+    this.touchMoveDistanceInGesture = 0;
+    this.pointerMoveDistanceInGesture = 0;
     this.maxScrollYReached = typeof window !== 'undefined' ? window.scrollY : 0;
     this.lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
     this.lastTouchY = 0;
     this.lastPointerY = 0;
+    this.lastVideoUrl = typeof window !== 'undefined' ? window.location.href : '';
+    this.lastSwipeTimestamp = 0;
     this.isSwiping = false;
     this.isPointerDown = false;
     this.lastTickTime = performance.now();
@@ -42,6 +49,7 @@ export class HeuristicsEngine {
     this.handlePointerUp = this.handlePointerUp.bind(this);
     this.handleKeyDownSwipe = this.handleKeyDownSwipe.bind(this);
     this.handleInteraction = this.handleInteraction.bind(this);
+    this.checkUrlChange = this.checkUrlChange.bind(this);
     this.runHeuristicsTick = this.runHeuristicsTick.bind(this);
   }
 
@@ -49,10 +57,49 @@ export class HeuristicsEngine {
     this.doomscrollThreshold = SENSITIVITY_MAP[sensitivity] || 8000;
   }
 
+  checkIsShortVideoPlatform() {
+    if (typeof window === 'undefined') return false;
+    const host = window.location.hostname.toLowerCase();
+    const path = window.location.pathname.toLowerCase();
+
+    if (host.includes('tiktok.com')) return true;
+    if (host.includes('youtube.com') && path.includes('/shorts')) return true;
+    if (host.includes('instagram.com') && path.includes('/reels')) return true;
+    return false;
+  }
+
+  recordVideoSwipe(forceByUrl = false) {
+    const now = performance.now();
+    if (!forceByUrl && (now - this.lastSwipeTimestamp < SWIPE_COOLDOWN_MS)) {
+      return; // Cooldown guard active - ignore duplicate gesture triggers
+    }
+
+    this.lastSwipeTimestamp = now;
+    this.swipeCount += 1;
+
+    if (this.checkIsShortVideoPlatform()) {
+      this.distractionScore += SWIPE_PENALTY_SCORE;
+    }
+  }
+
+  checkUrlChange() {
+    if (typeof window === 'undefined') return;
+    const currentUrl = window.location.href;
+    if (currentUrl !== this.lastVideoUrl) {
+      this.lastVideoUrl = currentUrl;
+      if (this.checkIsShortVideoPlatform()) {
+        this.recordVideoSwipe(true);
+      }
+    }
+  }
+
   handleScroll(e) {
     let delta = 0;
     if (e && e.type === 'wheel') {
       delta = Math.abs(e.deltaY || e.detail || 0);
+      if (delta > 50 && this.checkIsShortVideoPlatform()) {
+        this.recordVideoSwipe();
+      }
     } else {
       const currentScrollY = typeof window !== 'undefined' ? (window.scrollY || document.documentElement?.scrollTop || 0) : 0;
       delta = Math.abs(currentScrollY - this.lastScrollY);
@@ -72,6 +119,7 @@ export class HeuristicsEngine {
   handleTouchStart(e) {
     if (e.touches && e.touches[0]) {
       this.lastTouchY = e.touches[0].clientY;
+      this.touchMoveDistanceInGesture = 0;
       this.isSwiping = true;
     }
   }
@@ -85,16 +133,22 @@ export class HeuristicsEngine {
     if (delta > 0) {
       this.accumulatedScrollInTick += delta;
       this.totalScrollDistance += delta;
+      this.touchMoveDistanceInGesture += delta;
     }
   }
 
   handleTouchEnd() {
+    if (this.isSwiping && this.touchMoveDistanceInGesture > 40) {
+      this.recordVideoSwipe();
+    }
     this.isSwiping = false;
+    this.touchMoveDistanceInGesture = 0;
   }
 
   handlePointerDown(e) {
     this.isPointerDown = true;
     this.lastPointerY = e.clientY;
+    this.pointerMoveDistanceInGesture = 0;
   }
 
   handlePointerMove(e) {
@@ -105,11 +159,16 @@ export class HeuristicsEngine {
     if (delta > 5) {
       this.accumulatedScrollInTick += delta;
       this.totalScrollDistance += delta;
+      this.pointerMoveDistanceInGesture += delta;
     }
   }
 
   handlePointerUp() {
+    if (this.isPointerDown && this.pointerMoveDistanceInGesture > 40) {
+      this.recordVideoSwipe();
+    }
     this.isPointerDown = false;
+    this.pointerMoveDistanceInGesture = 0;
   }
 
   handleKeyDownSwipe(e) {
@@ -118,6 +177,7 @@ export class HeuristicsEngine {
       const simulatedSwipePx = 600;
       this.accumulatedScrollInTick += simulatedSwipePx;
       this.totalScrollDistance += simulatedSwipePx;
+      this.recordVideoSwipe();
     }
   }
 
@@ -132,6 +192,7 @@ export class HeuristicsEngine {
   }
 
   runHeuristicsTick() {
+    this.checkUrlChange();
     const now = performance.now();
     const dt = now - this.lastTickTime;
     this.lastTickTime = now;
@@ -154,8 +215,11 @@ export class HeuristicsEngine {
     }
 
     if (this.onTick) {
+      const isShortVideo = this.checkIsShortVideoPlatform();
       this.onTick({
         domain: typeof window !== 'undefined' ? window.location.hostname : '',
+        isShortVideo: isShortVideo,
+        swipeCount: this.swipeCount,
         scrollY: typeof window !== 'undefined' ? Math.round(window.scrollY) : 0,
         totalScrollPx: Math.round(this.totalScrollDistance),
         score: Math.round(this.distractionScore),
@@ -172,6 +236,32 @@ export class HeuristicsEngine {
 
   start() {
     if (this.isEngineRunning) return;
+
+    this.lastVideoUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+    if (typeof window !== 'undefined' && window.history && !window.__adhd_history_intercepted) {
+      window.__adhd_history_intercepted = true;
+      const self = this;
+      const origPush = window.history.pushState;
+      const origReplace = window.history.replaceState;
+
+      window.history.pushState = function (...args) {
+        const res = origPush.apply(this, args);
+        self.checkUrlChange();
+        return res;
+      };
+
+      window.history.replaceState = function (...args) {
+        const res = origReplace.apply(this, args);
+        self.checkUrlChange();
+        return res;
+      };
+    }
+
+    if (typeof window !== 'undefined') {
+      window.addEventListener('popstate', this.checkUrlChange);
+      window.addEventListener('hashchange', this.checkUrlChange);
+    }
 
     const opt = { capture: true, passive: true };
 
@@ -209,6 +299,11 @@ export class HeuristicsEngine {
     window.removeEventListener('pointerup', this.handlePointerUp, opt);
     window.removeEventListener('keydown', this.handleKeyDownSwipe, opt);
     window.removeEventListener('click', this.handleInteraction, opt);
+
+    if (typeof window !== 'undefined') {
+      window.removeEventListener('popstate', this.checkUrlChange);
+      window.removeEventListener('hashchange', this.checkUrlChange);
+    }
 
     if (this.tickIntervalId) {
       clearInterval(this.tickIntervalId);

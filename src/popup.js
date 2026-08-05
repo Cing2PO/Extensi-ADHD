@@ -79,8 +79,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (metrics) {
         if (domainEl && metrics.domain) domainEl.textContent = metrics.domain;
-        if (scrollEl && metrics.totalScrollPx !== undefined) {
-          scrollEl.textContent = `${metrics.totalScrollPx.toLocaleString()} px (pos: ${metrics.scrollY || 0}px)`;
+        if (scrollEl) {
+          if (metrics.isShortVideo) {
+            scrollEl.textContent = `🎬 ${metrics.swipeCount || 0} Video (${(metrics.totalScrollPx || 0).toLocaleString()} px)`;
+          } else if (metrics.totalScrollPx !== undefined) {
+            scrollEl.textContent = `📜 ${(metrics.totalScrollPx || 0).toLocaleString()} px (pos: ${metrics.scrollY || 0}px)`;
+          }
         }
       }
     });
