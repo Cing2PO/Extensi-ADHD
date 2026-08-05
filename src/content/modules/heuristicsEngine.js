@@ -22,6 +22,10 @@ export class HeuristicsEngine {
     this.totalScrollDistance = 0;
     this.maxScrollYReached = typeof window !== 'undefined' ? window.scrollY : 0;
     this.lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+    this.lastTouchY = 0;
+    this.lastPointerY = 0;
+    this.isSwiping = false;
+    this.isPointerDown = false;
     this.lastTickTime = performance.now();
     this.lastInteractionTime = performance.now();
 
@@ -30,6 +34,13 @@ export class HeuristicsEngine {
     this.doomscrollThreshold = 8000;
 
     this.handleScroll = this.handleScroll.bind(this);
+    this.handleTouchStart = this.handleTouchStart.bind(this);
+    this.handleTouchMove = this.handleTouchMove.bind(this);
+    this.handleTouchEnd = this.handleTouchEnd.bind(this);
+    this.handlePointerDown = this.handlePointerDown.bind(this);
+    this.handlePointerMove = this.handlePointerMove.bind(this);
+    this.handlePointerUp = this.handlePointerUp.bind(this);
+    this.handleKeyDownSwipe = this.handleKeyDownSwipe.bind(this);
     this.handleInteraction = this.handleInteraction.bind(this);
     this.runHeuristicsTick = this.runHeuristicsTick.bind(this);
   }
@@ -38,22 +49,81 @@ export class HeuristicsEngine {
     this.doomscrollThreshold = SENSITIVITY_MAP[sensitivity] || 8000;
   }
 
-  handleScroll() {
-    const currentScrollY = window.scrollY;
-    const delta = Math.abs(currentScrollY - this.lastScrollY);
+  handleScroll(e) {
+    let delta = 0;
+    if (e && e.type === 'wheel') {
+      delta = Math.abs(e.deltaY || e.detail || 0);
+    } else {
+      const currentScrollY = typeof window !== 'undefined' ? (window.scrollY || document.documentElement?.scrollTop || 0) : 0;
+      delta = Math.abs(currentScrollY - this.lastScrollY);
+      this.lastScrollY = currentScrollY;
+    }
 
-    this.accumulatedScrollInTick += delta;
-    this.totalScrollDistance += delta;
-    this.lastScrollY = currentScrollY;
+    if (delta > 0) {
+      this.accumulatedScrollInTick += delta;
+      this.totalScrollDistance += delta;
+    }
 
-    if (currentScrollY > this.maxScrollYReached) {
-      this.maxScrollYReached = currentScrollY;
+    if (typeof window !== 'undefined' && window.scrollY > this.maxScrollYReached) {
+      this.maxScrollYReached = window.scrollY;
+    }
+  }
+
+  handleTouchStart(e) {
+    if (e.touches && e.touches[0]) {
+      this.lastTouchY = e.touches[0].clientY;
+      this.isSwiping = true;
+    }
+  }
+
+  handleTouchMove(e) {
+    if (!this.isSwiping || !e.touches || !e.touches[0]) return;
+    const currentTouchY = e.touches[0].clientY;
+    const delta = Math.abs(currentTouchY - this.lastTouchY);
+    this.lastTouchY = currentTouchY;
+
+    if (delta > 0) {
+      this.accumulatedScrollInTick += delta;
+      this.totalScrollDistance += delta;
+    }
+  }
+
+  handleTouchEnd() {
+    this.isSwiping = false;
+  }
+
+  handlePointerDown(e) {
+    this.isPointerDown = true;
+    this.lastPointerY = e.clientY;
+  }
+
+  handlePointerMove(e) {
+    if (!this.isPointerDown) return;
+    const delta = Math.abs(e.clientY - this.lastPointerY);
+    this.lastPointerY = e.clientY;
+
+    if (delta > 5) {
+      this.accumulatedScrollInTick += delta;
+      this.totalScrollDistance += delta;
+    }
+  }
+
+  handlePointerUp() {
+    this.isPointerDown = false;
+  }
+
+  handleKeyDownSwipe(e) {
+    const navKeys = ['ArrowDown', 'ArrowUp', 'PageDown', 'PageUp', 'j', 'k', 'w', 's'];
+    if (navKeys.includes(e.key)) {
+      const simulatedSwipePx = 600;
+      this.accumulatedScrollInTick += simulatedSwipePx;
+      this.totalScrollDistance += simulatedSwipePx;
     }
   }
 
   handleInteraction(e) {
     if (e.type === 'keydown') {
-      const scrollKeys = ['ArrowDown', 'ArrowUp', 'Space', ' ', 'PageDown', 'PageUp', 'Home', 'End'];
+      const scrollKeys = ['ArrowDown', 'ArrowUp', 'Space', ' ', 'PageDown', 'PageUp', 'Home', 'End', 'j', 'k', 'w', 's'];
       if (scrollKeys.includes(e.key)) return;
     }
 
@@ -103,11 +173,18 @@ export class HeuristicsEngine {
   start() {
     if (this.isEngineRunning) return;
 
-    window.addEventListener('scroll', this.handleScroll, { passive: true });
-    window.addEventListener('wheel', this.handleScroll, { passive: true });
-    window.addEventListener('click', this.handleInteraction, { passive: true });
-    window.addEventListener('keydown', this.handleInteraction, { passive: true });
-    window.addEventListener('input', this.handleInteraction, { passive: true });
+    const opt = { capture: true, passive: true };
+
+    window.addEventListener('scroll', this.handleScroll, opt);
+    window.addEventListener('wheel', this.handleScroll, opt);
+    window.addEventListener('touchstart', this.handleTouchStart, opt);
+    window.addEventListener('touchmove', this.handleTouchMove, opt);
+    window.addEventListener('touchend', this.handleTouchEnd, opt);
+    window.addEventListener('pointerdown', this.handlePointerDown, opt);
+    window.addEventListener('pointermove', this.handlePointerMove, opt);
+    window.addEventListener('pointerup', this.handlePointerUp, opt);
+    window.addEventListener('keydown', this.handleKeyDownSwipe, opt);
+    window.addEventListener('click', this.handleInteraction, opt);
 
     this.tickIntervalId = setInterval(this.runHeuristicsTick, TICK_RATE_MS);
     this.isEngineRunning = true;
@@ -120,11 +197,18 @@ export class HeuristicsEngine {
   stop() {
     if (!this.isEngineRunning) return;
 
-    window.removeEventListener('scroll', this.handleScroll);
-    window.removeEventListener('wheel', this.handleScroll);
-    window.removeEventListener('click', this.handleInteraction);
-    window.removeEventListener('keydown', this.handleInteraction);
-    window.removeEventListener('input', this.handleInteraction);
+    const opt = { capture: true };
+
+    window.removeEventListener('scroll', this.handleScroll, opt);
+    window.removeEventListener('wheel', this.handleScroll, opt);
+    window.removeEventListener('touchstart', this.handleTouchStart, opt);
+    window.removeEventListener('touchmove', this.handleTouchMove, opt);
+    window.removeEventListener('touchend', this.handleTouchEnd, opt);
+    window.removeEventListener('pointerdown', this.handlePointerDown, opt);
+    window.removeEventListener('pointermove', this.handlePointerMove, opt);
+    window.removeEventListener('pointerup', this.handlePointerUp, opt);
+    window.removeEventListener('keydown', this.handleKeyDownSwipe, opt);
+    window.removeEventListener('click', this.handleInteraction, opt);
 
     if (this.tickIntervalId) {
       clearInterval(this.tickIntervalId);
