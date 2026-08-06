@@ -342,6 +342,8 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
 
       checkbox.addEventListener('change', () => {
         if (checkbox.checked) {
+          step.completed = true;
+          step.isDone = true;
           if (step.id) {
             markTodoDoneOnBackend(step.id);
           }
@@ -388,6 +390,8 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
             });
           }
         } else {
+          step.completed = false;
+          step.isDone = false;
           magicTaskState.currentStepIndex = index;
           magicTaskState.completed = false;
           setStorage({

@@ -3,6 +3,7 @@
  */
 
 import { setStorage, getStorage } from '../services/storageService.js';
+import { markTodoDoneOnBackend } from '../services/projectService.js';
 
 export function initFocusController({ onGoToMagic, onGoToMagicCreate, onStartPomodoro, onGoToGuard }) {
   const focusIdleView = document.getElementById('focus-idle-view');
@@ -53,7 +54,16 @@ export function initFocusController({ onGoToMagic, onGoToMagicCreate, onStartPom
         let isFinishedAll = false;
 
         if (state && state.steps && state.steps.length) {
-          const curIdx = typeof state.currentStepIndex === 'number' ? state.currentStepIndex : 0;
+          const curIdx = typeof state.currentStepIndex === 'number' ? Math.max(0, state.currentStepIndex) : 0;
+          
+          if (state.steps[curIdx]) {
+            state.steps[curIdx].completed = true;
+            state.steps[curIdx].isDone = true;
+            if (state.steps[curIdx].id) {
+              markTodoDoneOnBackend(state.steps[curIdx].id);
+            }
+          }
+
           const nxtIdx = curIdx + 1;
 
           if (nxtIdx < state.steps.length) {
