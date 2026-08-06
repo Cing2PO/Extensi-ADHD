@@ -16,9 +16,12 @@ export function initProjectController(callbacks = {}) {
   const resumeDurationInput = document.getElementById('resume-duration-input');
   const btnConfirmResume = document.getElementById('btn-confirm-resume');
 
+  const resumeTodosList = document.getElementById('resume-todos-list');
+  const resumeTodosCount = document.getElementById('resume-todos-count');
+
   let selectedProjectForResume = null;
 
-  function openResumeModal(project) {
+  async function openResumeModal(project) {
     selectedProjectForResume = project;
     if (resumeModalTitle) {
       resumeModalTitle.textContent = `Lanjutkan: ${project.name}`;
@@ -30,6 +33,64 @@ export function initProjectController(callbacks = {}) {
       resumeModal.classList.remove('hidden');
     }
     document.body.classList.add('modal-open');
+
+    // Render Preview To-Do List & Status
+    renderModalTodosPreview(project);
+  }
+
+  async function renderModalTodosPreview(project) {
+    if (!resumeTodosList) return;
+    resumeTodosList.innerHTML = '<div style="font-size:10px; color:#94a3b8; text-align:center; padding:8px;">Memuat daftar to-do...</div>';
+    if (resumeTodosCount) resumeTodosCount.textContent = 'Memuat...';
+
+    let steps = [];
+
+    // Case 1: Local project / active task with steps
+    if (project.steps && Array.isArray(project.steps)) {
+      steps = project.steps;
+    } else {
+      // Case 2: Fetch steps from backend
+      try {
+        const resumedData = await resumeProject(project.id, 999);
+        steps = resumedData.steps || [];
+      } catch (err) {
+        console.warn('[ProjectController] Error loading project todos for preview:', err);
+        steps = [
+          { text: `Sesi fokus: ${project.name}`, minutes: 15, isDone: false },
+          { text: 'Evaluasi & penyelesaian milestone', minutes: 15, isDone: false }
+        ];
+      }
+    }
+
+    resumeTodosList.innerHTML = '';
+    if (!steps || steps.length === 0) {
+      resumeTodosList.innerHTML = '<div style="font-size:10px; color:#94a3b8; text-align:center; padding:8px;">Tidak ada item to-do.</div>';
+      if (resumeTodosCount) resumeTodosCount.textContent = '0 item';
+      return;
+    }
+
+    const doneCount = steps.filter(s => s.isDone || s.completed).length;
+    if (resumeTodosCount) {
+      resumeTodosCount.textContent = `${doneCount}/${steps.length} selesai`;
+    }
+
+    steps.forEach((step, idx) => {
+      const isDone = !!(step.isDone || step.completed);
+      const itemRow = document.createElement('div');
+      itemRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; background: rgba(255, 255, 255, 0.04); border-radius: 8px; font-size: 10px; gap: 8px;';
+
+      const label = document.createElement('span');
+      label.style.cssText = `color: #e2e8f0; font-size: 10px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; ${isDone ? 'text-decoration: line-through; opacity: 0.5;' : ''}`;
+      label.textContent = `${idx + 1}. ${step.text}`;
+
+      const badge = document.createElement('span');
+      badge.style.cssText = `font-size: 9px; padding: 2px 6px; border-radius: 999px; font-weight: 600; white-space: nowrap; ${isDone ? 'background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);' : 'background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);'}`;
+      badge.textContent = isDone ? '✓ Selesai' : '⏳ Belum';
+
+      itemRow.appendChild(label);
+      itemRow.appendChild(badge);
+      resumeTodosList.appendChild(itemRow);
+    });
   }
 
   function closeResumeModal() {
@@ -106,55 +167,60 @@ export function initProjectController(callbacks = {}) {
     } finally {
       if (btnConfirmResume) {
         btnConfirmResume.disabled = false;
-        btnConfirmResume.textContent = '▶️ Mulai Sesi Fokus';
+        btnConfirmResume.textContent = '▶️ Lanjutkan Proyek';
       }
     }
   }
 
   async function renderProjectPreviewList() {
-    if (!projectCardsList) return;
+    const listContainers = document.querySelectorAll('.project-cards-list');
+    if (!listContainers || listContainers.length === 0) return;
 
     try {
       const projects = await getSavedProjects();
-      projectCardsList.innerHTML = '';
 
-      if (!projects || projects.length === 0) {
-        if (previewContainer) previewContainer.classList.add('hidden');
-        return;
-      }
+      listContainers.forEach(container => {
+        container.innerHTML = '';
+        const parentCard = container.closest('.card');
 
-      if (previewContainer) previewContainer.classList.remove('hidden');
+        if (!projects || projects.length === 0) {
+          if (parentCard) parentCard.classList.add('hidden');
+          return;
+        }
 
-      projects.forEach((project) => {
-        const card = document.createElement('div');
-        card.className = 'project-preview-card';
+        if (parentCard) parentCard.classList.remove('hidden');
 
-        const titleBox = document.createElement('div');
-        titleBox.className = 'project-card-title-box';
+        projects.forEach((project) => {
+          const card = document.createElement('div');
+          card.className = 'project-preview-card';
 
-        const title = document.createElement('span');
-        title.className = 'project-card-title';
-        title.textContent = project.name;
+          const titleBox = document.createElement('div');
+          titleBox.className = 'project-card-title-box';
 
-        const badge = document.createElement('span');
-        badge.className = 'project-card-badge';
-        badge.textContent = typeof project.undoneTodos === 'string' && project.undoneTodos.includes('sisa')
-          ? project.undoneTodos
-          : `${project.undoneTodos || 'Proyek'}`;
+          const title = document.createElement('span');
+          title.className = 'project-card-title';
+          title.textContent = project.name;
 
-        titleBox.appendChild(title);
-        titleBox.appendChild(badge);
+          const badge = document.createElement('span');
+          badge.className = 'project-card-badge';
+          badge.textContent = typeof project.undoneTodos === 'string' && project.undoneTodos.includes('sisa')
+            ? project.undoneTodos
+            : `${project.undoneTodos || 'Proyek'}`;
 
-        const actionBtn = document.createElement('button');
-        actionBtn.type = 'button';
-        actionBtn.className = 'btn-resume-project';
-        actionBtn.textContent = '▶️ Lanjutkan';
+          titleBox.appendChild(title);
+          titleBox.appendChild(badge);
 
-        card.appendChild(titleBox);
-        card.appendChild(actionBtn);
+          const actionBtn = document.createElement('button');
+          actionBtn.type = 'button';
+          actionBtn.className = 'btn-resume-project';
+          actionBtn.textContent = '▶️ Lanjutkan';
 
-        card.addEventListener('click', () => openResumeModal(project));
-        projectCardsList.appendChild(card);
+          card.appendChild(titleBox);
+          card.appendChild(actionBtn);
+
+          card.addEventListener('click', () => openResumeModal(project));
+          container.appendChild(card);
+        });
       });
     } catch (e) {
       console.warn('[ProjectController] Error rendering preview list:', e);

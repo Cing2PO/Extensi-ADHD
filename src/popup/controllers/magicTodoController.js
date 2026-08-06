@@ -8,6 +8,13 @@ import { getSwalTheme } from '../modules/themeManager.js';
 import { markTodoDoneOnBackend, deleteTodoOnBackend } from '../services/projectService.js';
 
 export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
+  const magicIdleView = document.getElementById('magic-idle-view');
+  const magicActiveView = document.getElementById('magic-active-view');
+
+  const btnToggleMagicAccordion = document.getElementById('btn-toggle-magic-accordion');
+  const magicAccordionBody = document.getElementById('magic-accordion-body');
+  const accordionArrow = document.getElementById('accordion-arrow');
+
   const magicInputPanel = document.getElementById('magic-input-panel');
   const magicLoadingPanel = document.getElementById('magic-loading-panel');
   const magicResultsPanel = document.getElementById('magic-results-panel');
@@ -35,6 +42,21 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
   let magicTaskState = null;
   let pomodoroSession = null;
   let pomodoroTimerInterval = null;
+
+  if (btnToggleMagicAccordion) {
+    btnToggleMagicAccordion.addEventListener('click', () => {
+      if (magicAccordionBody) {
+        const isHidden = magicAccordionBody.classList.contains('hidden');
+        if (isHidden) {
+          magicAccordionBody.classList.remove('hidden');
+          if (accordionArrow) accordionArrow.textContent = '▲';
+        } else {
+          magicAccordionBody.classList.add('hidden');
+          if (accordionArrow) accordionArrow.textContent = '▼';
+        }
+      }
+    });
+  }
 
   function buildPomodoroPlan(totalMinutes) {
     const plan = [];
@@ -76,9 +98,7 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
   }
 
   function renderPomodoroPanel() {
-    if (!magicPomodoroPanel) return;
-
-    magicPomodoroPanel.classList.remove('hidden');
+    if (!magicPomodoroTimer && !magicPomodoroStatus) return;
 
     if (!pomodoroSession || !pomodoroSession.isActive) {
       if (magicPomodoroStatus) magicPomodoroStatus.textContent = 'Belum Dimulai';
@@ -173,8 +193,41 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
       pomodoroTimerInterval = null;
     }
     pomodoroSession = null;
-    setStorage({ pomodoroSession: null }).then(() => {
+    setStorage({ pomodoroSession: null, currentTask: '' }).then(() => {
       renderPomodoroPanel();
+      if (onStartFocusTab) onStartFocusTab('');
+    });
+  }
+
+  function startNewPomodoroSession() {
+    const workM = Math.max(1, parseInt(pomodoroWorkInput?.value, 10) || 25);
+    const breakM = Math.max(1, parseInt(pomodoroBreakInput?.value, 10) || 5);
+
+    const plan = [
+      { type: 'work', minutes: workM },
+      { type: 'break', minutes: breakM },
+      { type: 'work', minutes: workM },
+      { type: 'break', minutes: breakM }
+    ];
+
+    const defaultTask = (magicTaskState && magicTaskState.taskName) || 'Sesi Fokus Mandiri';
+
+    pomodoroSession = {
+      isActive: true,
+      isRunning: true,
+      totalMinutes: workM * 2 + breakM * 2,
+      plan,
+      currentIndex: 0,
+      phase: 'work',
+      targetTimestamp: Date.now() + (workM * 60 * 1000),
+      pausedRemainingSeconds: null,
+      showFloatingWidget: floatingPomodoroToggle ? floatingPomodoroToggle.checked : true
+    };
+
+    setStorage({ pomodoroSession, currentTask: defaultTask }).then(() => {
+      renderPomodoroPanel();
+      startPomodoroTimer();
+      if (onStartFocusTab) onStartFocusTab(defaultTask);
     });
   }
 
@@ -185,15 +238,21 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
     if (magicCongratsPanel) magicCongratsPanel.classList.add('hidden');
 
     if (!magicTaskState) {
+      if (magicIdleView) magicIdleView.classList.remove('hidden');
+      if (magicActiveView) magicActiveView.classList.add('hidden');
       if (magicInputPanel) magicInputPanel.classList.remove('hidden');
       renderPomodoroPanel();
       return;
     }
 
     if (magicTaskState.completed) {
+      if (magicIdleView) magicIdleView.classList.remove('hidden');
+      if (magicActiveView) magicActiveView.classList.add('hidden');
       if (magicCongratsPanel) magicCongratsPanel.classList.remove('hidden');
       renderPomodoroPanel();
     } else {
+      if (magicIdleView) magicIdleView.classList.add('hidden');
+      if (magicActiveView) magicActiveView.classList.remove('hidden');
       if (magicResultsPanel) magicResultsPanel.classList.remove('hidden');
       renderMagicSteps();
       renderPomodoroPanel();
@@ -616,33 +675,14 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
     });
   }
 
-  function startNewPomodoroSession() {
-    const workM = Math.max(1, parseInt(pomodoroWorkInput?.value, 10) || 25);
-    const breakM = Math.max(1, parseInt(pomodoroBreakInput?.value, 10) || 5);
-
-    const plan = [
-      { type: 'work', minutes: workM },
-      { type: 'break', minutes: breakM },
-      { type: 'work', minutes: workM },
-      { type: 'break', minutes: breakM }
-    ];
-
-    pomodoroSession = {
-      isActive: true,
-      isRunning: true,
-      totalMinutes: workM * 2 + breakM * 2,
-      plan,
-      currentIndex: 0,
-      phase: 'work',
-      targetTimestamp: Date.now() + (workM * 60 * 1000),
-      pausedRemainingSeconds: null,
-      showFloatingWidget: floatingPomodoroToggle ? floatingPomodoroToggle.checked : true
-    };
-
-    setStorage({ pomodoroSession }).then(() => {
-      renderPomodoroPanel();
-      startPomodoroTimer();
-    });
+  function openCreateAccordion() {
+    if (magicAccordionBody) {
+      magicAccordionBody.classList.remove('hidden');
+      if (accordionArrow) accordionArrow.textContent = '▲';
+    }
+    if (magicTaskInput) {
+      setTimeout(() => magicTaskInput.focus(), 100);
+    }
   }
 
   function setInitialStates({ magicState, pomoSession }) {
@@ -655,6 +695,7 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
   return {
     setInitialStates,
     renderMagicStateUI,
-    startNewPomodoroSession
+    startNewPomodoroSession,
+    openCreateAccordion
   };
 }

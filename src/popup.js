@@ -18,11 +18,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Project Controller (Preview & Resume)
   const projectController = initProjectController({
     onProjectResumed: (magicTaskState) => {
-      const activeTaskText = magicTaskState.steps && magicTaskState.steps.length > 0
-        ? magicTaskState.steps[0].text
-        : magicTaskState.taskName;
-      focusController.renderFocusTab(activeTaskText, magicTaskState);
-      switchToTab('tab-focus-page');
+      magicTodoController.setInitialStates({
+        magicState: magicTaskState,
+        pomoSession: null
+      });
+      switchToTab('tab-magic-page');
     }
   });
 
@@ -36,6 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Controllers
   const focusController = initFocusController({
     onGoToMagic: () => switchToTab('tab-magic-page'),
+    onGoToMagicCreate: () => {
+      switchToTab('tab-magic-page');
+      magicTodoController.openCreateAccordion();
+    },
+    onGoToGuard: () => switchToTab('tab-guard-page'),
     onStartPomodoro: () => magicTodoController.startNewPomodoroSession()
   });
 
@@ -43,6 +48,7 @@ document.addEventListener('DOMContentLoaded', () => {
     onStartFocusTab: (taskText) => {
       getStorage(['magicTaskState']).then((items) => {
         focusController.renderFocusTab(taskText, items.magicTaskState || null);
+        projectController.renderProjectPreviewList();
         switchToTab('tab-focus-page');
       });
     },
@@ -82,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Focus Dashboard Controller
     focusController.renderFocusTab(items.currentTask || '', items.magicTaskState || null);
+    projectController.renderProjectPreviewList();
 
     // 4. Rules & Blacklist Controller
     rulesController.setInitialRules({ items });

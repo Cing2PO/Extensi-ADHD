@@ -89,12 +89,13 @@ export async function getSavedProjects() {
     }
   }
 
-  // If active magicTaskState exists and has projectId, make sure it's in the list
-  if (data.magicTaskState && data.magicTaskState.projectId) {
-    const existingIndex = combined.findIndex(p => p.id === data.magicTaskState.projectId);
+  // If active magicTaskState exists, make sure it's in the list
+  if (data.magicTaskState && data.magicTaskState.taskName) {
+    const projId = data.magicTaskState.projectId || 'local-active-task';
+    const existingIndex = combined.findIndex(p => p.id === projId);
     const undoneCount = data.magicTaskState.steps ? data.magicTaskState.steps.filter(s => !s.completed).length : 0;
     const currentProjectObj = {
-      id: data.magicTaskState.projectId,
+      id: projId,
       name: data.magicTaskState.taskName || 'Proyek Aktif',
       totalTodos: data.magicTaskState.steps ? data.magicTaskState.steps.length : 0,
       undoneTodos: `${undoneCount} sisa to-do`,

@@ -4,18 +4,28 @@
 
 import { setStorage, getStorage } from '../services/storageService.js';
 
-export function initFocusController({ onGoToMagic, onStartPomodoro }) {
-  const focusEmptyState = document.getElementById('focus-empty-state');
-  const focusActiveContent = document.getElementById('focus-active-content');
+export function initFocusController({ onGoToMagic, onGoToMagicCreate, onStartPomodoro, onGoToGuard }) {
+  const focusIdleView = document.getElementById('focus-idle-view');
+  const focusActiveView = document.getElementById('focus-active-view');
   const focusTaskDisplay = document.getElementById('focus-task-display');
   const btnDashboardComplete = document.getElementById('btn-dashboard-complete');
   const btnDashboardCancel = document.getElementById('btn-dashboard-cancel');
-  const btnGoToMagic = document.getElementById('btn-go-to-magic');
+  const btnGoToMagicLink = document.getElementById('btn-go-to-magic-link');
+  const btnDashboardCreateMagic = document.getElementById('btn-dashboard-create-magic');
+  const btnGoToGuardTab = document.getElementById('btn-go-to-guard-tab');
   const btnStartQuickPomodoro = document.getElementById('btn-start-quick-pomodoro');
   const refocusCounter = document.getElementById('refocus-counter');
 
-  if (btnGoToMagic && onGoToMagic) {
-    btnGoToMagic.addEventListener('click', onGoToMagic);
+  if (btnGoToMagicLink && onGoToMagic) {
+    btnGoToMagicLink.addEventListener('click', onGoToMagic);
+  }
+
+  if (btnDashboardCreateMagic && onGoToMagicCreate) {
+    btnDashboardCreateMagic.addEventListener('click', onGoToMagicCreate);
+  }
+
+  if (btnGoToGuardTab && onGoToGuard) {
+    btnGoToGuardTab.addEventListener('click', onGoToGuard);
   }
 
   if (btnStartQuickPomodoro && onStartPomodoro) {
@@ -109,14 +119,14 @@ export function initFocusController({ onGoToMagic, onStartPomodoro }) {
 
   function renderFocusTab(currentTaskText, magicTaskState) {
     if (!currentTaskText) {
-      if (focusEmptyState) focusEmptyState.classList.remove('hidden');
-      if (focusActiveContent) focusActiveContent.classList.add('hidden');
+      if (focusIdleView) focusIdleView.classList.remove('hidden');
+      if (focusActiveView) focusActiveView.classList.add('hidden');
       updateFocusProgress(0, 0);
       return;
     }
 
-    if (focusEmptyState) focusEmptyState.classList.add('hidden');
-    if (focusActiveContent) focusActiveContent.classList.remove('hidden');
+    if (focusIdleView) focusIdleView.classList.add('hidden');
+    if (focusActiveView) focusActiveView.classList.remove('hidden');
     if (focusTaskDisplay) focusTaskDisplay.textContent = currentTaskText;
 
     if (!magicTaskState || !magicTaskState.steps?.length) {
