@@ -7,8 +7,13 @@ import { getSwalTheme } from '../modules/themeManager.js';
 
 export function initRulesController({ onStartPomodoro }) {
   const protectionToggle = document.getElementById('protection-toggle');
+  const guardMasterToggle = document.getElementById('guard-master-toggle');
   const sensitivitySlider = document.getElementById('sensitivity-slider');
   const sliderValLabel = document.getElementById('slider-val-label');
+
+  const btnSettingsGear = document.getElementById('btn-settings-gear');
+  const settingsModal = document.getElementById('settings-modal');
+  const btnCloseSettingsModal = document.getElementById('btn-close-settings-modal');
 
   const activeSiteLabel = document.getElementById('active-site-label');
   const activeHostDisplay = document.getElementById('active-host');
@@ -32,7 +37,33 @@ export function initRulesController({ onStartPomodoro }) {
   if (protectionToggle) {
     protectionToggle.addEventListener('change', () => {
       setStorage({ isProtectionActive: protectionToggle.checked });
+      if (guardMasterToggle) guardMasterToggle.checked = protectionToggle.checked;
     });
+  }
+
+  if (guardMasterToggle) {
+    guardMasterToggle.addEventListener('change', () => {
+      setStorage({ isProtectionActive: guardMasterToggle.checked });
+      if (protectionToggle) protectionToggle.checked = guardMasterToggle.checked;
+    });
+  }
+
+  function openSettingsModal() {
+    if (settingsModal) settingsModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeSettingsModal() {
+    if (settingsModal) settingsModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+
+  if (btnSettingsGear) {
+    btnSettingsGear.addEventListener('click', openSettingsModal);
+  }
+
+  if (btnCloseSettingsModal) {
+    btnCloseSettingsModal.addEventListener('click', closeSettingsModal);
   }
 
   if (floatingPomodoroToggle) {
@@ -322,6 +353,9 @@ export function initRulesController({ onStartPomodoro }) {
   function setInitialRules({ items }) {
     if (protectionToggle) {
       protectionToggle.checked = items.isProtectionActive !== false;
+    }
+    if (guardMasterToggle) {
+      guardMasterToggle.checked = items.isProtectionActive !== false;
     }
 
     const sensitivity = items.sensitivity || 'balanced';

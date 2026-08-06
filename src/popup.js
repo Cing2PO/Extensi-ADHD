@@ -8,20 +8,52 @@ import { initNavigationManager, switchToTab } from './popup/modules/navigationMa
 import { initFocusController } from './popup/controllers/focusController.js';
 import { initMagicTodoController } from './popup/controllers/magicTodoController.js';
 import { initRulesController } from './popup/controllers/rulesController.js';
+import { initAuthController } from './popup/controllers/authController.js';
+import { initProjectController } from './popup/controllers/projectController.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize UI navigation
   initNavigationManager();
 
+  // Initialize Project Controller (Preview & Resume)
+  const projectController = initProjectController({
+    onProjectResumed: (magicTaskState) => {
+      magicTodoController.setInitialStates({
+        magicState: magicTaskState,
+        pomoSession: null
+      });
+      switchToTab('tab-magic-page');
+    }
+  });
+
+  // Initialize Auth Controller
+  const authController = initAuthController({
+    onLoginSuccess: () => {
+      projectController.renderProjectPreviewList();
+    }
+  });
+
   // Initialize Controllers
   const focusController = initFocusController({
-    onGoToMagic: () => switchToTab('tab-magic-page')
+    onGoToMagic: () => switchToTab('tab-magic-page'),
+    onGoToMagicCreate: () => {
+      switchToTab('tab-magic-page');
+      magicTodoController.openCreateAccordion();
+    },
+    onGoToGuard: () => switchToTab('tab-guard-page'),
+    onStartPomodoro: () => magicTodoController.startNewPomodoroSession()
   });
 
   const magicTodoController = initMagicTodoController({
     onStartFocusTab: (taskText) => {
-      focusController.renderFocusTab(taskText, null);
-      switchToTab('tab-focus-page');
+      getStorage(['magicTaskState']).then((items) => {
+        focusController.renderFocusTab(taskText, items.magicTaskState || null);
+        projectController.renderProjectPreviewList();
+        switchToTab('tab-focus-page');
+      });
+    },
+    onRequestAuth: () => {
+      authController.openAuthModal('login');
     }
   });
 
@@ -56,6 +88,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Focus Dashboard Controller
     focusController.renderFocusTab(items.currentTask || '', items.magicTaskState || null);
+    projectController.renderProjectPreviewList();
 
     // 4. Rules & Blacklist Controller
     rulesController.setInitialRules({ items });
@@ -67,17 +100,55 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Live Debug Sensor Sync
+  function updateDebugSensorUI() {
+    getStorage(['debugMetrics']).then((items) => {
+      const metrics = items.debugMetrics;
+      const domainEl = document.getElementById('debug-active-domain');
+      const scrollEl = document.getElementById('debug-scroll-px');
+
+      if (metrics) {
+        if (domainEl && metrics.domain) domainEl.textContent = metrics.domain;
+        if (scrollEl) {
+          if (metrics.isShortVideo) {
+            scrollEl.textContent = `🎬 ${metrics.swipeCount || 0} Video (${(metrics.totalScrollPx || 0).toLocaleString()} px)`;
+          } else if (metrics.totalScrollPx !== undefined) {
+            scrollEl.textContent = `📜 ${(metrics.totalScrollPx || 0).toLocaleString()} px (pos: ${metrics.scrollY || 0}px)`;
+          }
+        }
+      }
+    });
+
+    if (typeof chrome !== 'undefined' && chrome.tabs && chrome.tabs.query) {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs && tabs[0] && tabs[0].url) {
+          try {
+            const urlObj = new URL(tabs[0].url);
+            const domainEl = document.getElementById('debug-active-domain');
+            if (domainEl && urlObj.hostname && urlObj.protocol.startsWith('http')) {
+              domainEl.textContent = urlObj.hostname;
+            } else if (domainEl && urlObj.protocol.startsWith('chrome')) {
+              domainEl.textContent = `${urlObj.hostname} (Halaman Internal Chrome)`;
+            }
+          } catch (e) {}
+        }
+      });
+    }
+  }
+
+  updateDebugSensorUI();
+
   // Storage Change Sync
   if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.onChanged) {
     chrome.storage.onChanged.addListener((changes, namespace) => {
       if (namespace === 'local') {
-        getStorage(['magicTaskState', 'currentTask', 'pomodoroSession']).then((items) => {
-          if (changes.currentTask || changes.magicTaskState) {
-            focusController.renderFocusTab(items.currentTask || '', items.magicTaskState || null);
-          }
-          if (changes.magicTaskState || changes.pomodoroSession) {
-            magicTodoController.renderMagicStateUI();
-          }
+        getStorage(['magicTaskState', 'currentTask', 'pomodoroSession', 'debugMetrics']).then((items) => {
+          magicTodoController.setInitialStates({
+            magicState: items.magicTaskState || null,
+            pomoSession: items.pomodoroSession || null
+          });
+          focusController.renderFocusTab(items.currentTask || '', items.magicTaskState || null);
+          updateDebugSensorUI();
         });
       }
     });

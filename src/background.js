@@ -8,77 +8,12 @@
 import { encrypt, decrypt } from './utils/encryption.js';
 import { ENV_CONFIG } from './config.js';
 
-// Simulated WebSocket State
-let mockSocket = null;
+// WebSocket State
+let socket = null;
 let isSocketConnected = false;
-const REVERB_MOCK_URL = ENV_CONFIG?.REVERB_WS_URL || "ws://localhost:8000/app/reverb";
+const REVERB_WS_URL = ENV_CONFIG?.REVERB_WS_URL || "ws://localhost:8000/app/reverb";
 
 console.log("[Background Service Worker] Initializing...");
-
-// Auto-initialize mock connection
-connectMockWebSocket();
-
-function connectMockWebSocket() {
-  console.log(`[Mock WebSocket] Connecting to Reverb server at ${REVERB_MOCK_URL}...`);
-  
-  // Simulate network latency for connection
-  setTimeout(() => {
-    isSocketConnected = true;
-    mockSocket = {
-      send: (encryptedData) => {
-        // Log the sending of encrypted data
-        console.log("%c[Mock WebSocket] Sending Encrypted Payload to Server:", "color: #3b82f6; font-weight: bold;");
-        console.log(`Payload (Hex): ${encryptedData}`);
-        
-        // Let's decrypt it in the log just to verify it works
-        try {
-          const decrypted = decrypt(encryptedData);
-          console.log(`Decrypted verification output on server side:`, JSON.parse(decrypted));
-        } catch (e) {
-          console.error("Mock Server failed to decrypt payload:", e);
-        }
-
-        // Simulate server receiving and acknowledging the doomscroll event
-        simulateServerEventAcknowledgment(encryptedData);
-      }
-    };
-    console.log("%c[Mock WebSocket] Connection established successfully (Mock Server Mode).", "color: #10b981; font-weight: bold;");
-  }, 1000);
-}
-
-/**
- * Simulates a server event acknowledgment and cross-platform intervention trigger.
- */
-function simulateServerEventAcknowledgment(encryptedData) {
-  setTimeout(() => {
-    try {
-      const parsedData = JSON.parse(decrypt(encryptedData));
-      console.log("%c[Mock Server Response] Acknowledged doomscroll event on domain: " + parsedData.domain, "color: #ef4444; font-weight: bold;");
-      
-      // Simulate triggering the mobile app cross-platform intervention
-      console.log("%c[Mock Cross-Platform Hub] BROADCASTING EVENT -> Mobile ADHD App", "background: #ef4444; color: white; padding: 2px 6px; border-radius: 4px;");
-      console.log(`[Mock Mobile Haptic Alert] Triggering vibration and brown noise waveforms for task: "${parsedData.currentTask || 'No task active'}"`);
-      
-      // Broadcast back an acknowledgment to all open extension content scripts
-      chrome.tabs.query({}, (tabs) => {
-        tabs.forEach(tab => {
-          if (tab.url && (tab.url.startsWith("http") || tab.url.startsWith("https"))) {
-            chrome.tabs.sendMessage(tab.id, {
-              type: 'DOOMSCROLL_SERVER_ACK',
-              domain: parsedData.domain,
-              score: parsedData.score,
-              timestamp: parsedData.timestamp
-            }).catch(() => {
-              // Ignore errors for tabs where extension content script is not loaded
-            });
-          }
-        });
-      });
-    } catch (e) {
-      console.error("Error in simulation response:", e);
-    }
-  }, 1200);
-}
 
 // Listen for messages from content.js or popup.js
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
@@ -93,15 +28,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     console.log("%c[Background Script] Received Doomscroll Event from Content Script:", "color: #f59e0b; font-weight: bold;");
     console.log("Raw Payload:", rawPayload);
 
-    // Encrypt the payload using encryption utility (XOR with binary representation of ASCII '5')
+    // Encrypt the payload using encryption utility
     const encryptedHex = encrypt(JSON.stringify(rawPayload));
 
-    if (isSocketConnected && mockSocket) {
-      mockSocket.send(encryptedHex);
+    if (isSocketConnected && socket) {
+      socket.send(encryptedHex);
       sendResponse({ status: 'sent', encrypted: encryptedHex });
     } else {
-      console.warn("[Background Script] Mock WebSocket is not connected. Simulating buffer and reconnecting...");
-      connectMockWebSocket();
       sendResponse({ status: 'buffered_offline' });
     }
     return true; // Keep response channel open for async execution

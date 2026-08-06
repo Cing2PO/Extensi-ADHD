@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 /* Isolated Shadow DOM context resetting */
 :host {
   all: initial;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   box-sizing: border-box;
 }
 
@@ -11,16 +11,18 @@
   box-sizing: inherit;
 }
 
-/* 100% Fullscreen Overlay with Tailwind Slate-900 look */
+/* 100% Fullscreen Overlay matching Main Extension Theme */
 .focus-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: rgba(15, 23, 42, 0.97); /* Tailwind Slate-900 color at 97% opacity */
-  backdrop-filter: blur(8px);
-  -webkit-backdrop-filter: blur(8px);
+  background: radial-gradient(circle at top right, rgba(20, 184, 166, 0.18), transparent 60%),
+              radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.12), transparent 60%),
+              rgba(9, 13, 22, 0.96);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   z-index: 2147483647; /* Absolute maximum z-index priority */
   display: flex;
   justify-content: center;
@@ -28,6 +30,7 @@
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 .focus-overlay.visible {
@@ -35,18 +38,18 @@
   pointer-events: auto;
 }
 
-/* Elegant Slate-800 Glassmorphic Dialog Card */
+/* Elegant Glassmorphic Dialog Card matching Extension Popup */
 .focus-card {
-  background: rgba(30, 41, 59, 0.7); /* Tailwind Slate-800 translucent base */
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: linear-gradient(135deg, rgba(17, 24, 39, 0.85) 0%, rgba(10, 15, 30, 0.9) 100%);
+  border: 1px solid rgba(45, 212, 191, 0.25);
   border-radius: 24px;
   padding: 40px 32px;
   width: 420px;
   max-width: 90%;
   text-align: center;
   box-shadow: 
-    0 20px 50px rgba(0, 0, 0, 0.5), 
-    0 0 40px rgba(99, 102, 241, 0.08);
+    0 20px 50px rgba(0, 0, 0, 0.6), 
+    0 0 40px rgba(20, 184, 166, 0.15);
   transform: translateY(16px) scale(0.96);
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
@@ -58,18 +61,18 @@
   transform: translateY(0) scale(1);
 }
 
-/* Soft alerting icon container */
+/* Soft alerting icon container matching Teal theme */
 .focus-icon-container {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: rgba(99, 102, 241, 0.1);
-  border: 1px solid rgba(99, 102, 241, 0.25);
+  background: rgba(20, 184, 166, 0.12);
+  border: 1px solid rgba(45, 212, 191, 0.3);
   margin-bottom: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #818cf8; /* Slate-400-indigo */
+  color: #2dd4bf;
   animation: subtle-pulse 3s infinite ease-in-out;
 }
 
@@ -83,7 +86,7 @@
   margin: 0 0 10px 0;
   font-size: 24px;
   font-weight: 700;
-  color: #f8fafc; /* Slate-50 */
+  color: #f1f5f9;
   letter-spacing: -0.5px;
 }
 
@@ -91,7 +94,7 @@
   margin: 0 0 32px 0;
   font-size: 15px;
   line-height: 1.5;
-  color: #94a3b8; /* Slate-400 */
+  color: #94a3b8;
 }
 
 /* Button columns */
@@ -116,17 +119,17 @@
   justify-content: center;
 }
 
-/* Yes, I am working button */
+/* Yes, I am working button matching Teal/Emerald Gradient */
 .btn-working {
-  background: #4f46e5; /* Indigo-600 */
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   color: #ffffff;
-  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.35);
 }
 
 .btn-working:hover {
-  background: #4338ca; /* Indigo-700 */
+  background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 16px rgba(79, 70, 229, 0.35);
+  box-shadow: 0 6px 20px rgba(20, 184, 166, 0.5);
 }
 
 .btn-working:active {
@@ -135,15 +138,15 @@
 
 /* No, get me out button */
 .btn-exit {
-  background: rgba(255, 255, 255, 0.03);
+  background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #cbd5e1; /* Slate-300 */
+  color: #cbd5e1;
 }
 
 .btn-exit:hover {
-  background: rgba(239, 68, 68, 0.08); /* Transparent Red-500 */
-  border-color: rgba(239, 68, 68, 0.25);
-  color: #fca5a5; /* Red-300 */
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
   transform: translateY(-1px);
 }
 
@@ -154,13 +157,13 @@
 /* Soft pulsing animation for indicator icon */
 @keyframes subtle-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0.15);
+    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.25);
   }
   70% {
-    box-shadow: 0 0 0 10px rgba(99, 102, 241, 0);
+    box-shadow: 0 0 0 12px rgba(45, 212, 191, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(99, 102, 241, 0);
+    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0);
   }
 }
 
@@ -170,10 +173,10 @@
 
 .adhd-pomo-wrapper {
   position: fixed;
-  bottom: 24px;
-  right: 24px;
+  bottom: 32px;
+  right: 32px;
   z-index: 2147483646;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   user-select: none;
 }
 
@@ -183,13 +186,13 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: rgba(15, 23, 42, 0.92);
+  background: rgba(9, 13, 22, 0.94);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(129, 140, 248, 0.35);
+  border: 1px solid rgba(45, 212, 191, 0.35);
   border-radius: 999px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5), 0 4px 12px rgba(0, 0, 0, 0.3);
-  color: #f8fafc;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(20, 184, 166, 0.15);
+  color: #f1f5f9;
   cursor: grab;
   transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -200,22 +203,22 @@
 
 .adhd-pomo-pill:hover {
   transform: translateY(-2px);
-  border-color: rgba(129, 140, 248, 0.6);
-  box-shadow: 0 14px 30px -5px rgba(0, 0, 0, 0.6);
+  border-color: rgba(45, 212, 191, 0.6);
+  box-shadow: 0 14px 30px -5px rgba(0, 0, 0, 0.7), 0 0 20px rgba(20, 184, 166, 0.25);
 }
 
 .adhd-pomo-pill-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #34d399;
-  box-shadow: 0 0 10px #34d399;
+  background: #2dd4bf;
+  box-shadow: 0 0 10px #2dd4bf;
   animation: pomo-pulse 2s infinite ease-in-out;
 }
 
 .adhd-pomo-pill-dot.break {
-  background: #818cf8;
-  box-shadow: 0 0 10px #818cf8;
+  background: #38bdf8;
+  box-shadow: 0 0 10px #38bdf8;
 }
 
 @keyframes pomo-pulse {
@@ -245,14 +248,14 @@
   margin-top: 8px;
   right: 0;
   width: 270px;
-  background: rgba(15, 23, 42, 0.96);
+  background: rgba(9, 13, 22, 0.96);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(129, 140, 248, 0.35);
+  border: 1px solid rgba(45, 212, 191, 0.3);
   border-radius: 20px;
   padding: 16px;
-  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(129, 140, 248, 0.1);
-  color: #f8fafc;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(20, 184, 166, 0.12);
+  color: #f1f5f9;
   animation: pomo-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   transform-origin: top right;
 }
@@ -279,25 +282,25 @@
 }
 
 .adhd-pomo-status-badge.work {
-  color: #34d399;
+  color: #2dd4bf;
 }
 
 .adhd-pomo-status-badge.break {
-  color: #818cf8;
+  color: #38bdf8;
 }
 
 .adhd-pomo-task-box {
   margin-top: 10px;
   padding: 10px;
-  background: rgba(30, 41, 59, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(17, 24, 39, 0.6);
+  border: 1px solid rgba(45, 212, 191, 0.15);
   border-radius: 12px;
 }
 
 .adhd-pomo-task-label {
   font-size: 10px;
   font-weight: 700;
-  color: #818cf8;
+  color: #2dd4bf;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   display: block;
@@ -347,7 +350,7 @@
 }
 
 .adhd-pomo-ctrl-btn.btn-toggle-run {
-  background: rgba(13, 148, 136, 0.9);
+  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
   color: #ffffff;
 }
 
@@ -373,7 +376,7 @@
 
 .adhd-pomo-btn-icon:hover {
   background: rgba(255, 255, 255, 0.12);
-  color: #f8fafc;
+  color: #f1f5f9;
 }
 
 .adhd-pomo-btn-icon svg {
@@ -384,5 +387,3 @@
 .hidden {
   display: none !important;
 }
-
-

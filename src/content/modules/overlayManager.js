@@ -169,11 +169,21 @@ export class OverlayManager {
 
   // --- FLOATING POMODORO WIDGET ---
   injectPomodoroFloatingWidget() {
-    if (!document.body) return;
+    const targetParent = document.body || document.documentElement;
+    if (!targetParent) return;
     if (this.pomoRootContainer && this.pomoRootContainer.isConnected) return;
 
     if (!this.pomoRootContainer) {
       this.pomoRootContainer = document.createElement('adhd-pomodoro-floating-root');
+      this.pomoRootContainer.style.position = 'fixed';
+      this.pomoRootContainer.style.top = '0';
+      this.pomoRootContainer.style.left = '0';
+      this.pomoRootContainer.style.width = '0';
+      this.pomoRootContainer.style.height = '0';
+      this.pomoRootContainer.style.zIndex = '2147483646';
+      this.pomoRootContainer.style.display = 'block';
+      this.pomoRootContainer.style.pointerEvents = 'none';
+
       this.pomoShadowRootNode = this.pomoRootContainer.attachShadow({ mode: 'closed' });
 
       const linkElement = document.createElement('link');
@@ -184,6 +194,11 @@ export class OverlayManager {
       const wrapper = document.createElement('div');
       wrapper.className = 'adhd-pomo-wrapper';
       wrapper.id = 'adhd-pomo-wrapper';
+      wrapper.style.position = 'fixed';
+      wrapper.style.bottom = '32px';
+      wrapper.style.right = '32px';
+      wrapper.style.zIndex = '2147483646';
+      wrapper.style.pointerEvents = 'auto';
 
       wrapper.innerHTML = `
         <div class="adhd-pomo-pill" id="adhd-pomo-pill" title="Klik untuk membuka menu Pomodoro & Target Task">
@@ -209,6 +224,17 @@ export class OverlayManager {
           </div>
 
           <div class="adhd-pomo-timer-display" id="adhd-pomo-modal-time">25:00</div>
+
+          <div class="adhd-pomo-debug-box" style="margin-bottom: 10px; padding: 8px 10px; background: rgba(20, 184, 166, 0.08); border: 1px dashed rgba(45, 212, 191, 0.3); border-radius: 10px; font-size: 11px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; color: #2dd4bf; font-weight: 700;">
+              <span>🔍 Sensor Website</span>
+              <span id="adhd-pomo-debug-domain" style="color: #f1f5f9; font-weight: 600;">mendeteksi...</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; color: #94a3b8; margin-top: 4px; font-size: 10px;">
+              <span>📜 Scroll / Swipe:</span>
+              <span id="adhd-pomo-debug-scroll" style="color: #34d399; font-weight: 700;">0 px</span>
+            </div>
+          </div>
 
           <div class="adhd-pomo-modal-actions">
             <div style="display: flex; gap: 6px;">
@@ -253,7 +279,7 @@ export class OverlayManager {
     }
 
     if (!this.pomoRootContainer.isConnected) {
-      document.body.appendChild(this.pomoRootContainer);
+      targetParent.appendChild(this.pomoRootContainer);
     }
   }
 
@@ -287,12 +313,16 @@ export class OverlayManager {
       const savedPos = localStorage.getItem('adhd_pomo_floating_pos');
       if (savedPos) {
         const { left, top } = JSON.parse(savedPos);
-        wrapperEl.style.left = `${left}px`;
-        wrapperEl.style.top = `${top}px`;
-        wrapperEl.style.right = 'auto';
-        wrapperEl.style.bottom = 'auto';
+        if (typeof left === 'number' && typeof top === 'number' && left >= 0 && top >= 0 && left < (window.innerWidth - 60) && top < (window.innerHeight - 30)) {
+          wrapperEl.style.left = `${left}px`;
+          wrapperEl.style.top = `${top}px`;
+          wrapperEl.style.right = 'auto';
+          wrapperEl.style.bottom = 'auto';
+        } else {
+          localStorage.removeItem('adhd_pomo_floating_pos');
+        }
       }
-    } catch (e) {}
+    } catch (e) { }
 
     const onMouseDown = (e) => {
       if (e.target.closest('button')) return;
@@ -339,7 +369,7 @@ export class OverlayManager {
         const rect = wrapperEl.getBoundingClientRect();
         try {
           localStorage.setItem('adhd_pomo_floating_pos', JSON.stringify({ left: Math.round(rect.left), top: Math.round(rect.top) }));
-        } catch (e) {}
+        } catch (e) { }
       } else {
         this.togglePomoModal();
       }
@@ -389,6 +419,22 @@ export class OverlayManager {
 
     if (btnToggle) {
       btnToggle.textContent = session.isRunning ? 'Pause' : 'Lanjut';
+    }
+  }
+
+  updatePomoFloatingDebug(metrics) {
+    if (!this.pomoShadowRootNode || !metrics) return;
+    const domainEl = this.pomoShadowRootNode.getElementById('adhd-pomo-debug-domain');
+    const scrollEl = this.pomoShadowRootNode.getElementById('adhd-pomo-debug-scroll');
+    if (domainEl && metrics.domain) {
+      domainEl.textContent = metrics.domain;
+    }
+    if (scrollEl) {
+      if (metrics.isShortVideo) {
+        scrollEl.textContent = `🎬 ${metrics.swipeCount || 0} Video (${(metrics.totalScrollPx || 0).toLocaleString()} px)`;
+      } else if (metrics.totalScrollPx !== undefined) {
+        scrollEl.textContent = `📜 ${(metrics.totalScrollPx || 0).toLocaleString()} px (pos: ${metrics.scrollY || 0}px)`;
+      }
     }
   }
 
