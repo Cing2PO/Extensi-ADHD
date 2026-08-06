@@ -83,10 +83,12 @@ export function initAuthController(callbacks = {}) {
   function openAuthModal(defaultTab = 'login') {
     switchTab(defaultTab);
     if (authModal) authModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
   }
 
   function closeAuthModal() {
     if (authModal) authModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
     clearErrors();
   }
 

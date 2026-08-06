@@ -29,6 +29,7 @@ export function initProjectController(callbacks = {}) {
     if (resumeModal) {
       resumeModal.classList.remove('hidden');
     }
+    document.body.classList.add('modal-open');
   }
 
   function closeResumeModal() {
@@ -36,6 +37,7 @@ export function initProjectController(callbacks = {}) {
     if (resumeModal) {
       resumeModal.classList.add('hidden');
     }
+    document.body.classList.remove('modal-open');
   }
 
   async function handleConfirmResume() {
