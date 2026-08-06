@@ -3,6 +3,7 @@
  */
 
 import { ENV_CONFIG } from '../../config.js';
+import { getAuthSession, refreshAuthToken } from './authService.js';
 
 export function getApiConfig() {
   return {
@@ -11,11 +12,22 @@ export function getApiConfig() {
   };
 }
 
-export async function fetchMagicTodos(taskText, totalMinutes, options = {}) {
+/**
+ * Fetch generated Magic To-Do list from protected backend API
+ */
+export async function fetchMagicTodos(taskText, totalMinutes, options = {}, isRetry = false) {
   const config = getApiConfig();
 
   if (!config.MAGIC_TODO_URL) {
     throw new Error('URL Backend API tidak dikonfigurasi.');
+  }
+
+  // Get current Bearer token
+  const { accessToken } = await getAuthSession();
+  if (!accessToken) {
+    const authErr = new Error('Login diperlukan untuk menggunakan fitur AI Magic To-Do.');
+    authErr.code = 'AUTH_REQUIRED';
+    throw authErr;
   }
 
   const controller = new AbortController();
@@ -26,10 +38,10 @@ export async function fetchMagicTodos(taskText, totalMinutes, options = {}) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Accept': 'application/json'
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
       },
       body: JSON.stringify({
-        userId: options.userId || 1,
         prompt: taskText,
         availableMinutes: Number(totalMinutes) || 60,
         workMinutes: options.workMinutes || 25,
@@ -39,6 +51,18 @@ export async function fetchMagicTodos(taskText, totalMinutes, options = {}) {
     });
 
     clearTimeout(timeoutId);
+
+    // Handle Token Expiry / 401 Unauthorized with single retry
+    if (response.status === 401 && !isRetry) {
+      try {
+        await refreshAuthToken();
+        return await fetchMagicTodos(taskText, totalMinutes, options, true);
+      } catch (refreshErr) {
+        const authErr = new Error('Sesi login telah kedaluwarsa. Silakan login kembali.');
+        authErr.code = 'AUTH_REQUIRED';
+        throw authErr;
+      }
+    }
 
     const data = await response.json();
 
@@ -54,8 +78,9 @@ export async function fetchMagicTodos(taskText, totalMinutes, options = {}) {
 
     const perTaskMinutes = Math.max(5, Math.round(totalMinutes / rawSteps.length));
     return rawSteps.map(item => ({
+      id: typeof item === 'object' ? item.id : undefined,
       text: typeof item === 'string' ? item : (item.task || item.text || item.title || item.name),
-      minutes: typeof item === 'object' ? (item.estimated_minutes || item.minutes || perTaskMinutes) : perTaskMinutes
+      minutes: typeof item === 'object' ? (item.estimatedMinutes || item.estimated_minutes || item.minutes || perTaskMinutes) : perTaskMinutes
     }));
   } catch (err) {
     clearTimeout(timeoutId);

@@ -17,6 +17,14 @@
       </svg>
       <span class="brand-title">Focus Coach</span>
     </div>
+    <div class="header-auth-container" id="header-auth-container">
+      <button id="btn-header-auth" class="btn-auth-chip" title="Status Akun">
+        <svg class="auth-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+        </svg>
+        <span id="auth-user-chip-name">🔑 Login</span>
+      </button>
+    </div>
     <div class="switch-container">
       <button id="theme-toggle" class="theme-btn" title="Toggle Light/Dark Theme">
         <!-- Moon Icon (visible in light mode, click to go dark) -->
@@ -247,7 +255,52 @@
       </svg>
       Rules & Zones
     </button>
-  </nav>
+  <!-- Auth Modal Overlay -->
+  <div id="auth-modal" class="modal-overlay hidden">
+    <div class="modal-content auth-modal-card">
+      <div class="modal-header">
+        <span class="card-label" style="font-size: 13px;">Autentikasi Akun</span>
+        <button id="btn-close-auth-modal" class="btn-close-modal" title="Tutup Modal">✕</button>
+      </div>
+
+      <div class="auth-tabs">
+        <button id="tab-auth-login" class="auth-tab-btn active">Masuk (Login)</button>
+        <button id="tab-auth-register" class="auth-tab-btn">Daftar Akun</button>
+      </div>
+
+      <!-- Login Form -->
+      <form id="auth-form-login" class="auth-form">
+        <div class="form-group">
+          <label for="auth-login-email">Email</label>
+          <input type="email" id="auth-login-email" class="task-input" placeholder="user@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="auth-login-password">Password</label>
+          <input type="password" id="auth-login-password" class="task-input" placeholder="Minimal 6 karakter" required>
+        </div>
+        <div id="auth-login-error" class="auth-error-badge hidden"></div>
+        <button type="submit" id="btn-login-submit" class="btn-add" style="height: 36px; margin-top: 4px;">Masuk Akun</button>
+      </form>
+
+      <!-- Register Form -->
+      <form id="auth-form-register" class="auth-form hidden">
+        <div class="form-group">
+          <label for="auth-reg-name">Nama Lengkap</label>
+          <input type="text" id="auth-reg-name" class="task-input" placeholder="Nama Anda" required>
+        </div>
+        <div class="form-group">
+          <label for="auth-reg-email">Email</label>
+          <input type="email" id="auth-reg-email" class="task-input" placeholder="user@example.com" required>
+        </div>
+        <div class="form-group">
+          <label for="auth-reg-password">Password</label>
+          <input type="password" id="auth-reg-password" class="task-input" placeholder="Minimal 6 karakter" required>
+        </div>
+        <div id="auth-reg-error" class="auth-error-badge hidden"></div>
+        <button type="submit" id="btn-register-submit" class="btn-add" style="height: 36px; margin-top: 4px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Daftar Akun Baru</button>
+      </form>
+    </div>
+  </div>
 
   <script src="lib/sweetalert2.js"></script>
   <script src="lib/confetti.js"></script>

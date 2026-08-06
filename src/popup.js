@@ -8,10 +8,18 @@ import { initNavigationManager, switchToTab } from './popup/modules/navigationMa
 import { initFocusController } from './popup/controllers/focusController.js';
 import { initMagicTodoController } from './popup/controllers/magicTodoController.js';
 import { initRulesController } from './popup/controllers/rulesController.js';
+import { initAuthController } from './popup/controllers/authController.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize UI navigation
   initNavigationManager();
+
+  // Initialize Auth Controller
+  const authController = initAuthController({
+    onLoginSuccess: () => {
+      // Optional refresh or trigger syncing
+    }
+  });
 
   // Initialize Controllers
   const focusController = initFocusController({
@@ -25,6 +33,9 @@ document.addEventListener('DOMContentLoaded', () => {
         focusController.renderFocusTab(taskText, items.magicTaskState || null);
         switchToTab('tab-focus-page');
       });
+    },
+    onRequestAuth: () => {
+      authController.openAuthModal('login');
     }
   });
 

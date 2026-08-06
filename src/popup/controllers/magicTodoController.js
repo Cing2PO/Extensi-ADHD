@@ -6,7 +6,7 @@ import { fetchMagicTodos } from '../services/apiService.js';
 import { setStorage } from '../services/storageService.js';
 import { getSwalTheme } from '../modules/themeManager.js';
 
-export function initMagicTodoController({ onStartFocusTab }) {
+export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
   const magicInputPanel = document.getElementById('magic-input-panel');
   const magicLoadingPanel = document.getElementById('magic-loading-panel');
   const magicResultsPanel = document.getElementById('magic-results-panel');
@@ -450,7 +450,22 @@ export function initMagicTodoController({ onStartFocusTab }) {
         if (magicLoadingPanel) magicLoadingPanel.classList.add('hidden');
         if (magicInputPanel) magicInputPanel.classList.remove('hidden');
 
+        if (err.code === 'AUTH_REQUIRED') {
+          if (typeof onRequestAuth === 'function') {
+            onRequestAuth();
+          } else if (window.Swal) {
+            window.Swal.fire({
+              title: 'Login Diperlukan',
+              text: err.message || 'Silakan login terlebih dahulu untuk memuat AI Magic To-Do.',
+              icon: 'info',
+              ...getSwalTheme()
+            });
+          }
+          return;
+        }
+
         console.error('[Magic To-Do Error]', err);
+
         if (window.Swal) {
           window.Swal.fire({
             title: 'Gagal Negosiasi AI',
