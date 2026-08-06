@@ -128,6 +128,19 @@
         </div>
       </div>
 
+      <!-- Active Projects Preview Container -->
+      <div class="card" id="project-preview-container" style="margin-top: 6px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+          <span class="card-label" style="color: #cbd5e1; display: flex; align-items: center; gap: 4px;">
+            📁 Proyek Tersimpan (Resume)
+          </span>
+          <span style="font-size: 9px; color: #94a3b8;">Pilih untuk melanjutkan</span>
+        </div>
+        <div id="project-cards-list" class="project-cards-list">
+          <!-- Populated programmatically by projectController -->
+        </div>
+      </div>
+
       <!-- Loading Panel -->
       <div class="card hidden" id="magic-loading-panel">
         <div class="magic-loading">
@@ -148,7 +161,7 @@
         </div>
         <div style="display: flex; gap: 8px; margin-top: 12px;">
           <button id="btn-add-magic-item" class="btn-add" style="flex: 1; padding: 6px;">Tambah To-Do</button>
-          <button id="btn-reset-magic" class="btn-quick-toggle is-restricted" style="flex: 1; padding: 6px;">Reset Task</button>
+          <button id="btn-reset-magic" class="btn-quick-toggle is-restricted" style="flex: 1; padding: 6px;">Tutup Task</button>
         </div>
         <button id="btn-start-magic-focus" class="btn-add" style="margin-top: 10px; width: 100%; height: 36px; font-size: 12px; font-weight: 700; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff;">🚀 Mulai Fokus Sekarang</button>
       </div>
@@ -299,6 +312,24 @@
         <div id="auth-reg-error" class="auth-error-badge hidden"></div>
         <button type="submit" id="btn-register-submit" class="btn-add" style="height: 36px; margin-top: 4px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Daftar Akun Baru</button>
       </form>
+    </div>
+  </div>
+
+  <!-- Resume Project Modal Overlay -->
+  <div id="resume-project-modal" class="modal-overlay hidden">
+    <div class="modal-content auth-modal-card">
+      <div class="modal-header">
+        <span class="card-label" style="font-size: 13px;">Melanjutkan Proyek</span>
+        <button id="btn-close-resume-modal" class="btn-close-modal" title="Tutup Modal">✕</button>
+      </div>
+      <div style="display: flex; flex-direction: column; gap: 8px;">
+        <span id="resume-modal-title" style="font-size: 12px; font-weight: 700; color: #f8fafc;">Lanjutkan Proyek</span>
+        <div class="form-group">
+          <label for="resume-duration-input">Waktu yang Anda miliki saat ini (menit)</label>
+          <input type="number" id="resume-duration-input" class="task-input" min="10" step="5" value="30" placeholder="Contoh: 30">
+        </div>
+        <button id="btn-confirm-resume" class="btn-add" style="height: 36px; margin-top: 4px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff;">▶️ Mulai Sesi Fokus</button>
+      </div>
     </div>
   </div>
 

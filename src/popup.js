@@ -9,15 +9,27 @@ import { initFocusController } from './popup/controllers/focusController.js';
 import { initMagicTodoController } from './popup/controllers/magicTodoController.js';
 import { initRulesController } from './popup/controllers/rulesController.js';
 import { initAuthController } from './popup/controllers/authController.js';
+import { initProjectController } from './popup/controllers/projectController.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize UI navigation
   initNavigationManager();
 
+  // Initialize Project Controller (Preview & Resume)
+  const projectController = initProjectController({
+    onProjectResumed: (magicTaskState) => {
+      const activeTaskText = magicTaskState.steps && magicTaskState.steps.length > 0
+        ? magicTaskState.steps[0].text
+        : magicTaskState.taskName;
+      focusController.renderFocusTab(activeTaskText, magicTaskState);
+      switchToTab('tab-focus-page');
+    }
+  });
+
   // Initialize Auth Controller
   const authController = initAuthController({
     onLoginSuccess: () => {
-      // Optional refresh or trigger syncing
+      projectController.renderProjectPreviewList();
     }
   });
 

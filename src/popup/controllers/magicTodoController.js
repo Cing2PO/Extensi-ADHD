@@ -5,6 +5,7 @@
 import { fetchMagicTodos } from '../services/apiService.js';
 import { setStorage } from '../services/storageService.js';
 import { getSwalTheme } from '../modules/themeManager.js';
+import { markTodoDoneOnBackend, deleteTodoOnBackend } from '../services/projectService.js';
 
 export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
   const magicInputPanel = document.getElementById('magic-input-panel');
@@ -282,6 +283,9 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
 
       checkbox.addEventListener('change', () => {
         if (checkbox.checked) {
+          if (step.id) {
+            markTodoDoneOnBackend(step.id);
+          }
           const nextIndex = index + 1;
           if (nextIndex < magicTaskState.steps.length) {
             magicTaskState.currentStepIndex = nextIndex;
@@ -337,6 +341,9 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
       });
 
       deleteBtn.addEventListener('click', () => {
+        if (step.id) {
+          deleteTodoOnBackend(step.id);
+        }
         magicTaskState.steps.splice(index, 1);
         if (magicTaskState.currentStepIndex >= magicTaskState.steps.length) {
           magicTaskState.currentStepIndex = Math.max(0, magicTaskState.steps.length - 1);
@@ -538,19 +545,19 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
     btnResetMagic.addEventListener('click', () => {
       if (window.Swal) {
         window.Swal.fire({
-          title: 'Reset Tugas?',
-          text: 'Daftar to-do Anda akan dihapus.',
-          icon: 'warning',
+          title: 'Tutup Task Saat Ini?',
+          text: 'Tampilan tugas ini akan ditutup agar Anda dapat membuat tugas baru atau berpindah ke proyek lain.',
+          icon: 'question',
           showCancelButton: true,
-          confirmButtonText: 'Ya, reset!',
+          confirmButtonText: 'Ya, Tutup Task',
           cancelButtonText: 'Batal',
           ...getSwalTheme()
         }).then((result) => {
           if (result.isConfirmed) {
             resetMagicState();
             window.Swal.fire({
-              title: 'Direset!',
-              text: 'Daftar to-do baru dapat dibuat.',
+              title: 'Task Ditutup',
+              text: 'Silakan buat tugas baru atau pilih proyek tersimpan.',
               icon: 'success',
               timer: 1500,
               showConfirmButton: false,
@@ -558,6 +565,8 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
             });
           }
         });
+      } else {
+        resetMagicState();
       }
     });
   }
