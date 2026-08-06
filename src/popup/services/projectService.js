@@ -6,54 +6,105 @@ import { ENV_CONFIG } from '../../config.js';
 import { getAuthSession, refreshAuthToken } from './authService.js';
 import { getStorage } from './storageService.js';
 
-// Mock projects for preview when user is Guest or before GET /api/projects is deployed
-export const MOCK_PROJECTS = [
-  {
-    id: 1,
-    name: 'Belajar Machine Learning Dasar',
-    totalTodos: 5,
-    undoneTodos: 3,
-    createdAt: '2026-08-06T10:00:00.000Z'
-  },
-  {
-    id: 2,
-    name: 'Pengembangan Fitur Extensi-ADHD',
-    totalTodos: 8,
-    undoneTodos: 4,
-    createdAt: '2026-08-06T12:30:00.000Z'
+/**
+ * Fetch list of active projects for logged-in user from backend API
+ * GET /api/projects
+ */
+export async function fetchUserProjects(isRetry = false) {
+  const projectsUrl = (window.ENV_CONFIG && window.ENV_CONFIG.PROJECTS_URL) || ENV_CONFIG.PROJECTS_URL;
+  const timeoutMs = (window.ENV_CONFIG && window.ENV_CONFIG.API_TIMEOUT_MS) || 35000;
+
+  const { accessToken } = await getAuthSession();
+  if (!accessToken) {
+    return [];
   }
-];
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(projectsUrl, {
+      method: 'GET',
+      headers: {
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (response.status === 401 && !isRetry) {
+      try {
+        await refreshAuthToken();
+        return await fetchUserProjects(true);
+      } catch (err) {
+        return [];
+      }
+    }
+
+    const data = await response.json();
+    if (!response.ok || !data.success || !Array.isArray(data.projects)) {
+      return [];
+    }
+
+    return data.projects.map(p => ({
+      id: p.id,
+      name: p.name,
+      userId: p.userId,
+      isDone: !!p.isDone,
+      createdAt: p.createdAt,
+      updatedAt: p.updatedAt
+    }));
+  } catch (err) {
+    clearTimeout(timeoutId);
+    console.warn('[ProjectService] Failed to fetch user projects from backend:', err);
+    return [];
+  }
+}
 
 /**
- * Get active projects for preview (Combines local storage projects & mock data)
+ * Get active projects for preview (Combines real backend projects & local storage state)
  */
 export async function getSavedProjects() {
   const data = await getStorage(['userProjects', 'magicTaskState']);
   const localProjects = Array.isArray(data.userProjects) ? data.userProjects : [];
 
+  // Fetch real projects from backend if user is authenticated
+  const backendProjects = await fetchUserProjects();
+
+  // Map backend projects to UI cards shape
+  const apiProjects = backendProjects.filter(p => !p.isDone).map(p => ({
+    id: p.id,
+    name: p.name,
+    undoneTodos: 'Aktif',
+    createdAt: p.createdAt
+  }));
+
+  // Combine apiProjects and localProjects
+  const combined = [...apiProjects];
+  for (const locP of localProjects) {
+    if (!combined.some(p => p.id === locP.id)) {
+      combined.push(locP);
+    }
+  }
+
   // If active magicTaskState exists and has projectId, make sure it's in the list
   if (data.magicTaskState && data.magicTaskState.projectId) {
-    const existingIndex = localProjects.findIndex(p => p.id === data.magicTaskState.projectId);
+    const existingIndex = combined.findIndex(p => p.id === data.magicTaskState.projectId);
+    const undoneCount = data.magicTaskState.steps ? data.magicTaskState.steps.filter(s => !s.completed).length : 0;
     const currentProjectObj = {
       id: data.magicTaskState.projectId,
       name: data.magicTaskState.taskName || 'Proyek Aktif',
       totalTodos: data.magicTaskState.steps ? data.magicTaskState.steps.length : 0,
-      undoneTodos: data.magicTaskState.steps ? data.magicTaskState.steps.filter(s => !s.completed).length : 0,
+      undoneTodos: `${undoneCount} sisa to-do`,
       createdAt: new Date().toISOString()
     };
 
     if (existingIndex >= 0) {
-      localProjects[existingIndex] = currentProjectObj;
+      combined[existingIndex] = { ...combined[existingIndex], ...currentProjectObj };
     } else {
-      localProjects.unshift(currentProjectObj);
-    }
-  }
-
-  // Deduplicate and combine with mock projects if empty
-  const combined = [...localProjects];
-  for (const mockP of MOCK_PROJECTS) {
-    if (!combined.some(p => p.id === mockP.id)) {
-      combined.push(mockP);
+      combined.unshift(currentProjectObj);
     }
   }
 
@@ -67,7 +118,7 @@ export async function getSavedProjects() {
 export async function resumeProject(projectId, availableMinutes, options = {}, isRetry = false) {
   const baseUrl = (window.ENV_CONFIG && window.ENV_CONFIG.BACKEND_BASE_URL) || ENV_CONFIG.BACKEND_BASE_URL;
   const url = `${baseUrl.replace(/\/+$/, '')}/api/projects/${projectId}/todos`;
-  const timeoutMs = (window.ENV_CONFIG && window.ENV_CONFIG.API_TIMEOUT_MS) || 8000;
+  const timeoutMs = (window.ENV_CONFIG && window.ENV_CONFIG.API_TIMEOUT_MS) || 35000;
 
   const { accessToken } = await getAuthSession();
 

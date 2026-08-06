@@ -136,7 +136,9 @@ export function initProjectController(callbacks = {}) {
 
         const badge = document.createElement('span');
         badge.className = 'project-card-badge';
-        badge.textContent = `${project.undoneTodos} sisa to-do`;
+        badge.textContent = typeof project.undoneTodos === 'string' && project.undoneTodos.includes('sisa')
+          ? project.undoneTodos
+          : `${project.undoneTodos || 'Proyek'}`;
 
         titleBox.appendChild(title);
         titleBox.appendChild(badge);

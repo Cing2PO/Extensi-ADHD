@@ -47,7 +47,7 @@ export async function clearAuthSession() {
  */
 export async function loginUser(email, password) {
   const url = ENV_CONFIG.AUTH_LOGIN_URL;
-  const timeoutMs = ENV_CONFIG.API_TIMEOUT_MS || 8000;
+  const timeoutMs = ENV_CONFIG.API_TIMEOUT_MS || 35000;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
@@ -90,7 +90,7 @@ export async function loginUser(email, password) {
  */
 export async function registerUser(name, email, password) {
   const url = ENV_CONFIG.AUTH_REGISTER_URL;
-  const timeoutMs = ENV_CONFIG.API_TIMEOUT_MS || 8000;
+  const timeoutMs = ENV_CONFIG.API_TIMEOUT_MS || 35000;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
