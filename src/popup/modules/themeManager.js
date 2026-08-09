@@ -11,6 +11,8 @@ export function initThemeManager(savedTheme = 'dark') {
   const moonIcon = themeToggle.querySelector('.moon-icon');
   const sunIcon = themeToggle.querySelector('.sun-icon');
 
+  const themeStatusText = document.getElementById('theme-status-text');
+
   applyTheme(savedTheme);
 
   themeToggle.addEventListener('click', () => {
@@ -25,10 +27,12 @@ export function initThemeManager(savedTheme = 'dark') {
       document.body.classList.add('light-theme');
       if (sunIcon) sunIcon.classList.add('hidden');
       if (moonIcon) moonIcon.classList.remove('hidden');
+      if (themeStatusText) themeStatusText.textContent = 'Mode Terang (Light)';
     } else {
       document.body.classList.remove('light-theme');
       if (sunIcon) sunIcon.classList.remove('hidden');
       if (moonIcon) moonIcon.classList.add('hidden');
+      if (themeStatusText) themeStatusText.textContent = 'Mode Gelap (Dark)';
     }
   }
 }

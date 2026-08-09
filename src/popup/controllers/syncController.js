@@ -29,6 +29,12 @@ import { getAuthSession, refreshAuthToken } from '../services/authService.js';
  * Binds UI elements in the Settings Modal for phone sync & Pairing Debugger HUD
  */
 export function initSyncController() {
+  const syncModal = document.getElementById('sync-modal');
+  const btnCloseSyncModal = document.getElementById('btn-close-sync-modal');
+  const btnHeaderSync = document.getElementById('btn-header-sync');
+  const headerSyncLabel = document.getElementById('header-sync-label');
+  const btnDashboardSync = document.getElementById('btn-dashboard-sync');
+
   const btnGenerateQr = document.getElementById('btn-generate-sync-qr');
   const syncQrContainer = document.getElementById('sync-qr-container');
   const syncQrCanvas = document.getElementById('sync-qr-canvas');
@@ -48,6 +54,28 @@ export function initSyncController() {
   const btnDbgSendCustom = document.getElementById('btn-dbg-send-custom');
   const btnDbgCopyLogs = document.getElementById('btn-dbg-copy-logs');
   const btnDbgClearLogs = document.getElementById('btn-dbg-clear-logs');
+
+  function openSyncModal() {
+    if (syncModal) syncModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeSyncModal() {
+    if (syncModal) syncModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+
+  if (btnHeaderSync) {
+    btnHeaderSync.addEventListener('click', openSyncModal);
+  }
+
+  if (btnDashboardSync) {
+    btnDashboardSync.addEventListener('click', openSyncModal);
+  }
+
+  if (btnCloseSyncModal) {
+    btnCloseSyncModal.addEventListener('click', closeSyncModal);
+  }
 
   /**
    * Helper to write structured packet logs to UI terminal
@@ -111,6 +139,16 @@ export function initSyncController() {
       } else {
         syncStatusBadge.className = 'sync-status-badge sync-disconnected';
         if (syncStatusText) syncStatusText.textContent = 'Terputus';
+      }
+    }
+
+    if (btnHeaderSync) {
+      if (connected) {
+        btnHeaderSync.className = 'btn-sync-chip sync-connected';
+        if (headerSyncLabel) headerSyncLabel.textContent = 'Sync';
+      } else {
+        btnHeaderSync.className = 'btn-sync-chip sync-disconnected';
+        if (headerSyncLabel) headerSyncLabel.textContent = 'Pair HP';
       }
     }
   }

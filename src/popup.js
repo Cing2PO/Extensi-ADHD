@@ -131,8 +131,10 @@ document.addEventListener('DOMContentLoaded', () => {
             const domainEl = document.getElementById('debug-active-domain');
             if (domainEl && urlObj.hostname && urlObj.protocol.startsWith('http')) {
               domainEl.textContent = urlObj.hostname;
+              domainEl.title = urlObj.hostname;
             } else if (domainEl && urlObj.protocol.startsWith('chrome')) {
-              domainEl.textContent = `${urlObj.hostname} (Halaman Internal Chrome)`;
+              domainEl.textContent = urlObj.hostname ? `${urlObj.hostname} (Internal)` : 'Halaman Internal';
+              domainEl.title = `${urlObj.hostname} (Halaman Internal Chrome)`;
             }
           } catch (e) {}
         }

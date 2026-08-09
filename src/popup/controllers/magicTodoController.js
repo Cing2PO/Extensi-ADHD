@@ -59,6 +59,32 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
     });
   }
 
+  // Interactive Duration Chips Synchronizer
+  const durationChips = document.querySelectorAll('.duration-chip');
+  if (durationChips.length && magicDurationInput) {
+    durationChips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        const val = chip.getAttribute('data-min');
+        if (val) {
+          magicDurationInput.value = val;
+          durationChips.forEach(c => c.classList.remove('active'));
+          chip.classList.add('active');
+        }
+      });
+    });
+
+    magicDurationInput.addEventListener('input', () => {
+      const currentVal = String(magicDurationInput.value).trim();
+      durationChips.forEach(c => {
+        if (c.getAttribute('data-min') === currentVal) {
+          c.classList.add('active');
+        } else {
+          c.classList.remove('active');
+        }
+      });
+    });
+  }
+
   function buildPomodoroPlan(totalMinutes) {
     const plan = [];
     const workMin = Math.max(1, parseInt(pomodoroWorkInput?.value, 10) || 25);
