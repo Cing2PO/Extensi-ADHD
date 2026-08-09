@@ -6,8 +6,7 @@
 
 const DEFAULT_CONFIG = {
   // Base Backend API URL
-  // BACKEND_BASE_URL: 'https://extensi-adhd-backend.vercel.app',
-  BACKEND_BASE_URL: 'http://localhost:3000',
+  BACKEND_BASE_URL: 'https://extensi-adhd-backend.vercel.app',
 
   // Specific Endpoint relative/absolute paths
   MAGIC_TODO_PATH: '/api/generate-todos',
@@ -20,6 +19,13 @@ const DEFAULT_CONFIG = {
 
   // WebSocket Server Endpoint for cross-platform alerts (Laravel Reverb / Mock)
   REVERB_WS_URL: 'ws://localhost:8000/app/reverb',
+
+  // Socket.IO WebSocket Deployment URL for Pomodoro sync
+  SOCKET_IO_URL: 'https://extensi-adhd-websocket.onrender.com',
+
+  // Sync Room endpoint (always uses production backend)
+  SYNC_BACKEND_BASE_URL: 'https://extensi-adhd-backend.vercel.app',
+  SYNC_ROOM_PATH: '/sync/getroomid',
 
   // Network Timeout in MS (Increased to 35s to allow Gemini AI generation)
   API_TIMEOUT_MS: 35000
@@ -55,6 +61,9 @@ export const ENV_CONFIG = {
   },
   get AUTH_LOGOUT_URL() {
     return resolveUrl(this.BACKEND_BASE_URL, this.AUTH_LOGOUT_PATH);
+  },
+  get SYNC_ROOM_URL() {
+    return resolveUrl(this.SYNC_BACKEND_BASE_URL, this.SYNC_ROOM_PATH);
   }
 };
 

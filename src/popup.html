@@ -303,6 +303,36 @@
             <span class="slider-small"></span>
           </label>
         </div>
+
+        <!-- Sync with Phone Section -->
+        <div class="sync-section" style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; margin-top: 8px;">
+          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
+            <span style="font-size: 11px; font-weight: 700; color: #cbd5e1;">📱 Sinkronisasi Handphone</span>
+            <div id="sync-status-badge" class="sync-status-badge sync-disconnected">
+              <span class="sync-status-dot"></span>
+              <span id="sync-status-text" style="font-size: 8px;">Terputus</span>
+            </div>
+          </div>
+          <p style="font-size: 10px; color: #64748b; margin-bottom: 8px; line-height: 1.4;">Scan QR Code dari HP untuk melihat status timer Pomodoro secara real-time.</p>
+          <button id="btn-generate-sync-qr" class="btn-add sync-qr-btn" style="width: 100%; height: 34px; font-size: 11px; font-weight: 600;">🔗 Generate QR Code</button>
+
+          <!-- QR Code Display Container (hidden until generated) -->
+          <div id="sync-qr-container" class="hidden" style="margin-top: 10px;">
+            <div class="sync-qr-wrapper">
+              <div id="sync-qr-canvas" class="sync-qr-canvas"></div>
+            </div>
+            <div style="text-align: center; margin-top: 6px;">
+              <span style="font-size: 9px; color: #64748b;">Room ID:</span>
+              <span id="sync-room-id-display" style="font-size: 9px; color: #818cf8; font-weight: 600; font-family: monospace;"></span>
+            </div>
+            <button id="btn-disconnect-sync" class="btn-disconnect-sync" style="margin-top: 8px; width: 100%; height: 28px; font-size: 10px;">🔌 Putuskan Koneksi</button>
+          </div>
+          
+          <!-- Debug Log Container -->
+          <div id="sync-debug-log" style="margin-top: 10px; max-height: 120px; overflow-y: auto; font-family: monospace; font-size: 8px; color: #94a3b8; background: rgba(15, 23, 42, 0.8); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word;">
+            <!-- Logs will be injected here -->
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -386,6 +416,8 @@
     </div>
   </div>
 
+  <script src="lib/socket.io.min.js"></script>
+  <script src="lib/qrcode.min.js"></script>
   <script src="lib/sweetalert2.js"></script>
   <script src="lib/confetti.js"></script>
   <script type="module" src="config.js"></script>

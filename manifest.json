@@ -10,7 +10,8 @@
   ],
   "host_permissions": [
     "https://*/*",
-    "http://*/*"
+    "http://*/*",
+    "wss://adhd-extension-c6xz-adhd-extension-c-mmxf.rivet.run/*"
   ],
   "background": {
     "service_worker": "src/background.js",
@@ -29,6 +30,8 @@
         "src/overlay.css",
         "src/config.js",
         "src/content.js",
+        "src/lib/qrcode.min.js",
+        "src/lib/socket.io.min.js",
         "src/content/modules/domainMatcher.js",
         "src/content/modules/heuristicsEngine.js",
         "src/content/modules/overlayManager.js",

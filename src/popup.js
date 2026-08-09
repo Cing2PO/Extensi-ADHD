@@ -10,6 +10,7 @@ import { initMagicTodoController } from './popup/controllers/magicTodoController
 import { initRulesController } from './popup/controllers/rulesController.js';
 import { initAuthController } from './popup/controllers/authController.js';
 import { initProjectController } from './popup/controllers/projectController.js';
+import { initSyncController } from './popup/controllers/syncController.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize UI navigation
@@ -62,6 +63,9 @@ document.addEventListener('DOMContentLoaded', () => {
       magicTodoController.startNewPomodoroSession();
     }
   });
+
+  // Initialize Sync Controller (WebSocket + QR Code)
+  const syncController = initSyncController();
 
   // Load Initial Settings & Hydrate Controllers
   getStorage([

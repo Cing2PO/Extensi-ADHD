@@ -71,8 +71,9 @@ export async function loginUser(email, password) {
       throw new Error(errorMsg);
     }
 
-    const { accessToken, refreshToken } = data.tokens || {};
-    const user = data.user;
+    const accessToken = data.accessToken || data.tokens?.accessToken || data.data?.accessToken;
+    const refreshToken = data.refreshToken || data.tokens?.refreshToken || data.data?.refreshToken;
+    const user = data.user || data.data?.user;
 
     await saveAuthSession({ accessToken, refreshToken, user });
     return { user, accessToken, refreshToken };
@@ -80,6 +81,9 @@ export async function loginUser(email, password) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
       throw new Error('Koneksi login RTO (Request Timeout). Periksa server backend.');
+    }
+    if (err.message === 'Failed to fetch' || err instanceof TypeError) {
+      throw new Error(`Gagal terhubung ke server backend (${url}). Pastikan server online.`);
     }
     throw err;
   }
@@ -114,8 +118,9 @@ export async function registerUser(name, email, password) {
       throw new Error(errorMsg);
     }
 
-    const { accessToken, refreshToken } = data.tokens || {};
-    const user = data.user;
+    const accessToken = data.accessToken || data.tokens?.accessToken || data.data?.accessToken;
+    const refreshToken = data.refreshToken || data.tokens?.refreshToken || data.data?.refreshToken;
+    const user = data.user || data.data?.user;
 
     await saveAuthSession({ accessToken, refreshToken, user });
     return { user, accessToken, refreshToken };
@@ -123,6 +128,9 @@ export async function registerUser(name, email, password) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
       throw new Error('Koneksi registrasi RTO (Request Timeout).');
+    }
+    if (err.message === 'Failed to fetch' || err instanceof TypeError) {
+      throw new Error(`Gagal terhubung ke server backend (${url}). Pastikan server online.`);
     }
     throw err;
   }
@@ -141,6 +149,7 @@ export async function refreshAuthToken() {
 
   const url = ENV_CONFIG.AUTH_REFRESH_URL;
   try {
+    console.log('[Auth Service] Refreshing access token via:', url);
     const response = await fetch(url, {
       method: 'POST',
       headers: {
@@ -151,23 +160,26 @@ export async function refreshAuthToken() {
     });
 
     const data = await response.json();
+    const accessToken = data.accessToken || data.tokens?.accessToken || data.data?.accessToken;
+    const newRefreshToken = data.refreshToken || data.tokens?.refreshToken || data.data?.refreshToken || currentRefreshToken;
 
-    if (!response.ok || !data.success) {
+    if (!response.ok || !accessToken) {
       await clearAuthSession();
-      throw new Error(data.message || 'Sesi login kedaluwarsa.');
+      throw new Error(data.message || data.error || 'Sesi login kedaluwarsa. Silakan login kembali.');
     }
 
-    const { accessToken, refreshToken: newRefreshToken } = data.tokens || {};
     const { currentUser } = await getAuthSession();
 
     await saveAuthSession({
       accessToken,
-      refreshToken: newRefreshToken || currentRefreshToken,
-      user: currentUser
+      refreshToken: newRefreshToken,
+      user: data.user || currentUser
     });
 
+    console.log('[Auth Service] Token refreshed successfully!');
     return accessToken;
   } catch (err) {
+    console.error('[Auth Service] Token refresh failed:', err);
     await clearAuthSession();
     throw err;
   }

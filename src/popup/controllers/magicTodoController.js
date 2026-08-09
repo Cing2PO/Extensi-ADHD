@@ -6,6 +6,7 @@ import { fetchMagicTodos } from '../services/apiService.js';
 import { setStorage } from '../services/storageService.js';
 import { getSwalTheme } from '../modules/themeManager.js';
 import { markTodoDoneOnBackend, deleteTodoOnBackend } from '../services/projectService.js';
+import { sendTimerEvent, getConnectionStatus } from '../services/websocketService.js';
 
 export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
   const magicIdleView = document.getElementById('magic-idle-view');
@@ -165,6 +166,14 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
           pomodoroSession.targetTimestamp = Date.now() + (nextBlock.minutes * 60 * 1000);
           pomodoroSession.pausedRemainingSeconds = null;
           savePomodoroSession();
+
+          // Emit phase change to WebSocket
+          sendTimerEvent({
+            type: 'timer_phase_change',
+            task: magicTaskState?.steps?.[magicTaskState.currentStepIndex]?.text || 'Sesi Fokus',
+            remainingSeconds: nextBlock.minutes * 60,
+            phase: nextBlock.type
+          });
         } else {
           pomodoroSession.isActive = false;
           pomodoroSession.isRunning = false;
@@ -172,6 +181,10 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
           pomodoroSession.targetTimestamp = null;
           pomodoroSession.pausedRemainingSeconds = 0;
           savePomodoroSession();
+
+          // Emit timer stop to WebSocket
+          sendTimerEvent({ type: 'timer_stop', phase: 'done' });
+
           if (window.Swal) {
             window.Swal.fire({
               title: 'Pomodoro selesai!',
@@ -193,6 +206,10 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
       pomodoroTimerInterval = null;
     }
     pomodoroSession = null;
+
+    // Emit timer stop to WebSocket
+    sendTimerEvent({ type: 'timer_stop' });
+
     setStorage({ pomodoroSession: null, currentTask: '' }).then(() => {
       renderPomodoroPanel();
       if (onStartFocusTab) onStartFocusTab('');
@@ -228,6 +245,14 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
       renderPomodoroPanel();
       startPomodoroTimer();
       if (onStartFocusTab) onStartFocusTab(defaultTask);
+
+      // Emit timer start to WebSocket
+      sendTimerEvent({
+        type: 'timer_start',
+        task: defaultTask,
+        remainingSeconds: workM * 60,
+        phase: 'work'
+      });
     });
   }
 
@@ -590,6 +615,14 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
         if (onStartFocusTab) onStartFocusTab(firstTaskText);
         renderMagicStateUI();
 
+        // Emit timer start to WebSocket
+        sendTimerEvent({
+          type: 'timer_start',
+          task: firstTaskText,
+          remainingSeconds: stepMin * 60,
+          phase: 'work'
+        });
+
         if (window.Swal) {
           window.Swal.fire({
             title: 'Fokus Dimulai! 🚀',
@@ -652,11 +685,27 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
         pomodoroSession.isRunning = false;
         pomodoroSession.pausedRemainingSeconds = remSec;
         pomodoroSession.targetTimestamp = null;
+
+        // Emit timer pause to WebSocket
+        sendTimerEvent({
+          type: 'timer_pause',
+          task: magicTaskState?.steps?.[magicTaskState?.currentStepIndex]?.text || 'Sesi Fokus',
+          remainingSeconds: remSec,
+          phase: pomodoroSession.phase
+        });
       } else {
         const remSec = pomodoroSession.pausedRemainingSeconds != null ? pomodoroSession.pausedRemainingSeconds : ((pomodoroSession.plan?.[pomodoroSession.currentIndex]?.minutes || 25) * 60);
         pomodoroSession.isRunning = true;
         pomodoroSession.targetTimestamp = Date.now() + (remSec * 1000);
         pomodoroSession.pausedRemainingSeconds = null;
+
+        // Emit timer resume (start) to WebSocket
+        sendTimerEvent({
+          type: 'timer_start',
+          task: magicTaskState?.steps?.[magicTaskState?.currentStepIndex]?.text || 'Sesi Fokus',
+          remainingSeconds: remSec,
+          phase: pomodoroSession.phase
+        });
       }
       savePomodoroSession();
       startPomodoroTimer();
