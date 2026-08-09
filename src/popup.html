@@ -328,9 +328,39 @@
             <button id="btn-disconnect-sync" class="btn-disconnect-sync" style="margin-top: 8px; width: 100%; height: 28px; font-size: 10px;">🔌 Putuskan Koneksi</button>
           </div>
           
-          <!-- Debug Log Container -->
-          <div id="sync-debug-log" style="margin-top: 10px; max-height: 120px; overflow-y: auto; font-family: monospace; font-size: 8px; color: #94a3b8; background: rgba(15, 23, 42, 0.8); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word;">
-            <!-- Logs will be injected here -->
+          <!-- Debugger HUD Collapsible Panel -->
+          <div class="debugger-hud-panel" style="margin-top: 12px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 10px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+              <span style="font-size: 10px; font-weight: 700; color: #818cf8;">🛠️ Pairing & WebSocket Debugger</span>
+              <span id="sync-latency-badge" style="font-size: 8px; font-family: monospace; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3);">RTT: -- ms</span>
+            </div>
+
+            <!-- Quick Action Test Grid -->
+            <div class="debug-actions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-bottom: 8px;">
+              <button id="btn-dbg-ping" class="btn-dbg" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-size: 9px; padding: 6px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">🚀 Test Ping</button>
+              <button id="btn-dbg-alert" class="btn-dbg" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; font-size: 9px; padding: 6px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">⚡ Shock Alert</button>
+              <button id="btn-dbg-focus-on" class="btn-dbg" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; font-size: 9px; padding: 6px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">⏱️ Start Focus</button>
+              <button id="btn-dbg-focus-off" class="btn-dbg" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; font-size: 9px; padding: 6px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">🛑 Stop Focus</button>
+            </div>
+
+            <!-- Custom Message Input -->
+            <div style="display: flex; gap: 4px; margin-bottom: 8px;">
+              <input type="text" id="input-dbg-custom-msg" placeholder="Ketik custom pesan..." style="flex: 1; height: 26px; font-size: 9px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 0 6px; color: #fff; outline: none;">
+              <button id="btn-dbg-send-custom" style="background: #4f46e5; border: none; color: #fff; font-size: 9px; font-weight: 600; padding: 0 8px; border-radius: 4px; cursor: pointer;">Kirim</button>
+            </div>
+
+            <!-- Terminal Toolbar & Log Container -->
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+              <span style="font-size: 8px; color: #64748b; font-family: monospace;">Live Packet Stream:</span>
+              <div style="display: flex; gap: 4px;">
+                <button id="btn-dbg-copy-logs" style="background: transparent; border: none; color: #818cf8; font-size: 8px; cursor: pointer; text-decoration: underline;">Copy Logs</button>
+                <span style="color: #334155; font-size: 8px;">•</span>
+                <button id="btn-dbg-clear-logs" style="background: transparent; border: none; color: #94a3b8; font-size: 8px; cursor: pointer; text-decoration: underline;">Clear</button>
+              </div>
+            </div>
+            <div id="sync-debug-log" style="height: 110px; max-height: 120px; overflow-y: auto; font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 8px; color: #94a3b8; background: #090d16; padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word; line-height: 1.4;">
+              <!-- Real-time logs will be injected here -->
+            </div>
           </div>
         </div>
       </div>
