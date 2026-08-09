@@ -36,6 +36,9 @@ function notifyConnectionChange(status) {
   });
 }
 
+let receiveMessageCallbacks = [];
+let systemMessageCallbacks = [];
+
 /**
  * Connect to Socket.IO server with the given roomId
  * @param {string} roomId - Room ID obtained from backend
@@ -99,10 +102,16 @@ export function connectWebSocket(roomId) {
 
     socket.on('systemMessage', (msg) => {
       console.log('[WS Service] System Message from server:', msg);
+      systemMessageCallbacks.forEach(cb => {
+        try { cb(msg); } catch (e) { console.error('[WS Service] systemMessage callback error:', e); }
+      });
     });
 
     socket.on('receiveMessage', (data) => {
       console.log('[WS Service] Receive Message in Room:', data);
+      receiveMessageCallbacks.forEach(cb => {
+        try { cb(data); } catch (e) { console.error('[WS Service] receiveMessage callback error:', e); }
+      });
     });
 
     socket.on('disconnect', (reason) => {
@@ -137,10 +146,11 @@ export function disconnectWebSocket() {
  * Emit a message to the room via Socket.IO
  * Format: { "roomId": string, "message": string }
  * 
- * @param {string} message - Message string ("on" | "off")
+ * @param {string} message - Message string
+ * @param {Function} [ackCallback] - Optional ack callback receiving (response, latencyMs)
  * @returns {boolean}
  */
-export function sendTimerMessage(message) {
+export function sendTimerMessage(message, ackCallback) {
   if (!socket || !socket.connected || !currentRoomId) {
     console.warn('[WS Service] Cannot send message - socket not connected or no roomId.', { connected: socket?.connected, roomId: currentRoomId });
     return false;
@@ -151,10 +161,15 @@ export function sendTimerMessage(message) {
     message: String(message)
   };
 
+  const startTime = performance.now();
   console.log('%c[WS Service] Emitting sendMessage:', 'color: #818cf8; font-weight: bold;', payload);
 
   socket.emit('sendMessage', payload, (response) => {
-    console.log('[WS Service] Ack response from server:', response);
+    const latencyMs = Math.round(performance.now() - startTime);
+    console.log(`[WS Service] Ack response from server (${latencyMs}ms):`, response);
+    if (typeof ackCallback === 'function') {
+      ackCallback(response, latencyMs);
+    }
   });
 
   return true;
@@ -183,13 +198,24 @@ export function sendTimerEvent(eventData) {
 }
 
 /**
- * Get current WebSocket connection status
- * @returns {{ connected: boolean, roomId: string|null }}
+ * Send a Test Ping to measure Round-Trip Latency
+ * @param {Function} callback - Callback function receiving (response, latencyMs)
+ * @returns {boolean}
+ */
+export function sendTestPing(callback) {
+  return sendTimerMessage('PING_TEST', callback);
+}
+
+/**
+ * Get current WebSocket connection status details
+ * @returns {{ connected: boolean, roomId: string|null, socketId: string|null, serverUrl: string }}
  */
 export function getConnectionStatus() {
   return {
     connected: isConnected && socket?.connected,
-    roomId: currentRoomId
+    roomId: currentRoomId,
+    socketId: socket?.id || null,
+    serverUrl: ENV_CONFIG.SOCKET_IO_URL || 'https://extensi-adhd-websocket.onrender.com'
   };
 }
 
@@ -202,5 +228,29 @@ export function onConnectionChange(callback) {
   connectionChangeCallbacks.push(callback);
   return () => {
     connectionChangeCallbacks = connectionChangeCallbacks.filter(cb => cb !== callback);
+  };
+}
+
+/**
+ * Register a callback for incoming messages in room
+ * @param {function(Object): void} callback
+ * @returns {function} Unsubscribe function
+ */
+export function onReceiveMessage(callback) {
+  receiveMessageCallbacks.push(callback);
+  return () => {
+    receiveMessageCallbacks = receiveMessageCallbacks.filter(cb => cb !== callback);
+  };
+}
+
+/**
+ * Register a callback for system messages
+ * @param {function(string): void} callback
+ * @returns {function} Unsubscribe function
+ */
+export function onSystemMessage(callback) {
+  systemMessageCallbacks.push(callback);
+  return () => {
+    systemMessageCallbacks = systemMessageCallbacks.filter(cb => cb !== callback);
   };
 }

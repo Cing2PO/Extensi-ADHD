@@ -11,6 +11,8 @@
   "host_permissions": [
     "https://*/*",
     "http://*/*",
+    "wss://extensi-adhd-websocket.onrender.com/*",
+    "https://extensi-adhd-websocket.onrender.com/*",
     "wss://adhd-extension-c6xz-adhd-extension-c-mmxf.rivet.run/*"
   ],
   "background": {

@@ -11,14 +11,30 @@
 
 import { ENV_CONFIG } from '../../config.js';
 import { getStorage, setStorage } from '../services/storageService.js';
-import { connectWebSocket, disconnectWebSocket, getConnectionStatus, onConnectionChange } from '../services/websocketService.js';
+import {
+  connectWebSocket,
+  disconnectWebSocket,
+  getConnectionStatus,
+  onConnectionChange,
+  sendTimerMessage,
+  sendTimerEvent,
+  sendTestPing,
+  onReceiveMessage,
+  onSystemMessage
+} from '../services/websocketService.js';
 import { getAuthSession, refreshAuthToken } from '../services/authService.js';
 
 /**
  * Initialize the Sync Controller
- * Binds UI elements in the Settings Modal for phone sync
+ * Binds UI elements in the Settings Modal for phone sync & Pairing Debugger HUD
  */
 export function initSyncController() {
+  const syncModal = document.getElementById('sync-modal');
+  const btnCloseSyncModal = document.getElementById('btn-close-sync-modal');
+  const btnHeaderSync = document.getElementById('btn-header-sync');
+  const headerSyncLabel = document.getElementById('header-sync-label');
+  const btnDashboardSync = document.getElementById('btn-dashboard-sync');
+
   const btnGenerateQr = document.getElementById('btn-generate-sync-qr');
   const syncQrContainer = document.getElementById('sync-qr-container');
   const syncQrCanvas = document.getElementById('sync-qr-canvas');
@@ -27,23 +43,88 @@ export function initSyncController() {
   const syncRoomIdDisplay = document.getElementById('sync-room-id-display');
   const btnDisconnectSync = document.getElementById('btn-disconnect-sync');
   const syncDebugLog = document.getElementById('sync-debug-log');
+  const syncLatencyBadge = document.getElementById('sync-latency-badge');
+
+  // Debugger HUD Buttons
+  const btnDbgPing = document.getElementById('btn-dbg-ping');
+  const btnDbgAlert = document.getElementById('btn-dbg-alert');
+  const btnDbgFocusOn = document.getElementById('btn-dbg-focus-on');
+  const btnDbgFocusOff = document.getElementById('btn-dbg-focus-off');
+  const inputDbgCustomMsg = document.getElementById('input-dbg-custom-msg');
+  const btnDbgSendCustom = document.getElementById('btn-dbg-send-custom');
+  const btnDbgCopyLogs = document.getElementById('btn-dbg-copy-logs');
+  const btnDbgClearLogs = document.getElementById('btn-dbg-clear-logs');
+
+  function openSyncModal() {
+    if (syncModal) syncModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+  }
+
+  function closeSyncModal() {
+    if (syncModal) syncModal.classList.add('hidden');
+    document.body.classList.remove('modal-open');
+  }
+
+  if (btnHeaderSync) {
+    btnHeaderSync.addEventListener('click', openSyncModal);
+  }
+
+  if (btnDashboardSync) {
+    btnDashboardSync.addEventListener('click', openSyncModal);
+  }
+
+  if (btnCloseSyncModal) {
+    btnCloseSyncModal.addEventListener('click', closeSyncModal);
+  }
 
   /**
-   * Helper to write logs to UI container
+   * Helper to write structured packet logs to UI terminal
    */
+  function logPacket(type, msg, meta = '') {
+    console.log(`[WS-${type}]`, msg, meta);
+    if (!syncDebugLog) return;
+
+    const line = document.createElement('div');
+    line.style.marginBottom = '3px';
+    line.style.display = 'flex';
+    line.style.alignItems = 'flex-start';
+    line.style.gap = '4px';
+
+    const time = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    let badgeClass = 'badge-sys';
+    if (type === 'SENT') badgeClass = 'badge-sent';
+    else if (type === 'RECV') badgeClass = 'badge-recv';
+    else if (type === 'ACK') badgeClass = 'badge-ack';
+    else if (type === 'ERR') badgeClass = 'badge-err';
+
+    line.innerHTML = `
+      <span style="color: #475569; flex-shrink: 0;">${time}</span>
+      <span class="log-packet-badge ${badgeClass}">${type}</span>
+      <span style="color: #cbd5e1; word-break: break-all; flex: 1;">${msg} ${meta ? `<span style="color: #818cf8; font-size: 7.5px;">(${meta})</span>` : ''}</span>
+    `;
+
+    syncDebugLog.appendChild(line);
+    syncDebugLog.scrollTop = syncDebugLog.scrollHeight;
+  }
+
   function logToUI(msg, color = '#94a3b8') {
-    console.log(msg); // still log to console
-    if (syncDebugLog) {
-      const line = document.createElement('div');
-      line.style.color = color;
-      line.style.marginBottom = '2px';
-      
-      const time = new Date().toLocaleTimeString('id-ID', { hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' });
-      line.textContent = `[${time}] ${msg}`;
-      
-      syncDebugLog.appendChild(line);
-      // Auto scroll to bottom
-      syncDebugLog.scrollTop = syncDebugLog.scrollHeight;
+    logPacket('SYS', msg);
+  }
+
+  function updateLatencyUI(latencyMs) {
+    if (syncLatencyBadge) {
+      syncLatencyBadge.textContent = `RTT: ${latencyMs} ms`;
+      if (latencyMs < 150) {
+        syncLatencyBadge.style.color = '#34d399';
+        syncLatencyBadge.style.borderColor = 'rgba(16, 185, 129, 0.3)';
+      } else if (latencyMs < 400) {
+        syncLatencyBadge.style.color = '#fbbf24';
+        syncLatencyBadge.style.borderColor = 'rgba(245, 158, 11, 0.3)';
+      } else {
+        syncLatencyBadge.style.color = '#f87171';
+        syncLatencyBadge.style.borderColor = 'rgba(239, 68, 68, 0.3)';
+      }
     }
   }
 
@@ -60,6 +141,16 @@ export function initSyncController() {
         if (syncStatusText) syncStatusText.textContent = 'Terputus';
       }
     }
+
+    if (btnHeaderSync) {
+      if (connected) {
+        btnHeaderSync.className = 'btn-sync-chip sync-connected';
+        if (headerSyncLabel) headerSyncLabel.textContent = 'Sync';
+      } else {
+        btnHeaderSync.className = 'btn-sync-chip sync-disconnected';
+        if (headerSyncLabel) headerSyncLabel.textContent = 'Pair HP';
+      }
+    }
   }
 
   /**
@@ -68,6 +159,12 @@ export function initSyncController() {
   function generateQrCode(roomId) {
     if (!syncQrCanvas) return;
 
+    const cleanRoomId = String(roomId || '').trim();
+    if (!cleanRoomId || cleanRoomId === '[object Object]') {
+      syncQrCanvas.innerHTML = `<span style="color: #f87171; font-size: 10px;">Room ID tidak valid</span>`;
+      return;
+    }
+
     // Clear previous QR
     syncQrCanvas.innerHTML = '';
 
@@ -75,14 +172,14 @@ export function initSyncController() {
     if (typeof QRCode !== 'undefined') {
       try {
         new QRCode(syncQrCanvas, {
-          text: roomId,
+          text: cleanRoomId,
           width: 160,
           height: 160,
           colorDark: '#f8fafc',
           colorLight: '#0f172a',
           correctLevel: QRCode.CorrectLevel.M
         });
-        console.log('[Sync Controller] QR Code generated for roomId:', roomId);
+        console.log('[Sync Controller] QR Code generated for roomId:', cleanRoomId);
       } catch (err) {
         console.error('[Sync Controller] QR Code generation error:', err);
         syncQrCanvas.innerHTML = `<span style="color: #f87171; font-size: 10px;">Gagal membuat QR Code</span>`;
@@ -97,10 +194,16 @@ export function initSyncController() {
    * Show the QR container with generated QR + status
    */
   function showSyncUI(roomId) {
+    const cleanRoomId = String(roomId || '').trim();
+    if (!cleanRoomId || cleanRoomId === '[object Object]') {
+      hideSyncUI();
+      return;
+    }
+
     if (syncQrContainer) syncQrContainer.classList.remove('hidden');
-    if (syncRoomIdDisplay) syncRoomIdDisplay.textContent = roomId;
+    if (syncRoomIdDisplay) syncRoomIdDisplay.textContent = cleanRoomId;
     if (btnGenerateQr) btnGenerateQr.textContent = '🔄 Regenerate QR Code';
-    generateQrCode(roomId);
+    generateQrCode(cleanRoomId);
   }
 
   /**
@@ -176,11 +279,23 @@ export function initSyncController() {
         }
       }
 
-      if (!response.ok || !data.roomId) {
-        throw new Error(data.message || `Failed to get roomId (HTTP ${response.status})`);
+      let extractedRoomId = data.roomId;
+      if (typeof extractedRoomId === 'object' && extractedRoomId !== null) {
+        extractedRoomId = extractedRoomId.roomId || extractedRoomId.id || extractedRoomId.room || extractedRoomId.code || '';
       }
 
-      return data.roomId;
+      // If backend returned {} (empty object) or invalid value, generate a clean readable roomId string
+      if (!extractedRoomId || typeof extractedRoomId !== 'string' || extractedRoomId.trim() === '' || extractedRoomId === '[object Object]') {
+        const { currentUser } = await getAuthSession();
+        const userId = currentUser?.id || 'U';
+        const randomSuffix = Math.random().toString(36).substring(2, 7).toUpperCase();
+        extractedRoomId = `ROOM-${userId}-${randomSuffix}`;
+        logToUI(`⚠️ Backend returned object for roomId, resolved to: ${extractedRoomId}`, '#f59e0b');
+      } else {
+        extractedRoomId = String(extractedRoomId).trim();
+      }
+
+      return extractedRoomId;
     } catch (err) {
       clearTimeout(timeoutId);
       logToUI(`❌ requestRoomId error: ${err.name} - ${err.message}`, '#f87171');
@@ -280,25 +395,147 @@ export function initSyncController() {
     btnDisconnectSync.addEventListener('click', disconnectSync);
   }
 
+  // --- Debugger HUD Action Listeners ---
+  if (btnDbgPing) {
+    btnDbgPing.addEventListener('click', () => {
+      logPacket('SENT', 'PING_TEST');
+      const sent = sendTestPing((ack, ms) => {
+        updateLatencyUI(ms);
+        logPacket('ACK', 'Pong received from server', `${ms}ms`);
+      });
+      if (!sent) logPacket('ERR', 'Gagal kirim ping: Socket belum terhubung');
+    });
+  }
+
+  if (btnDbgAlert) {
+    btnDbgAlert.addEventListener('click', () => {
+      logPacket('SENT', 'CRITICAL_DOOMSCROLL_ALERT');
+      const sent = sendTimerMessage('CRITICAL_DOOMSCROLL_ALERT', (ack, ms) => {
+        updateLatencyUI(ms);
+        logPacket('ACK', 'Alert broadcast confirmed', `${ms}ms`);
+      });
+      if (!sent) logPacket('ERR', 'Gagal kirim alert: Socket belum terhubung');
+    });
+  }
+
+  if (btnDbgFocusOn) {
+    btnDbgFocusOn.addEventListener('click', () => {
+      logPacket('SENT', 'on (timer_start)');
+      const sent = sendTimerMessage('on', (ack, ms) => {
+        updateLatencyUI(ms);
+        logPacket('ACK', 'Timer ON confirmed', `${ms}ms`);
+      });
+      if (!sent) logPacket('ERR', 'Gagal kirim: Socket belum terhubung');
+    });
+  }
+
+  if (btnDbgFocusOff) {
+    btnDbgFocusOff.addEventListener('click', () => {
+      logPacket('SENT', 'off (timer_stop)');
+      const sent = sendTimerMessage('off', (ack, ms) => {
+        updateLatencyUI(ms);
+        logPacket('ACK', 'Timer OFF confirmed', `${ms}ms`);
+      });
+      if (!sent) logPacket('ERR', 'Gagal kirim: Socket belum terhubung');
+    });
+  }
+
+  if (btnDbgSendCustom && inputDbgCustomMsg) {
+    const handleSendCustom = () => {
+      const text = inputDbgCustomMsg.value.trim();
+      if (!text) return;
+      logPacket('SENT', text);
+      const sent = sendTimerMessage(text, (ack, ms) => {
+        updateLatencyUI(ms);
+        logPacket('ACK', 'Custom message confirmed', `${ms}ms`);
+      });
+      if (!sent) logPacket('ERR', 'Gagal kirim: Socket belum terhubung');
+      inputDbgCustomMsg.value = '';
+    };
+
+    btnDbgSendCustom.addEventListener('click', handleSendCustom);
+    inputDbgCustomMsg.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') handleSendCustom();
+    });
+  }
+
+  if (btnDbgClearLogs && syncDebugLog) {
+    btnDbgClearLogs.addEventListener('click', () => {
+      syncDebugLog.innerHTML = '';
+    });
+  }
+
+  if (btnDbgCopyLogs && syncDebugLog) {
+    btnDbgCopyLogs.addEventListener('click', () => {
+      const logsText = syncDebugLog.innerText || syncDebugLog.textContent;
+      navigator.clipboard.writeText(logsText).then(() => {
+        if (window.Swal) {
+          window.Swal.fire({
+            title: 'Copied!',
+            text: 'Debugger logs copied to clipboard.',
+            icon: 'success',
+            timer: 1500,
+            showConfirmButton: false,
+            background: '#1e293b',
+            color: '#f8fafc'
+          });
+        } else {
+          alert('Logs copied!');
+        }
+      });
+    });
+  }
+
+  // --- Real-time Socket Event Stream Listeners ---
+  onReceiveMessage((data) => {
+    logPacket('RECV', data.message || JSON.stringify(data), `From: ${data.sender ? data.sender.substring(0, 6) : 'anon'}`);
+  });
+
+  onSystemMessage((msg) => {
+    logPacket('SYS', msg);
+  });
+
+  // Listen to background service worker events
+  if (typeof chrome !== 'undefined' && chrome.runtime?.onMessage) {
+    chrome.runtime.onMessage.addListener((msg) => {
+      if (msg.action === 'syncDebugLog') {
+        logPacket(msg.type || 'SYS', msg.message, msg.meta);
+      }
+      if (msg.action === 'doomscrollDetected') {
+        logPacket('SENT', 'CRITICAL_DOOMSCROLL_ALERT', `Domain: ${msg.domain || 'web'}`);
+      }
+    });
+  }
+
   // Listen for connection status changes
   onConnectionChange((connected) => {
     updateStatusUI(connected);
+    if (connected) {
+      logPacket('SYS', 'Socket connection established & joined room');
+    } else {
+      logPacket('SYS', 'Socket disconnected');
+      if (syncLatencyBadge) syncLatencyBadge.textContent = 'RTT: -- ms';
+    }
   });
 
   // --- Auto-restore from storage on init ---
   getStorage(['syncRoomId']).then(async (items) => {
-    if (items.syncRoomId) {
-      console.log('[Sync Controller] Found saved roomId, auto-reconnecting:', items.syncRoomId);
+    const saved = items.syncRoomId;
+    if (saved && typeof saved === 'string' && saved.trim() !== '' && saved !== '[object Object]') {
+      console.log('[Sync Controller] Found saved roomId, auto-reconnecting:', saved);
       try {
-        await connectWebSocket(items.syncRoomId);
-        showSyncUI(items.syncRoomId);
+        await connectWebSocket(saved);
+        showSyncUI(saved);
         updateStatusUI(true);
       } catch (err) {
         console.warn('[Sync Controller] Auto-reconnect failed:', err.message);
-        // Still show QR but with disconnected status
-        showSyncUI(items.syncRoomId);
+        showSyncUI(saved);
         updateStatusUI(false);
       }
+    } else if (saved === '[object Object]' || (saved && typeof saved === 'object')) {
+      // Clear corrupt saved roomId
+      setStorage({ syncRoomId: null });
+      hideSyncUI();
     }
   });
 

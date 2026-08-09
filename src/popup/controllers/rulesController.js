@@ -33,6 +33,16 @@ export function initRulesController({ onStartPomodoro }) {
   let blacklist = [];
   let currentActiveDomain = null;
 
+  // --- Horizontal Mouse Wheel Scroll for Blacklist ---
+  if (blacklistScrollArea) {
+    blacklistScrollArea.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        blacklistScrollArea.scrollLeft += e.deltaY;
+      }
+    }, { passive: false });
+  }
+
   // --- Auto-Sync Listeners ---
   if (protectionToggle) {
     protectionToggle.addEventListener('change', () => {
@@ -191,97 +201,115 @@ export function initRulesController({ onStartPomodoro }) {
     });
   }
 
-  // --- Blacklist Management ---
+  // --- Blacklist Management (Horizontal 3-Row Grid) ---
   function renderBlacklistArea() {
     if (!blacklistScrollArea) return;
     blacklistScrollArea.innerHTML = '';
 
+    const countBadge = document.getElementById('blacklist-count-badge');
+    const activeCount = blacklist.filter(item => item.enabled).length;
+    if (countBadge) {
+      countBadge.textContent = `${activeCount}/${blacklist.length} Aktif`;
+    }
+
     if (blacklist.length === 0) {
-      blacklistScrollArea.innerHTML = '<div style="font-size: 11px; color:#64748b; text-align:center; padding:12px 0;">No restricted zones.</div>';
+      blacklistScrollArea.innerHTML = '<div style="font-size: 10px; color:#64748b; text-align:center; padding:12px 0; width: 100%;">Belum ada domain blacklist.</div>';
       return;
     }
 
-    blacklist.forEach((itemObj) => {
-      const rowEl = document.createElement('div');
-      rowEl.className = 'blacklist-item-clean';
-      rowEl.style.marginTop = '4px';
+    const columnCount = Math.ceil(blacklist.length / 3);
 
-      rowEl.innerHTML = `
-        <div style="display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;">
-          <svg style="width: 14px; height: 14px; color: #a78bfa; flex-shrink: 0; opacity: 0.85;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+    for (let colIdx = 0; colIdx < columnCount; colIdx++) {
+      const colEl = document.createElement('div');
+      colEl.className = 'blacklist-col';
+
+      const startIdx = colIdx * 3;
+      const endIdx = Math.min(startIdx + 3, blacklist.length);
+      const chunk = blacklist.slice(startIdx, endIdx);
+
+      chunk.forEach((itemObj) => {
+        const itemEl = document.createElement('div');
+        itemEl.className = `blacklist-item-compact ${itemObj.enabled ? 'is-blocked' : 'disabled'}`;
+
+        itemEl.innerHTML = `
+          <svg style="width: 12px; height: 12px; color: ${itemObj.enabled ? '#2dd4bf' : '#64748b'}; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18" />
           </svg>
-          <span class="domain-name" style="${itemObj.enabled ? '' : 'opacity: 0.45; text-decoration: line-through;'}">${itemObj.domain}</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 10px; flex-shrink: 0;">
-          <label class="switch-small">
-            <input type="checkbox" class="zone-toggle-cb">
-            <span class="slider-small"></span>
-          </label>
-          <button class="btn-delete-zone" title="Delete restricted domain">
-             <svg style="width: 13px; height: 13px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-             </svg>
-          </button>
-        </div>
-      `;
+          <span class="domain-text" title="${itemObj.domain}">${itemObj.domain}</span>
+          <div style="display: flex; align-items: center; gap: 4px; flex-shrink: 0;">
+            <label class="switch-small" style="transform: scale(0.7); transform-origin: center;">
+              <input type="checkbox" class="zone-toggle-cb" ${itemObj.enabled ? 'checked' : ''}>
+              <span class="slider-small"></span>
+            </label>
+            <button class="btn-delete-zone" title="Hapus domain" style="background: none; border: none; padding: 2px; cursor: pointer; color: #ef4444; display: flex; align-items: center;">
+               <svg style="width: 11px; height: 11px;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+               </svg>
+            </button>
+          </div>
+        `;
 
-      const domainSpan = rowEl.querySelector('.domain-name');
-      const toggleInput = rowEl.querySelector('.zone-toggle-cb');
-      toggleInput.checked = itemObj.enabled;
-
-      toggleInput.addEventListener('change', () => {
-        itemObj.enabled = toggleInput.checked;
-        setStorage({ blacklist }).then(() => {
-          if (itemObj.enabled) {
-            domainSpan.style.opacity = '1';
-            domainSpan.style.textDecoration = 'none';
-          } else {
-            domainSpan.style.opacity = '0.45';
-            domainSpan.style.textDecoration = 'line-through';
-          }
-          updateQuickToggleButton();
-        });
-      });
-
-      const deleteBtn = rowEl.querySelector('.btn-delete-zone');
-      deleteBtn.addEventListener('click', () => {
-        if (window.Swal) {
-          window.Swal.fire({
-            title: 'Hapus Zona?',
-            text: `Apakah Anda yakin ingin menghapus '${itemObj.domain}' dari Restricted Zones?`,
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonText: 'Ya, hapus!',
-            cancelButtonText: 'Batal',
-            ...getSwalTheme()
-          }).then((result) => {
-            if (result.isConfirmed) {
-              const domainIndex = blacklist.findIndex(item => item.domain === itemObj.domain);
-              if (domainIndex !== -1) {
-                blacklist.splice(domainIndex, 1);
-                setStorage({ blacklist }).then(() => {
-                  renderBlacklistArea();
-                  updateQuickToggleButton();
-                  window.Swal.fire({
-                    title: 'Dihapus!',
-                    text: 'Domain berhasil dihapus.',
-                    icon: 'success',
-                    timer: 1000,
-                    showConfirmButton: false,
-                    ...getSwalTheme()
-                  });
-                });
-              }
+        const toggleInput = itemEl.querySelector('.zone-toggle-cb');
+        toggleInput.addEventListener('change', () => {
+          itemObj.enabled = toggleInput.checked;
+          setStorage({ blacklist }).then(() => {
+            if (itemObj.enabled) {
+              itemEl.classList.add('is-blocked');
+              itemEl.classList.remove('disabled');
+            } else {
+              itemEl.classList.remove('is-blocked');
+              itemEl.classList.add('disabled');
             }
+            if (countBadge) {
+              const currentActive = blacklist.filter(i => i.enabled).length;
+              countBadge.textContent = `${currentActive}/${blacklist.length} Aktif`;
+            }
+            updateQuickToggleButton();
           });
-        }
+        });
+
+        const deleteBtn = itemEl.querySelector('.btn-delete-zone');
+        deleteBtn.addEventListener('click', () => {
+          if (window.Swal) {
+            window.Swal.fire({
+              title: 'Hapus Domain?',
+              text: `Hapus '${itemObj.domain}' dari Blacklist?`,
+              icon: 'warning',
+              showCancelButton: true,
+              confirmButtonText: 'Hapus',
+              cancelButtonText: 'Batal',
+              ...getSwalTheme()
+            }).then((result) => {
+              if (result.isConfirmed) {
+                const domainIndex = blacklist.findIndex(item => item.domain === itemObj.domain);
+                if (domainIndex !== -1) {
+                  blacklist.splice(domainIndex, 1);
+                  setStorage({ blacklist }).then(() => {
+                    renderBlacklistArea();
+                    updateQuickToggleButton();
+                  });
+                }
+              }
+            });
+          } else {
+            const domainIndex = blacklist.findIndex(item => item.domain === itemObj.domain);
+            if (domainIndex !== -1) {
+              blacklist.splice(domainIndex, 1);
+              setStorage({ blacklist }).then(() => {
+                renderBlacklistArea();
+                updateQuickToggleButton();
+              });
+            }
+          }
+        });
+
+        colEl.appendChild(itemEl);
       });
 
-      blacklistScrollArea.appendChild(rowEl);
-    });
+      blacklistScrollArea.appendChild(colEl);
+    }
   }
 
   if (addForm) {

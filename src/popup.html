@@ -9,6 +9,7 @@
 </head>
 
 <body>
+  <!-- Header Bar: Brand, Sync Pill, Auth Button, Theme & Settings -->
   <header>
     <div class="brand">
       <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
@@ -17,29 +18,34 @@
       </svg>
       <span class="brand-title">Focus Coach</span>
     </div>
-    <div class="header-auth-container" id="header-auth-container">
-      <button id="btn-header-auth" class="btn-auth-chip" title="Status Akun">
-        <svg class="auth-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
-        </svg>
-        <span id="auth-user-chip-name">🔑 Login</span>
+
+    <!-- Right Header Actions (Sync Pill, Auth, Theme, Settings) -->
+    <div class="header-right-actions">
+      <!-- Sync Status Button Pill (Opens Sync Modal) -->
+      <button id="btn-header-sync" class="btn-sync-chip sync-disconnected" title="Sinkronisasi & Pairing HP">
+        <span class="sync-dot"></span>
+        <span id="header-sync-label">Pair HP</span>
       </button>
-    </div>
-    <div class="switch-container">
-      <button id="theme-toggle" class="theme-btn" title="Toggle Light/Dark Theme">
-        <svg class="moon-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
-        </svg>
-        <svg class="sun-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m0 13.5V21M3 12h2.25m13.5 0H21M5.75 5.75l1.591 1.591M16.659 16.659l1.591 1.591M5.75 18.25l1.591-1.591M16.659 7.341l1.591-1.591M12 18.75a6.75 6.75 0 1 0 0-13.5 6.75 6.75 0 0 0 0 13.5Z" />
-        </svg>
-      </button>
-      <button id="btn-settings-gear" class="theme-btn" title="Pengaturan (Settings)" style="margin-left: 2px;">
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h3.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.796 3.111a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.798 3.111a1.125 1.125 0 0 1-1.37.491l-1.216-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-3.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.797-3.111a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.797-3.111a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.281Z" />
-          <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
-        </svg>
-      </button>
+
+      <!-- Auth User Chip -->
+      <div class="header-auth-container" id="header-auth-container">
+        <button id="btn-header-auth" class="btn-auth-chip" title="Status Akun">
+          <svg class="auth-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 1 1-7.5 0 3.75 3.75 0 0 1 7.5 0ZM4.501 20.118a7.5 7.5 0 0 1 14.998 0A17.933 17.933 0 0 1 12 21.75c-2.676 0-5.216-.584-7.499-1.632Z" />
+          </svg>
+          <span id="auth-user-chip-name">Login</span>
+        </button>
+      </div>
+
+      <!-- Settings Gear Control -->
+      <div class="switch-container">
+        <button id="btn-settings-gear" class="theme-btn" title="Pengaturan (Settings)">
+          <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h3.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.325.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 0 1 1.37.49l1.796 3.111a1.125 1.125 0 0 1-.26 1.431l-1.003.827c-.293.241-.438.613-.43.992a7.723 7.723 0 0 1 0 .255c-.008.378.137.75.43.991l1.004.827c.424.35.534.955.26 1.43l-1.798 3.111a1.125 1.125 0 0 1-1.37.491l-1.216-.456c-.355-.133-.75-.072-1.076.124a6.47 6.47 0 0 1-.22.128c-.331.183-.581.495-.644.869l-.213 1.281c-.09.543-.56.94-1.11.94h-3.594c-.55 0-1.019-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 0 1-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 0 1-1.369-.49l-1.797-3.111a1.125 1.125 0 0 1 .26-1.43l1.004-.827c.292-.24.437-.613.43-.991a6.932 6.932 0 0 1 0-.255c.007-.38-.138-.751-.43-.992l-1.004-.827a1.125 1.125 0 0 1-.26-1.43l1.797-3.111a1.125 1.125 0 0 1 1.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.086.22-.128.332-.183.582-.495.644-.869l.214-1.281Z" />
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+          </svg>
+        </button>
+      </div>
     </div>
   </header>
 
@@ -49,55 +55,64 @@
     <section id="tab-focus-page" class="subpage">
       <!-- IDLE MODE DASHBOARD -->
       <div id="focus-idle-view">
-        <!-- Quick Pomodoro Independent Card -->
-        <div class="card" style="padding: 12px; background: linear-gradient(135deg, rgba(99, 102, 241, 0.12) 0%, rgba(79, 70, 229, 0.08) 100%); border: 1px solid rgba(99, 102, 241, 0.25);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span class="card-label" style="color: #a5b4fc; display: flex; align-items: center; gap: 6px;">
-              ⏱️ Sesi Pomodoro Mandiri
-            </span>
-            <span style="font-size: 10px; color: #818cf8; font-weight: 600;">25 Menit</span>
+        <!-- 1. Row 1: Timer & Sync Side-by-Side (Small Compact Cards) -->
+        <div class="dashboard-matrix-row">
+          <!-- Quick Pomodoro Small Card -->
+          <div class="card matrix-card card-pomodoro">
+            <div class="matrix-card-header">
+              <span class="matrix-title">⏱️ Pomodoro</span>
+              <span class="matrix-badge">25m</span>
+            </div>
+            <button id="btn-start-quick-pomodoro" class="btn-matrix-action">▶️ Mulai Sesi</button>
           </div>
-          <p style="font-size: 10px; color: #94a3b8; margin-bottom: 8px;">Mulai sesi fokus cepat langsung tanpa perlu prompt AI.</p>
-          <button id="btn-start-quick-pomodoro" class="btn-add" style="width: 100%; height: 32px; font-size: 11px;">⏱️ Mulai Sesi Fokus Mandiri</button>
+
+          <!-- Quick Sync Small Card -->
+          <div class="card matrix-card card-sync">
+            <div class="matrix-card-header">
+              <span class="matrix-title">📱 Sync HP</span>
+              <span class="matrix-badge sync-pill">Pairing</span>
+            </div>
+            <button id="btn-dashboard-sync" class="btn-matrix-action btn-sync-action">🔗 Buka QR</button>
+          </div>
         </div>
 
-        <!-- Create New Magic To-Do Shortcut Card -->
-        <div class="card" style="margin-top: 8px; padding: 12px; background: linear-gradient(135deg, rgba(167, 139, 250, 0.12) 0%, rgba(139, 92, 246, 0.08) 100%); border: 1px solid rgba(167, 139, 250, 0.25);">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span class="card-label" style="color: #c4b5fd; display: flex; align-items: center; gap: 6px;">
+        <!-- 2. Row 2: Shortcut Magic To-Do (Banner Card) -->
+        <div class="card magic-banner-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
+            <span class="card-label" style="color: #c4b5fd; display: flex; align-items: center; gap: 5px; font-size: 11px;">
               🪄 Pecah Tugas Baru (AI)
             </span>
-            <span style="font-size: 10px; color: #a78bfa; font-weight: 600;">Magic To-Do</span>
+            <span style="font-size: 8px; color: #a78bfa; font-weight: 700; background: rgba(167, 139, 250, 0.15); padding: 1.5px 5px; border-radius: 4px;">Magic To-Do</span>
           </div>
-          <p style="font-size: 10px; color: #94a3b8; margin-bottom: 8px;">Ubah beban tugas raksasa menjadi milestone mikro realistis.</p>
-          <button id="btn-dashboard-create-magic" class="btn-add" style="width: 100%; height: 32px; font-size: 11px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #ffffff;">🪄 Buat To-Do List Baru</button>
+          <p style="font-size: 8.5px; color: #94a3b8; margin-bottom: 6px; line-height: 1.2;">Ubah beban tugas raksasa jadi milestone mikro.</p>
+          <button id="btn-dashboard-create-magic" class="btn-add" style="width: 100%; height: 26px; font-size: 9.5px; font-weight: 700; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #ffffff; border-radius: 7px;">🪄 Buat To-Do List Baru</button>
         </div>
 
-        <!-- Saved Projects Preview Card -->
-        <div class="card" id="focus-projects-preview-card" style="margin-top: 8px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span class="card-label" style="color: #cbd5e1; display: flex; align-items: center; gap: 4px;">
+        <!-- 3. Row 3: Shortcut Blocker / Guard Card -->
+        <div class="card guard-summary-card" style="padding: 8px 10px; background: rgba(20, 184, 166, 0.08); border: 1px solid rgba(45, 212, 191, 0.25); border-radius: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-weight: 700; font-size: 10.5px; color: #2dd4bf; display: flex; align-items: center; gap: 5px;">
+              <span style="width: 5px; height: 5px; border-radius: 50%; background: #2dd4bf; display: inline-block; box-shadow: 0 0 6px #2dd4bf;"></span>
+              🛡️ Anti-Doomscroll Guard
+            </span>
+            <button id="btn-go-to-guard-tab" class="btn-auth-chip" style="font-size: 8.5px; padding: 2.5px 8px;">Kelola ➔</button>
+          </div>
+          <div style="display: flex; justify-content: space-between; color: #cbd5e1; margin-top: 4px; font-size: 9px;">
+            <span style="color: #94a3b8;">Situs Aktif:</span>
+            <span id="debug-active-domain" style="font-weight: 700; color: #f1f5f9; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mencari...</span>
+          </div>
+        </div>
+
+        <!-- 4. Row 4: Saved Projects Preview Card -->
+        <div class="card" id="focus-projects-preview-card" style="padding: 8px 10px; border-radius: 10px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span class="card-label" style="color: #cbd5e1; display: flex; align-items: center; gap: 4px; font-size: 11px;">
               📁 Proyek Aktif Saya
             </span>
-            <button id="btn-go-to-magic-link" style="background: none; border: none; font-size: 10px; color: #818cf8; cursor: pointer; font-weight: 600;">+ Buat Baru</button>
+            <button id="btn-go-to-magic-link" style="background: none; border: none; font-size: 9px; color: #818cf8; cursor: pointer; font-weight: 700;">+ Buat Baru</button>
           </div>
           <div id="focus-project-cards-list" class="project-cards-list">
             <!-- Populated programmatically -->
-          </div>
-        </div>
-
-        <!-- Guard Protection Summary Card -->
-        <div class="card" style="margin-top: 8px; padding: 10px 12px; background: rgba(20, 184, 166, 0.08); border: 1px solid rgba(45, 212, 191, 0.25);">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: 700; font-size: 11px; color: #2dd4bf; display: flex; align-items: center; gap: 6px;">
-              <span style="width: 6px; height: 6px; border-radius: 50%; background: #2dd4bf; display: inline-block; box-shadow: 0 0 8px #2dd4bf;"></span>
-              🛡️ Anti-Doomscroll Guard
-            </span>
-            <button id="btn-go-to-guard-tab" class="btn-auth-chip" style="font-size: 9px; padding: 2px 8px;">Kelola Guard ➔</button>
-          </div>
-          <div style="display: flex; justify-content: space-between; color: #cbd5e1; margin-top: 6px; font-size: 10px;">
-            <span>Situs Aktif:</span>
-            <span id="debug-active-domain" style="font-weight: 700; color: #f1f5f9;">Mencari...</span>
           </div>
         </div>
       </div>
@@ -105,20 +120,20 @@
       <!-- ACTIVE FOCUS MODE -->
       <div id="focus-active-view" class="hidden">
         <div class="card" style="padding: 14px; text-align: center; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(129, 140, 248, 0.3);">
-          <span class="card-label" style="font-size: 11px; color: #a78bfa;">Sesi Fokus Sedang Berjalan</span>
-          <div id="magic-pomodoro-timer" style="margin-top: 10px; font-size: 32px; font-weight: 800; color: #f8fafc; letter-spacing: -1px;">25:00</div>
-          <span id="magic-pomodoro-status" style="font-size: 11px; color: #34d399; font-weight: 600; display: block; margin-top: 2px;">Kerja • 25 menit</span>
+          <span class="card-label" style="font-size: 11px; color: #a78bfa; letter-spacing: 0.5px;">🟢 SESI FOKUS AKTIF</span>
+          <div id="magic-pomodoro-timer" style="margin-top: 6px; font-size: 38px; font-weight: 800; color: #f8fafc; letter-spacing: -1px; font-variant-numeric: tabular-nums;">25:00</div>
+          <span id="magic-pomodoro-status" style="font-size: 10.5px; color: #34d399; font-weight: 600; display: inline-block; margin-top: 2px; background: rgba(16, 185, 129, 0.15); padding: 2px 8px; border-radius: 8px;">Kerja • 25 menit</span>
 
-          <div style="margin-top: 14px; padding: 10px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; text-align: left;">
-            <span style="font-size: 9px; text-transform: uppercase; letter-spacing: 0.5px; color: #64748b; font-weight: 700;">Task Aktif Saat Ini</span>
-            <div id="focus-task-display" style="font-size: 12px; font-weight: 700; color: #f8fafc; margin-top: 4px;">Sesi Fokus Mandiri</div>
+          <div style="margin-top: 12px; padding: 10px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; text-align: left;">
+            <span style="font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.6px; color: #64748b; font-weight: 700;">Task Aktif Saat Ini</span>
+            <div id="focus-task-display" style="font-size: 11.5px; font-weight: 700; color: #f8fafc; margin-top: 3px;">Sesi Fokus Mandiri</div>
           </div>
 
-          <div style="display: flex; gap: 8px; margin-top: 14px;">
-            <button id="btn-pause-pomodoro" class="btn-add" style="flex: 1; height: 34px; font-size: 11px;">Pause</button>
-            <button id="btn-reset-pomodoro" class="btn-quick-toggle is-restricted" style="flex: 1; height: 34px; font-size: 11px;">Stop</button>
+          <div style="display: flex; gap: 8px; margin-top: 12px;">
+            <button id="btn-pause-pomodoro" class="btn-add" style="flex: 1; height: 32px; font-size: 11px;">Pause</button>
+            <button id="btn-reset-pomodoro" class="btn-quick-toggle is-restricted" style="flex: 1; height: 32px; font-size: 11px;">Stop</button>
           </div>
-          <button id="btn-dashboard-complete" class="btn-add" style="margin-top: 8px; width: 100%; height: 32px; font-size: 11px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">✓ Selesai Task Ini</button>
+          <button id="btn-dashboard-complete" class="btn-add" style="margin-top: 6px; width: 100%; height: 32px; font-size: 11px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">✓ Selesai Task Ini</button>
         </div>
       </div>
     </section>
@@ -130,27 +145,42 @@
         <!-- Expandable Accordion Input Panel -->
         <div class="card accordion-card" id="magic-accordion-card">
           <div class="accordion-header" id="btn-toggle-magic-accordion" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-            <span class="card-label" style="display: flex; align-items: center; gap: 6px;">
+            <span class="card-label" style="display: flex; align-items: center; gap: 6px; font-size: 11.5px;">
               🪄 Pecah Tugas Baru dengan AI
             </span>
-            <span id="accordion-arrow" style="font-size: 12px; color: #94a3b8;">▼</span>
+            <span id="accordion-arrow" style="font-size: 11px; color: #94a3b8;">▼</span>
           </div>
           <div class="accordion-body hidden" id="magic-accordion-body" style="margin-top: 8px;">
             <div class="task-input-container" style="display: flex; flex-direction: column; gap: 8px;">
               <input type="text" id="magic-task-input" class="task-input" placeholder="Deskripsikan tugas raksasa yang ingin dipecah..." autocomplete="off" spellcheck="false">
-              <div style="display: flex; flex-direction: column; gap: 4px;">
-                <label for="magic-duration-input" style="font-size: 10px; color: #94a3b8;">Durasi kerja total (menit)</label>
-                <input type="number" id="magic-duration-input" class="task-input" min="15" step="5" value="60" placeholder="Contoh: 60">
+              
+              <!-- Integrated Duration Row: Manual Input on Left + Horizontal Scrollable Chips on Right -->
+              <div class="duration-row-container">
+                <label style="font-size: 9.5px; color: #94a3b8; font-weight: 700; margin-bottom: 3px; display: block;">Durasi Kerja Total</label>
+                <div style="display: flex; align-items: center; gap: 6px;">
+                  <div class="duration-manual-wrapper">
+                    <input type="number" id="magic-duration-input" class="task-input duration-input-box" min="5" step="5" value="60">
+                    <span class="duration-unit">m</span>
+                  </div>
+                  <div class="duration-chips-scroll" id="duration-chips-container">
+                    <button type="button" class="duration-chip" data-min="15">15m</button>
+                    <button type="button" class="duration-chip" data-min="25">25m</button>
+                    <button type="button" class="duration-chip" data-min="30">30m</button>
+                    <button type="button" class="duration-chip" data-min="45">45m</button>
+                    <button type="button" class="duration-chip active" data-min="60">60m</button>
+                  </div>
+                </div>
               </div>
-              <button id="btn-negotiate" class="btn-add" style="margin-top: 4px; width: 100%; height: 32px;">Pecah Tugas dengan AI</button>
+
+              <button id="btn-negotiate" class="btn-add" style="margin-top: 2px; width: 100%; height: 32px; font-weight: 700;">🪄 Pecah Tugas dengan AI</button>
             </div>
           </div>
         </div>
 
         <!-- Saved Projects Library Container -->
-        <div class="card" id="project-preview-container" style="margin-top: 8px;">
+        <div class="card" id="project-preview-container" style="margin-top: 6px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span class="card-label" style="color: #cbd5e1; display: flex; align-items: center; gap: 4px;">
+            <span class="card-label" style="color: #cbd5e1; display: flex; align-items: center; gap: 4px; font-size: 11px;">
               📁 Perpustakaan Proyek (Database)
             </span>
             <span style="font-size: 9px; color: #94a3b8;">Klik untuk melanjutkan</span>
@@ -166,7 +196,7 @@
         <div class="magic-loading">
           <div class="magic-spinner"></div>
           <span class="card-label" style="animation: subtle-pulse 2s infinite ease-in-out;">Menegosiasikan dengan Gemini AI...</span>
-          <span style="font-size: 11px; color: #64748b;">Memecah beban tugas raksasa...</span>
+          <span style="font-size: 10.5px; color: #64748b;">Memecah beban tugas raksasa...</span>
         </div>
       </div>
 
@@ -174,38 +204,38 @@
       <div id="magic-active-view" class="hidden">
         <div class="card" id="magic-results-panel">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-            <span class="card-label">Checklist Mikro-Tugas</span>
-            <span id="magic-step-count-label" style="font-size: 10px; font-weight: 600; color: #a78bfa;">0 item</span>
+            <span class="card-label" style="font-size: 11.5px;">Checklist Mikro-Tugas</span>
+            <span id="magic-step-count-label" style="font-size: 9.5px; font-weight: 700; color: #a78bfa; background: rgba(167, 139, 250, 0.15); padding: 2px 6px; border-radius: 6px;">0 item</span>
           </div>
           <div class="magic-steps-list" id="magic-steps-list">
             <!-- Populated by JavaScript -->
           </div>
-          <div style="display: flex; gap: 8px; margin-top: 10px;">
-            <button id="btn-add-magic-item" class="btn-add" style="flex: 1; padding: 6px; font-size: 11px;">+ Tambah Item</button>
-            <button id="btn-reset-magic" class="btn-quick-toggle is-restricted" style="flex: 1; padding: 6px; font-size: 11px;">Selesaikan Task</button>
+          <div style="display: flex; gap: 6px; margin-top: 8px;">
+            <button id="btn-add-magic-item" class="btn-add" style="flex: 1; padding: 4px; height: 28px; font-size: 10.5px;">+ Tambah Item</button>
+            <button id="btn-reset-magic" class="btn-quick-toggle is-restricted" style="flex: 1; padding: 4px; height: 28px; font-size: 10.5px;">Selesaikan Task</button>
           </div>
-          <button id="btn-start-magic-focus" class="btn-add" style="margin-top: 10px; width: 100%; height: 34px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff;">🚀 Mulai Sesi Fokus Sekarang</button>
+          <button id="btn-start-magic-focus" class="btn-add" style="margin-top: 8px; width: 100%; height: 34px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff;">🚀 Mulai Sesi Fokus Sekarang</button>
         </div>
       </div>
 
       <!-- Congratulations Banner -->
       <div class="congrats-card hidden" id="magic-congrats-panel">
-        <span style="font-size: 24px;">🎉</span>
-        <span class="card-label" style="color: #10b981; font-size: 13px;">Seluruh Todo Selesai!</span>
-        <span style="font-size: 11px; color: #94a3b8; line-height: 1.4;">Anda berhasil menyelesaikan seluruh milestone mikro!</span>
-        <button id="btn-new-magic" class="btn-add" style="margin-top: 6px; width: 100%; height: 32px;">Mulai Tugas Baru</button>
+        <span style="font-size: 22px;">🎉</span>
+        <span class="card-label" style="color: #10b981; font-size: 12.5px;">Seluruh Todo Selesai!</span>
+        <span style="font-size: 10.5px; color: #94a3b8; line-height: 1.4;">Anda berhasil menyelesaikan seluruh milestone mikro!</span>
+        <button id="btn-new-magic" class="btn-add" style="margin-top: 6px; width: 100%; height: 30px;">Mulai Tugas Baru</button>
       </div>
     </section>
 
     <!-- PAGE 3: GUARD -->
     <section id="tab-guard-page" class="subpage hidden">
       <!-- Master Shield Switch -->
-      <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 12px;">
+      <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px;">
         <div>
-          <span class="card-label" style="color: #2dd4bf; display: flex; align-items: center; gap: 6px;">
+          <span class="card-label" style="color: #2dd4bf; display: flex; align-items: center; gap: 6px; font-size: 11.5px;">
             🛡️ Anti-Doomscroll Shield
           </span>
-          <span style="font-size: 10px; color: #94a3b8; display: block; margin-top: 2px;">Proteksi otomatis dari distraksi scroll</span>
+          <span style="font-size: 9.5px; color: #94a3b8; display: block; margin-top: 2px;">Proteksi otomatis dari distraksi scroll</span>
         </div>
         <label class="switch">
           <input type="checkbox" id="guard-master-toggle" checked>
@@ -214,9 +244,9 @@
       </div>
 
       <!-- Sensitivity Pills -->
-      <div class="card slider-group" style="margin-top: 8px;">
+      <div class="card slider-group" style="margin-top: 6px;">
         <div class="slider-header">
-          <span class="card-label" style="color: #cbd5e1;">Sensitivitas Deteksi</span>
+          <span class="card-label" style="color: #cbd5e1; font-size: 11px;">Sensitivitas Deteksi</span>
           <span id="slider-val-label" class="slider-value">Balanced</span>
         </div>
         <input type="range" id="sensitivity-slider" min="1" max="3" value="2" step="1">
@@ -227,17 +257,18 @@
         </div>
       </div>
 
-      <!-- Blacklist URL Manager -->
-      <div class="card" style="margin-top: 8px; padding: 10px;">
+      <!-- Blacklist URL Manager (Horizontal 3-Row Preview) -->
+      <div class="card" style="margin-top: 6px; padding: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span class="card-label" style="color: #cbd5e1;">Domain Terlarang (Blacklist)</span>
+          <span class="card-label" style="color: #cbd5e1; font-size: 11px;">Domain Terlarang (Blacklist)</span>
+          <span id="blacklist-count-badge" style="font-size: 9px; font-weight: 700; color: #2dd4bf; background: rgba(45, 212, 191, 0.15); padding: 1px 6px; border-radius: 6px;">0 Aktif</span>
         </div>
-        <form id="add-form" class="add-row">
+        <form id="add-form" class="add-row" style="margin-bottom: 6px;">
           <input type="text" id="manual-domain-input" placeholder="Contoh: youtube.com" required autocomplete="off">
-          <button type="submit" class="btn-add" style="padding: 0 12px; height: 32px;">Tambah</button>
+          <button type="submit" class="btn-add" style="padding: 0 10px; height: 30px; font-size: 10.5px;">Tambah</button>
         </form>
-        <div class="blacklist-scroll-area" id="blacklist-scroll-area" style="max-height: 130px; overflow-y: auto; display: flex; flex-direction: column; gap: 6px; margin-top: 6px;">
-          <!-- Injected programmatically -->
+        <div class="blacklist-scroll-area" id="blacklist-scroll-area">
+          <!-- Injected programmatically as 3-row horizontal columns -->
         </div>
       </div>
     </section>
@@ -265,7 +296,84 @@
     </button>
   </nav>
 
-  <!-- Settings Modal Overlay -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+  <!-- MODALS SECTION -->
+  <!-- ═════════════════════════════════════════════════════════════════════════ -->
+
+  <!-- 1. Dedicated Sync & QR Pairing Modal Overlay -->
+  <div id="sync-modal" class="modal-overlay hidden">
+    <div class="modal-content auth-modal-card">
+      <div class="modal-header">
+        <span class="card-label" style="font-size: 13px; color: #2dd4bf; display: flex; align-items: center; gap: 6px;">
+          📱 Sinkronisasi & Pairing HP
+        </span>
+        <button id="btn-close-sync-modal" class="btn-close-modal" title="Tutup Modal">✕</button>
+      </div>
+
+      <div style="display: flex; flex-direction: column; gap: 10px;">
+        <!-- Status Indicator Pill -->
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: rgba(255,255,255,0.04); border-radius: 10px;">
+          <span style="font-size: 11px; color: #cbd5e1;">Status WebSocket:</span>
+          <div id="sync-status-badge" class="sync-status-badge sync-disconnected">
+            <span class="sync-status-dot"></span>
+            <span id="sync-status-text" style="font-size: 9px; font-weight: 700;">Terputus</span>
+          </div>
+        </div>
+
+        <p style="font-size: 10px; color: #94a3b8; line-height: 1.4;">Scan QR Code dari aplikasi Mobile ADHD untuk menyinkronkan status timer Pomodoro secara real-time.</p>
+        <button id="btn-generate-sync-qr" class="btn-add sync-qr-btn" style="width: 100%; height: 34px; font-size: 11px; font-weight: 700;">🔗 Generate QR Code</button>
+
+        <!-- QR Code Display Container (hidden until generated) -->
+        <div id="sync-qr-container" class="hidden" style="margin-top: 4px;">
+          <div class="sync-qr-wrapper">
+            <div id="sync-qr-canvas" class="sync-qr-canvas"></div>
+          </div>
+          <div style="text-align: center; margin-top: 6px;">
+            <span style="font-size: 9px; color: #64748b;">Room ID:</span>
+            <span id="sync-room-id-display" style="font-size: 9.5px; color: #818cf8; font-weight: 700; font-family: monospace;"></span>
+          </div>
+          <button id="btn-disconnect-sync" class="btn-disconnect-sync" style="margin-top: 8px; width: 100%; height: 28px; font-size: 10px;">🔌 Putuskan Koneksi</button>
+        </div>
+        
+        <!-- Debugger HUD Collapsible Panel -->
+        <div class="debugger-hud-panel" style="margin-top: 6px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px;">
+          <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
+            <span style="font-size: 10px; font-weight: 700; color: #818cf8;">🛠️ WebSocket Debugger</span>
+            <span id="sync-latency-badge" style="font-size: 8px; font-family: monospace; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3);">RTT: -- ms</span>
+          </div>
+
+          <!-- Quick Action Test Grid -->
+          <div class="debug-actions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 6px;">
+            <button id="btn-dbg-ping" class="btn-dbg" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">🚀 Test Ping</button>
+            <button id="btn-dbg-alert" class="btn-dbg" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">⚡ Shock Alert</button>
+            <button id="btn-dbg-focus-on" class="btn-dbg" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">⏱️ Start Focus</button>
+            <button id="btn-dbg-focus-off" class="btn-dbg" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">🛑 Stop Focus</button>
+          </div>
+
+          <!-- Custom Message Input -->
+          <div style="display: flex; gap: 4px; margin-bottom: 6px;">
+            <input type="text" id="input-dbg-custom-msg" placeholder="Ketik custom pesan..." style="flex: 1; height: 26px; font-size: 9px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 0 6px; color: #fff; outline: none;">
+            <button id="btn-dbg-send-custom" style="background: #4f46e5; border: none; color: #fff; font-size: 9px; font-weight: 600; padding: 0 8px; border-radius: 4px; cursor: pointer;">Kirim</button>
+          </div>
+
+          <!-- Terminal Toolbar & Log Container -->
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
+            <span style="font-size: 8px; color: #64748b; font-family: monospace;">Live Packet Stream:</span>
+            <div style="display: flex; gap: 4px;">
+              <button id="btn-dbg-copy-logs" style="background: transparent; border: none; color: #818cf8; font-size: 8px; cursor: pointer; text-decoration: underline;">Copy</button>
+              <span style="color: #334155; font-size: 8px;">•</span>
+              <button id="btn-dbg-clear-logs" style="background: transparent; border: none; color: #94a3b8; font-size: 8px; cursor: pointer; text-decoration: underline;">Clear</button>
+            </div>
+          </div>
+          <div id="sync-debug-log" style="height: 90px; max-height: 100px; overflow-y: auto; font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 8px; color: #94a3b8; background: #090d16; padding: 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word; line-height: 1.4;">
+            <!-- Real-time logs will be injected here -->
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Settings Modal Overlay (Pomodoro & Preferences) -->
   <div id="settings-modal" class="modal-overlay hidden">
     <div class="modal-content auth-modal-card">
       <div class="modal-header">
@@ -274,10 +382,20 @@
       </div>
 
       <div style="display: flex; flex-direction: column; gap: 12px;">
-        <!-- Theme Status -->
+        <!-- Theme Switcher Row -->
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: rgba(255,255,255,0.04); border-radius: 10px;">
-          <span style="font-size: 11px; color: #cbd5e1;">Preferensi Warna</span>
-          <span style="font-size: 10px; color: #94a3b8;">Sesuai Toggle Header</span>
+          <div style="display: flex; flex-direction: column;">
+            <span style="font-size: 11px; color: #cbd5e1; font-weight: 600;">Tema Tampilan</span>
+            <span id="theme-status-text" style="font-size: 9.5px; color: #94a3b8;">Mode Gelap</span>
+          </div>
+          <button id="theme-toggle" class="theme-btn" title="Ganti Tema Gelap / Terang" style="background: rgba(255, 255, 255, 0.08); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">
+            <svg class="moon-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.72 9.72 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" />
+            </svg>
+            <svg class="sun-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m0 13.5V21M3 12h2.25m13.5 0H21M5.75 5.75l1.591 1.591M16.659 16.659l1.591 1.591M5.75 18.25l1.591-1.591M16.659 7.341l1.591-1.591M12 18.75a6.75 6.75 0 1 0 0-13.5 6.75 6.75 0 0 0 0 13.5Z" />
+            </svg>
+          </button>
         </div>
 
         <!-- Pomodoro Config -->
@@ -303,41 +421,11 @@
             <span class="slider-small"></span>
           </label>
         </div>
-
-        <!-- Sync with Phone Section -->
-        <div class="sync-section" style="border-top: 1px solid rgba(255,255,255,0.08); padding-top: 12px; margin-top: 8px;">
-          <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 4px;">
-            <span style="font-size: 11px; font-weight: 700; color: #cbd5e1;">📱 Sinkronisasi Handphone</span>
-            <div id="sync-status-badge" class="sync-status-badge sync-disconnected">
-              <span class="sync-status-dot"></span>
-              <span id="sync-status-text" style="font-size: 8px;">Terputus</span>
-            </div>
-          </div>
-          <p style="font-size: 10px; color: #64748b; margin-bottom: 8px; line-height: 1.4;">Scan QR Code dari HP untuk melihat status timer Pomodoro secara real-time.</p>
-          <button id="btn-generate-sync-qr" class="btn-add sync-qr-btn" style="width: 100%; height: 34px; font-size: 11px; font-weight: 600;">🔗 Generate QR Code</button>
-
-          <!-- QR Code Display Container (hidden until generated) -->
-          <div id="sync-qr-container" class="hidden" style="margin-top: 10px;">
-            <div class="sync-qr-wrapper">
-              <div id="sync-qr-canvas" class="sync-qr-canvas"></div>
-            </div>
-            <div style="text-align: center; margin-top: 6px;">
-              <span style="font-size: 9px; color: #64748b;">Room ID:</span>
-              <span id="sync-room-id-display" style="font-size: 9px; color: #818cf8; font-weight: 600; font-family: monospace;"></span>
-            </div>
-            <button id="btn-disconnect-sync" class="btn-disconnect-sync" style="margin-top: 8px; width: 100%; height: 28px; font-size: 10px;">🔌 Putuskan Koneksi</button>
-          </div>
-          
-          <!-- Debug Log Container -->
-          <div id="sync-debug-log" style="margin-top: 10px; max-height: 120px; overflow-y: auto; font-family: monospace; font-size: 8px; color: #94a3b8; background: rgba(15, 23, 42, 0.8); padding: 8px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word;">
-            <!-- Logs will be injected here -->
-          </div>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- Auth Modal Overlay -->
+  <!-- 3. Auth Modal Overlay -->
   <div id="auth-modal" class="modal-overlay hidden">
     <div class="modal-content auth-modal-card">
       <div class="modal-header">
@@ -361,7 +449,7 @@
           <input type="password" id="auth-login-password" class="task-input" placeholder="Minimal 6 karakter" required>
         </div>
         <div id="auth-login-error" class="auth-error-badge hidden"></div>
-        <button type="submit" id="btn-login-submit" class="btn-add" style="height: 36px; margin-top: 4px;">Masuk Akun</button>
+        <button type="submit" id="btn-login-submit" class="btn-add" style="height: 36px; margin-top: 4px; font-weight: 700;">Masuk Akun</button>
       </form>
 
       <!-- Register Form -->
@@ -379,12 +467,12 @@
           <input type="password" id="auth-reg-password" class="task-input" placeholder="Minimal 6 karakter" required>
         </div>
         <div id="auth-reg-error" class="auth-error-badge hidden"></div>
-        <button type="submit" id="btn-register-submit" class="btn-add" style="height: 36px; margin-top: 4px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">Daftar Akun Baru</button>
+        <button type="submit" id="btn-register-submit" class="btn-add" style="height: 36px; margin-top: 4px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-weight: 700;">Daftar Akun Baru</button>
       </form>
     </div>
   </div>
 
-  <!-- Resume Project Modal Overlay -->
+  <!-- 4. Resume Project Modal Overlay -->
   <div id="resume-project-modal" class="modal-overlay hidden">
     <div class="modal-content auth-modal-card">
       <div class="modal-header">
@@ -411,7 +499,7 @@
           <label for="resume-duration-input">Waktu yang Anda miliki saat ini (menit)</label>
           <input type="number" id="resume-duration-input" class="task-input" min="10" step="5" value="30" placeholder="Contoh: 30">
         </div>
-        <button id="btn-confirm-resume" class="btn-add" style="height: 36px; margin-top: 4px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff;">▶️ Lanjutkan Proyek</button>
+        <button id="btn-confirm-resume" class="btn-add" style="height: 36px; margin-top: 4px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff; font-weight: 700;">▶️ Lanjutkan Proyek</button>
       </div>
     </div>
   </div>
