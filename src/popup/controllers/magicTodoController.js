@@ -7,6 +7,7 @@ import { setStorage } from '../services/storageService.js';
 import { getSwalTheme } from '../modules/themeManager.js';
 import { markTodoDoneOnBackend, deleteTodoOnBackend } from '../services/projectService.js';
 import { sendTimerEvent, getConnectionStatus } from '../services/websocketService.js';
+import { toggleStepDropdown } from '../modules/resourceRecommendationModule.js';
 
 export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
   const magicIdleView = document.getElementById('magic-idle-view');
@@ -386,7 +387,7 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
       mainRow.appendChild(textWrap);
       mainRow.appendChild(deleteBtn);
 
-      // Bottom Row Container (Time Badge + Focus Trigger)
+      // Bottom Row Container (Time Badge + Dropdown Hint + Focus Trigger)
       const footerRow = document.createElement('div');
       footerRow.className = 'magic-step-footer';
 
@@ -399,6 +400,14 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
           <polyline points="12 6 12 12 16 14"></polyline>
         </svg>
         <span>${step.minutes || 10}m</span>
+      `;
+
+      const dropdownHint = document.createElement('div');
+      dropdownHint.className = 'step-dropdown-hint';
+      dropdownHint.title = 'Klik to-do ini untuk melihat referensi materi & tools AI';
+      dropdownHint.innerHTML = `
+        <span class="step-dropdown-chevron">▼</span>
+        <span class="step-dropdown-label">Referensi & Tools</span>
       `;
 
       const syncBtn = document.createElement('button');
@@ -414,11 +423,25 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
       }
 
       footerRow.appendChild(timeBadge);
+      footerRow.appendChild(dropdownHint);
       footerRow.appendChild(syncBtn);
 
       li.appendChild(mainRow);
       li.appendChild(footerRow);
       magicStepsList.appendChild(li);
+
+      // Make to-do item click toggle the dropdown
+      li.classList.add('is-clickable');
+      li.addEventListener('click', () => {
+        toggleStepDropdown(step, li);
+      });
+
+      // Prevent child interactive elements from triggering dropdown toggle
+      cbWrapper.addEventListener('click', (e) => e.stopPropagation());
+      checkbox.addEventListener('click', (e) => e.stopPropagation());
+      textarea.addEventListener('click', (e) => e.stopPropagation());
+      deleteBtn.addEventListener('click', (e) => e.stopPropagation());
+      syncBtn.addEventListener('click', (e) => e.stopPropagation());
 
       // Auto-resize on initial render
       setTimeout(() => autoResizeTextarea(textarea), 0);

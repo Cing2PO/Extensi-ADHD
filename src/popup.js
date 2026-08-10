@@ -27,10 +27,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Initialize Sync Controller reference
+  let syncController = null;
+
   // Initialize Auth Controller
   const authController = initAuthController({
-    onLoginSuccess: () => {
+    onLoginSuccess: (result) => {
       projectController.refreshAllProjects();
+      if (syncController && result?.roomId) {
+        syncController.autoSyncOnLogin(result.roomId);
+      }
+    },
+    onLogout: () => {
+      if (syncController) {
+        syncController.disconnectSync();
+      }
     }
   });
 
@@ -65,7 +76,11 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initialize Sync Controller (WebSocket + QR Code)
-  const syncController = initSyncController();
+  syncController = initSyncController({
+    onRequestAuth: () => {
+      authController.openAuthModal('login');
+    }
+  });
 
   // Load Initial Settings & Hydrate Controllers
   getStorage([

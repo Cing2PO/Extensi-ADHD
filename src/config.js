@@ -16,6 +16,10 @@ const DEFAULT_CONFIG = {
   AUTH_REGISTER_PATH: '/api/auth/register',
   AUTH_REFRESH_PATH: '/api/auth/refresh',
   AUTH_LOGOUT_PATH: '/api/auth/logout',
+  AUTH_GENERATE_QR_PATH: '/api/auth/generate-qr',
+  AUTH_VALIDATE_QR_PATH: '/api/auth/validate-qr',
+  RECOMMEND_RESOURCES_PATH: '/api/recommend-resources',
+  PUBLIC_RECOMMEND_RESOURCES_PATH: '/api/public/recommend-resources',
 
   // WebSocket Server Endpoint for cross-platform alerts (Laravel Reverb / Mock)
   REVERB_WS_URL: 'ws://localhost:8000/app/reverb',
@@ -47,6 +51,12 @@ export const ENV_CONFIG = {
   get PUBLIC_MAGIC_TODO_URL() {
     return resolveUrl(this.BACKEND_BASE_URL, this.PUBLIC_MAGIC_TODO_PATH);
   },
+  get RECOMMEND_RESOURCES_URL() {
+    return resolveUrl(this.BACKEND_BASE_URL, this.RECOMMEND_RESOURCES_PATH);
+  },
+  get PUBLIC_RECOMMEND_RESOURCES_URL() {
+    return resolveUrl(this.BACKEND_BASE_URL, this.PUBLIC_RECOMMEND_RESOURCES_PATH);
+  },
   get PROJECTS_URL() {
     return resolveUrl(this.BACKEND_BASE_URL, this.PROJECTS_PATH);
   },
@@ -61,6 +71,12 @@ export const ENV_CONFIG = {
   },
   get AUTH_LOGOUT_URL() {
     return resolveUrl(this.BACKEND_BASE_URL, this.AUTH_LOGOUT_PATH);
+  },
+  get AUTH_GENERATE_QR_URL() {
+    return resolveUrl(this.BACKEND_BASE_URL, this.AUTH_GENERATE_QR_PATH);
+  },
+  get AUTH_VALIDATE_QR_URL() {
+    return resolveUrl(this.BACKEND_BASE_URL, this.AUTH_VALIDATE_QR_PATH);
   },
   get SYNC_ROOM_URL() {
     return resolveUrl(this.SYNC_BACKEND_BASE_URL, this.SYNC_ROOM_PATH);

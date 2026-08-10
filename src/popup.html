@@ -333,19 +333,29 @@
           </div>
         </div>
 
-        <p style="font-size: 10px; color: #94a3b8; line-height: 1.4;">Scan QR Code dari aplikasi Mobile ADHD untuk menyinkronkan status timer Pomodoro secara real-time.</p>
-        <button id="btn-generate-sync-qr" class="btn-add sync-qr-btn" style="width: 100%; height: 34px; font-size: 11px; font-weight: 700;">🔗 Generate QR Code</button>
+        <!-- Auth Required Notice (shown if not logged in) -->
+        <div id="sync-auth-notice" class="hidden" style="text-align: center; padding: 14px 10px; background: rgba(239, 68, 68, 0.08); border: 1px dashed rgba(239, 68, 68, 0.3); border-radius: 12px;">
+          <div style="font-size: 22px; margin-bottom: 4px;">🔐</div>
+          <p style="font-size: 11px; color: #f87171; font-weight: 700; margin-bottom: 2px;">Login Diperlukan</p>
+          <p style="font-size: 10px; color: #94a3b8; line-height: 1.4; margin-bottom: 10px;">Silakan masuk ke akun Anda terlebih dahulu untuk membuat QR Code pairing.</p>
+          <button id="btn-sync-to-login" class="btn-add" style="width: 100%; height: 32px; font-size: 11px; font-weight: 700; background: #4f46e5;">🔑 Masuk Akun Sekarang</button>
+        </div>
 
-        <!-- QR Code Display Container (hidden until generated) -->
-        <div id="sync-qr-container" class="hidden" style="margin-top: 4px;">
+        <!-- QR Code Display Container (default shown when logged in) -->
+        <div id="sync-qr-container" style="display: flex; flex-direction: column; gap: 8px;">
+          <p style="font-size: 10px; color: #94a3b8; line-height: 1.4; text-align: center;">Pindai QR Code dari aplikasi <b>Mobile ADHD</b> untuk login instan dan menyinkronkan status timer secara real-time.</p>
           <div class="sync-qr-wrapper">
             <div id="sync-qr-canvas" class="sync-qr-canvas"></div>
           </div>
-          <div style="text-align: center; margin-top: 6px;">
+          <div style="text-align: center; margin-top: 2px;">
             <span style="font-size: 9px; color: #64748b;">Room ID:</span>
-            <span id="sync-room-id-display" style="font-size: 9.5px; color: #818cf8; font-weight: 700; font-family: monospace;"></span>
+            <span id="sync-room-id-display" style="font-size: 9.5px; color: #818cf8; font-weight: 700; font-family: monospace;">-</span>
           </div>
-          <button id="btn-disconnect-sync" class="btn-disconnect-sync" style="margin-top: 8px; width: 100%; height: 28px; font-size: 10px;">🔌 Putuskan Koneksi</button>
+
+          <div style="display: flex; gap: 6px; margin-top: 4px;">
+            <button id="btn-generate-sync-qr" class="btn-add sync-qr-btn" style="flex: 1; height: 32px; font-size: 10.5px; font-weight: 700; background: rgba(99, 102, 241, 0.2); border: 1px solid rgba(99, 102, 241, 0.4); color: #c7d2fe;">🔄 Refresh QR Code</button>
+            <button id="btn-disconnect-sync" class="btn-disconnect-sync" style="height: 32px; font-size: 10.5px; padding: 0 10px;">🔌 Putuskan</button>
+          </div>
         </div>
         
         <!-- Debugger HUD Collapsible Panel -->

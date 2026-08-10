@@ -9,6 +9,8 @@ export function getApiConfig() {
   return {
     MAGIC_TODO_URL: (window.ENV_CONFIG && window.ENV_CONFIG.MAGIC_TODO_URL) || ENV_CONFIG.MAGIC_TODO_URL,
     PUBLIC_MAGIC_TODO_URL: (window.ENV_CONFIG && window.ENV_CONFIG.PUBLIC_MAGIC_TODO_URL) || ENV_CONFIG.PUBLIC_MAGIC_TODO_URL,
+    RECOMMEND_RESOURCES_URL: (window.ENV_CONFIG && window.ENV_CONFIG.RECOMMEND_RESOURCES_URL) || ENV_CONFIG.RECOMMEND_RESOURCES_URL,
+    PUBLIC_RECOMMEND_RESOURCES_URL: (window.ENV_CONFIG && window.ENV_CONFIG.PUBLIC_RECOMMEND_RESOURCES_URL) || ENV_CONFIG.PUBLIC_RECOMMEND_RESOURCES_URL,
     TIMEOUT_MS: (window.ENV_CONFIG && window.ENV_CONFIG.API_TIMEOUT_MS) || 35000
   };
 }
@@ -147,6 +149,105 @@ export async function fetchMagicTodos(taskText, totalMinutes, options = {}, isRe
     if (err.name === 'AbortError') {
       throw new Error('Request ke API Backend mengalami RTO (Request Timeout).');
     }
+    throw err;
+  }
+}
+
+/**
+ * Fetch recommended learning resources or tools for a specific todo item from Gemini AI
+ */
+export async function fetchResourceRecommendations(todoText, isRetry = false) {
+  const cleanTodo = (todoText || '').trim();
+  if (!cleanTodo || cleanTodo.length < 3) {
+    throw new Error('Deskripsi to-do minimal 3 karakter untuk rekomendasi.');
+  }
+
+  const config = getApiConfig();
+  const { accessToken } = await getAuthSession();
+
+  const url = accessToken
+    ? (config.RECOMMEND_RESOURCES_URL || ENV_CONFIG.RECOMMEND_RESOURCES_URL)
+    : (config.PUBLIC_RECOMMEND_RESOURCES_URL || ENV_CONFIG.PUBLIC_RECOMMEND_RESOURCES_URL);
+
+  const headers = {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json'
+  };
+
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
+  }
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), config.TIMEOUT_MS || 35000);
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers,
+      body: JSON.stringify({ todo: cleanTodo }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+
+    if (response.status === 401 && accessToken && !isRetry) {
+      try {
+        await refreshAuthToken();
+        return await fetchResourceRecommendations(cleanTodo, true);
+      } catch {
+        return await fetchPublicResourceRecommendations(cleanTodo);
+      }
+    }
+
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      const errorMsg = data.message || `Gagal mengambil rekomendasi (HTTP ${response.status})`;
+      throw new Error(errorMsg);
+    }
+
+    return Array.isArray(data.resources) ? data.resources : [];
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      throw new Error('Request rekomendasi AI mengalami batas waktu (timeout).');
+    }
+    throw err;
+  }
+}
+
+/**
+ * Fetch recommended resources specifically via Public endpoint
+ */
+export async function fetchPublicResourceRecommendations(todoText) {
+  const config = getApiConfig();
+  const url = config.PUBLIC_RECOMMEND_RESOURCES_URL || ENV_CONFIG.PUBLIC_RECOMMEND_RESOURCES_URL;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), config.TIMEOUT_MS || 35000);
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json'
+      },
+      body: JSON.stringify({ todo: (todoText || '').trim() }),
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || 'Gagal mengambil rekomendasi');
+    }
+
+    return Array.isArray(data.resources) ? data.resources : [];
+  } catch (err) {
+    clearTimeout(timeoutId);
     throw err;
   }
 }
