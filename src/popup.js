@@ -30,7 +30,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize Auth Controller
   const authController = initAuthController({
     onLoginSuccess: () => {
-      projectController.renderProjectPreviewList();
+      projectController.refreshAllProjects();
     }
   });
 
@@ -49,7 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
     onStartFocusTab: (taskText) => {
       getStorage(['magicTaskState']).then((items) => {
         focusController.renderFocusTab(taskText, items.magicTaskState || null);
-        projectController.renderProjectPreviewList();
+        projectController.refreshAllProjects();
         switchToTab('tab-focus-page');
       });
     },
@@ -92,7 +92,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 3. Focus Dashboard Controller
     focusController.renderFocusTab(items.currentTask || '', items.magicTaskState || null);
-    projectController.renderProjectPreviewList();
+    projectController.refreshAllProjects();
 
     // 4. Rules & Blacklist Controller
     rulesController.setInitialRules({ items });

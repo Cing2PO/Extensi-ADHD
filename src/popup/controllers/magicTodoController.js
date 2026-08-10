@@ -310,6 +310,12 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
     }
   }
 
+  function autoResizeTextarea(el) {
+    if (!el) return;
+    el.style.height = 'auto';
+    el.style.height = `${Math.max(18, el.scrollHeight)}px`;
+  }
+
   function renderMagicSteps() {
     if (!magicStepsList) return;
     magicStepsList.innerHTML = '';
@@ -321,73 +327,106 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
       const li = document.createElement('li');
       li.className = 'magic-step-item';
 
-      const isCompleted = (activeIndex >= 0 && index < activeIndex) || magicTaskState.completed;
-      const isCurrentActive = (activeIndex >= 0 && activeIndex === index && !magicTaskState.completed);
+      const isCompleted = (activeIndex >= 0 && index < activeIndex) || !!step.isDone || !!step.completed || magicTaskState.completed;
+      const isCurrentActive = (activeIndex >= 0 && activeIndex === index && !magicTaskState.completed && !isCompleted);
 
       if (isCurrentActive) {
         li.classList.add('active-focus-step');
       }
+      if (isCompleted) {
+        li.classList.add('completed-step');
+      }
 
-      // Checkbox Selesai / Done
+      // Top Row Container (Checkbox + Textarea + Delete Button)
+      const mainRow = document.createElement('div');
+      mainRow.className = 'magic-step-main';
+
+      // Custom Checkbox
+      const cbWrapper = document.createElement('label');
+      cbWrapper.className = 'magic-custom-checkbox-wrapper';
+      cbWrapper.title = isCompleted ? 'Tandai belum selesai' : 'Tandai selesai';
+
       const checkbox = document.createElement('input');
       checkbox.type = 'checkbox';
       checkbox.className = 'magic-step-checkbox';
-      checkbox.title = 'Tandai to-do ini selesai';
       checkbox.checked = isCompleted;
-      checkbox.style.marginRight = '6px';
-      checkbox.style.accentColor = '#10b981';
-      checkbox.style.cursor = 'pointer';
 
-      const content = document.createElement('div');
-      content.className = 'magic-step-content';
+      const cbCustom = document.createElement('span');
+      cbCustom.className = 'magic-custom-checkbox';
+
+      cbWrapper.appendChild(checkbox);
+      cbWrapper.appendChild(cbCustom);
+
+      // Textarea Container
+      const textWrap = document.createElement('div');
+      textWrap.className = 'magic-step-text-wrap';
 
       const textarea = document.createElement('textarea');
       textarea.className = 'magic-step-textarea';
       textarea.spellcheck = false;
-      textarea.value = step.text;
+      textarea.rows = 1;
+      textarea.value = step.text || '';
+      textarea.placeholder = 'Tuliskan butir tugas...';
 
-      if (isCompleted) {
-        textarea.style.textDecoration = 'line-through';
-        textarea.style.opacity = '0.5';
-      } else {
-        textarea.style.textDecoration = 'none';
-        textarea.style.opacity = '1';
-      }
+      textWrap.appendChild(textarea);
 
-      const meta = document.createElement('span');
-      meta.className = 'magic-step-meta';
-      meta.textContent = `${step.minutes}m`;
-
-      content.appendChild(textarea);
-      content.appendChild(meta);
-
+      // Delete Button
       const deleteBtn = document.createElement('button');
       deleteBtn.type = 'button';
       deleteBtn.className = 'btn-delete-step';
       deleteBtn.title = 'Hapus to-do ini';
-      deleteBtn.textContent = '×';
+      deleteBtn.innerHTML = `
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      `;
+
+      mainRow.appendChild(cbWrapper);
+      mainRow.appendChild(textWrap);
+      mainRow.appendChild(deleteBtn);
+
+      // Bottom Row Container (Time Badge + Focus Trigger)
+      const footerRow = document.createElement('div');
+      footerRow.className = 'magic-step-footer';
+
+      const timeBadge = document.createElement('div');
+      timeBadge.className = 'magic-step-time-badge';
+      timeBadge.title = `Estimasi durasi: ${step.minutes || 10} menit`;
+      timeBadge.innerHTML = `
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <polyline points="12 6 12 12 16 14"></polyline>
+        </svg>
+        <span>${step.minutes || 10}m</span>
+      `;
 
       const syncBtn = document.createElement('button');
       syncBtn.type = 'button';
       syncBtn.className = 'btn-sync-focus';
-      syncBtn.title = 'Set sebagai fokus aktif sekarang dan mulai timer';
-
       if (isCurrentActive) {
-        syncBtn.textContent = 'Fokus Aktif ✓';
-        syncBtn.style.color = '#10b981';
-        syncBtn.style.borderColor = '#10b981';
-        syncBtn.style.backgroundColor = 'rgba(16, 185, 129, 0.15)';
-        syncBtn.style.fontWeight = 'bold';
+        syncBtn.classList.add('is-active');
+        syncBtn.innerHTML = '<span class="focus-pulse-dot"></span> Fokus Aktif';
+        syncBtn.title = 'Sedang fokus pada tugas ini';
       } else {
-        syncBtn.textContent = 'Fokus';
-        syncBtn.style.color = '';
-        syncBtn.style.borderColor = '';
-        syncBtn.style.backgroundColor = '';
-        syncBtn.style.fontWeight = '';
+        syncBtn.innerHTML = '🎯 Fokus';
+        syncBtn.title = 'Set sebagai fokus aktif sekarang dan mulai timer';
       }
 
+      footerRow.appendChild(timeBadge);
+      footerRow.appendChild(syncBtn);
+
+      li.appendChild(mainRow);
+      li.appendChild(footerRow);
+      magicStepsList.appendChild(li);
+
+      // Auto-resize on initial render
+      setTimeout(() => autoResizeTextarea(textarea), 0);
+
+      // Listeners
       textarea.addEventListener('input', () => {
         magicTaskState.steps[index].text = textarea.value;
+        autoResizeTextarea(textarea);
         setStorage({ magicTaskState });
       });
 
@@ -503,12 +542,6 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
           renderMagicStateUI();
         });
       });
-
-      li.appendChild(checkbox);
-      li.appendChild(content);
-      li.appendChild(deleteBtn);
-      li.appendChild(syncBtn);
-      magicStepsList.appendChild(li);
     });
 
     if (magicStepCountLabel) {

@@ -113,6 +113,58 @@ export async function getSavedProjects() {
 }
 
 /**
+ * Get completed projects (Combines backend projects where isDone === true & local completed projects)
+ */
+export async function getCompletedProjects() {
+  const data = await getStorage(['completedProjects', 'userProjects']);
+  const localCompleted = Array.isArray(data.completedProjects) ? data.completedProjects : [];
+  const localProjects = Array.isArray(data.userProjects) ? data.userProjects : [];
+
+  // Fetch real projects from backend if authenticated
+  const backendProjects = await fetchUserProjects();
+
+  // Filter backend completed projects
+  const apiCompleted = backendProjects.filter(p => p.isDone).map(p => ({
+    id: p.id,
+    name: p.name,
+    isDone: true,
+    completedAt: p.updatedAt || p.createdAt,
+    statusText: 'Selesai'
+  }));
+
+  const combined = [...apiCompleted];
+
+  // Also include local projects marked as completed
+  for (const locP of localCompleted) {
+    if (!combined.some(p => p.id === locP.id)) {
+      combined.push({
+        id: locP.id || `local-comp-${Date.now()}`,
+        name: locP.name || locP.taskName || 'Proyek Selesai',
+        isDone: true,
+        steps: locP.steps || [],
+        completedAt: locP.completedAt || new Date().toISOString(),
+        statusText: 'Selesai'
+      });
+    }
+  }
+
+  for (const locP of localProjects) {
+    if (locP.isDone && !combined.some(p => p.id === locP.id)) {
+      combined.push({
+        id: locP.id,
+        name: locP.name,
+        isDone: true,
+        steps: locP.steps || [],
+        completedAt: locP.updatedAt || locP.createdAt,
+        statusText: 'Selesai'
+      });
+    }
+  }
+
+  return combined;
+}
+
+/**
  * Resume project based on available effective time via backend API
  * POST /api/projects/:projectId/todos
  */
