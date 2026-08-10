@@ -832,6 +832,25 @@
       transform: translateY(-0.5px);
     }
 
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-secondary);
+      border-radius: 8px;
+      padding: 0 10px;
+      font-size: 10.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: inherit;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      border-color: rgba(255, 255, 255, 0.2);
+      color: var(--text-primary);
+    }
+
     /* CLEAN restricted zones item styles */
     .blacklist-item-clean {
       display: flex;
@@ -1049,89 +1068,246 @@
     .magic-steps-list {
       display: flex;
       flex-direction: column;
-      gap: 8px;
-      margin-top: 8px;
+      gap: 7px;
+      margin-top: 6px;
       list-style-type: none;
     }
 
     .magic-step-item {
       display: flex;
-      align-items: flex-start;
-      gap: 10px;
+      flex-direction: column;
+      gap: 5px;
       background: var(--item-bg);
       border: 1px solid var(--item-border);
-      border-radius: 8px;
-      padding: 10px;
-      transition: all 0.2s ease;
+      border-radius: 10px;
+      padding: 8px 10px;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
       width: 100%;
-    }
-
-    .magic-step-item.active-focus-step {
-      border-color: rgba(16, 185, 129, 0.6) !important;
-      background: rgba(16, 185, 129, 0.08) !important;
-      box-shadow: 0 0 12px rgba(16, 185, 129, 0.12);
+      position: relative;
     }
 
     .magic-step-item:hover {
       background: var(--switch-bg);
-      border-color: var(--item-border);
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
     }
 
-    .magic-step-content {
+    .magic-step-item.active-focus-step {
+      border-color: rgba(16, 185, 129, 0.5) !important;
+      background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(20, 184, 166, 0.04) 100%) !important;
+      box-shadow: 0 2px 10px rgba(16, 185, 129, 0.15);
+    }
+
+    .magic-step-item.completed-step {
+      opacity: 0.5;
+      background: rgba(255, 255, 255, 0.01);
+      border-color: rgba(255, 255, 255, 0.03);
+    }
+
+    .magic-step-item.completed-step:hover {
+      opacity: 0.85;
+    }
+
+    /* Top Row: Checkbox, Textarea, Delete Button */
+    .magic-step-main {
       display: flex;
-      flex-direction: column;
-      gap: 6px;
+      align-items: flex-start;
+      gap: 8px;
+      width: 100%;
+    }
+
+    /* Custom Checkbox */
+    .magic-custom-checkbox-wrapper {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+      margin-top: 1px;
+    }
+
+    .magic-custom-checkbox-wrapper input[type="checkbox"] {
+      position: absolute;
+      opacity: 0;
+      width: 0;
+      height: 0;
+    }
+
+    .magic-custom-checkbox {
+      width: 16px;
+      height: 16px;
+      border-radius: 5px;
+      border: 1.5px solid rgba(148, 163, 184, 0.4);
+      background: rgba(255, 255, 255, 0.04);
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .magic-custom-checkbox-wrapper:hover .magic-custom-checkbox {
+      border-color: var(--accent-label);
+      background: rgba(45, 212, 191, 0.08);
+    }
+
+    .magic-custom-checkbox-wrapper input:checked + .magic-custom-checkbox {
+      background: #10b981;
+      border-color: #10b981;
+      box-shadow: 0 0 8px rgba(16, 185, 129, 0.35);
+    }
+
+    .magic-custom-checkbox-wrapper input:checked + .magic-custom-checkbox::after {
+      content: '';
+      width: 4px;
+      height: 8px;
+      border: solid #ffffff;
+      border-width: 0 2px 2px 0;
+      transform: rotate(45deg) translate(-0.5px, -0.5px);
+      display: block;
+    }
+
+    /* Text Area / Content */
+    .magic-step-text-wrap {
       flex: 1;
       min-width: 0;
+      display: flex;
+      flex-direction: column;
     }
 
     .magic-step-textarea {
       width: 100%;
-      min-height: 60px;
-      padding: 10px 12px;
-      background: var(--card-bg);
+      min-height: 20px;
+      height: auto;
+      padding: 0;
+      margin: 0;
+      background: transparent;
       color: var(--text-primary);
-      border: 1px solid var(--item-border);
-      border-radius: 10px;
-      resize: vertical;
-      font-size: 12px;
+      border: none;
+      resize: none;
+      overflow-y: hidden;
+      font-family: inherit;
+      font-size: 11.5px;
+      font-weight: 500;
       line-height: 1.4;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
       white-space: pre-wrap;
+      word-break: break-word;
+      transition: color 0.2s ease, opacity 0.2s ease;
     }
 
     .magic-step-textarea:focus {
       outline: none;
-      border-color: var(--accent-label);
-      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.08);
+      color: #ffffff;
     }
 
-    .magic-step-meta {
-      font-size: 10px;
-      color: #94a3b8;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.3px;
+    body.light-theme .magic-step-textarea:focus {
+      color: #0f172a;
     }
 
-    .btn-delete-step,
-    .btn-sync-focus {
+    .completed-step .magic-step-textarea {
+      text-decoration: line-through;
+      color: var(--text-muted);
+    }
+
+    /* Delete Button */
+    .btn-delete-step {
       background: transparent;
-      border: 1px solid rgba(148, 163, 184, 0.2);
-      color: var(--accent-label);
-      border-radius: 8px;
-      padding: 6px 8px;
-      font-size: 10px;
+      border: none;
+      color: var(--text-muted);
       cursor: pointer;
+      padding: 2px 4px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0.5;
       transition: all 0.2s ease;
       flex-shrink: 0;
-      height: 32px;
     }
 
-    .btn-delete-step:hover,
+    .magic-step-item:hover .btn-delete-step {
+      opacity: 0.85;
+    }
+
+    .btn-delete-step:hover {
+      opacity: 1 !important;
+      color: #ef4444;
+      background: rgba(239, 68, 68, 0.1);
+    }
+
+    /* Bottom Row / Footer */
+    .magic-step-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-left: 24px;
+      margin-top: 1px;
+    }
+
+    .magic-step-time-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 3.5px;
+      font-size: 9px;
+      font-weight: 600;
+      color: #94a3b8;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.5px 6px;
+      border-radius: 6px;
+      letter-spacing: 0.2px;
+    }
+
+    .active-focus-step .magic-step-time-badge {
+      color: #34d399;
+      background: rgba(16, 185, 129, 0.12);
+      border-color: rgba(16, 185, 129, 0.2);
+    }
+
+    /* Focus Trigger Button */
+    .btn-sync-focus {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: rgba(45, 212, 191, 0.08);
+      border: 1px solid rgba(45, 212, 191, 0.25);
+      color: var(--accent-label);
+      border-radius: 6px;
+      padding: 2.5px 8px;
+      font-size: 9.5px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
     .btn-sync-focus:hover {
-      background: rgba(148, 163, 184, 0.08);
+      background: rgba(45, 212, 191, 0.18);
       border-color: var(--accent-label);
+      box-shadow: 0 0 8px rgba(45, 212, 191, 0.2);
+      transform: translateY(-0.5px);
+    }
+
+    .btn-sync-focus.is-active {
+      background: rgba(16, 185, 129, 0.2);
+      border-color: #10b981;
+      color: #10b981;
+      font-weight: 700;
+      box-shadow: 0 0 10px rgba(16, 185, 129, 0.25);
+    }
+
+    .focus-pulse-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background: #10b981;
+      box-shadow: 0 0 6px #10b981;
+      animation: pulse-dot 1.5s infinite ease-in-out;
+      display: inline-block;
+    }
+
+    @keyframes pulse-dot {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50% { transform: scale(1.4); opacity: 0.6; }
     }
 
     .magic-progress-container {
@@ -1150,30 +1326,6 @@
       transition: width 0.3s ease;
     }
 
-    .magic-step-cb {
-      cursor: pointer;
-      width: 14px;
-      height: 14px;
-      accent-color: var(--accent-label);
-    }
-
-    .btn-sync-focus {
-      background: transparent;
-      border: 1px dashed rgba(20, 184, 166, 0.3);
-      color: var(--accent-label);
-      border-radius: 6px;
-      padding: 2px 6px;
-      font-size: 9px;
-      cursor: pointer;
-      font-weight: 500;
-      transition: all 0.2s ease;
-    }
-
-    .btn-sync-focus:hover {
-      background: rgba(20, 184, 166, 0.08);
-      border-color: var(--accent-label);
-    }
-
     .congrats-card {
       text-align: center;
       background: rgba(16, 185, 129, 0.06);
@@ -1184,6 +1336,118 @@
       flex-direction: column;
       gap: 6px;
       animation: popIn 0.3s ease;
+    }
+
+    /* Project Cards & Completed Projects List */
+    .project-cards-list,
+    .completed-projects-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-top: 4px;
+      max-height: 140px;
+      overflow-y: auto;
+      padding-right: 2px;
+    }
+
+    .project-preview-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      background: var(--item-bg);
+      border: 1px solid var(--item-border);
+      border-radius: 9px;
+      padding: 7px 10px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .project-preview-card:hover {
+      background: var(--switch-bg);
+      border-color: rgba(255, 255, 255, 0.12);
+      transform: translateY(-1px);
+    }
+
+    .project-card-title-box {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      flex: 1;
+      min-width: 0;
+    }
+
+    .project-card-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: var(--text-primary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .project-card-badge {
+      font-size: 8.5px;
+      font-weight: 600;
+      color: #818cf8;
+      background: rgba(129, 140, 248, 0.12);
+      padding: 1px 5px;
+      border-radius: 4px;
+      width: fit-content;
+    }
+
+    .btn-resume-project {
+      background: rgba(99, 102, 241, 0.15);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+      color: #a5b4fc;
+      border-radius: 6px;
+      padding: 3px 8px;
+      font-size: 9px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+      flex-shrink: 0;
+    }
+
+    .btn-resume-project:hover {
+      background: rgba(99, 102, 241, 0.3);
+      border-color: #818cf8;
+      color: #ffffff;
+      transform: translateY(-0.5px);
+    }
+
+    /* Completed Project Specific Styling */
+    .completed-project-card {
+      background: rgba(16, 185, 129, 0.03);
+      border-color: rgba(16, 185, 129, 0.12);
+    }
+
+    .completed-project-card:hover {
+      background: rgba(16, 185, 129, 0.08);
+      border-color: rgba(16, 185, 129, 0.25);
+    }
+
+    .completed-title {
+      color: #e2e8f0;
+    }
+
+    .completed-badge {
+      color: #10b981 !important;
+      background: rgba(16, 185, 129, 0.15) !important;
+      border: 1px solid rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-view-completed {
+      background: rgba(16, 185, 129, 0.1);
+      border-color: rgba(16, 185, 129, 0.25);
+      color: #34d399;
+    }
+
+    .btn-view-completed:hover {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: #10b981;
+      color: #ffffff;
     }
 
     @keyframes popIn {

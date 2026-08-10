@@ -189,6 +189,19 @@
             <!-- Populated programmatically -->
           </div>
         </div>
+
+        <!-- Completed Projects Container -->
+        <div class="card" id="completed-projects-container" style="margin-top: 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+            <span class="card-label" style="color: #10b981; display: flex; align-items: center; gap: 4px; font-size: 11px;">
+              ✅ Proyek Selesai
+            </span>
+            <span id="completed-projects-count" style="font-size: 9px; color: #94a3b8; font-weight: 600;">0 selesai</span>
+          </div>
+          <div id="completed-projects-list" class="completed-projects-list">
+            <!-- Populated programmatically -->
+          </div>
+        </div>
       </div>
 
       <!-- Loading Panel -->
@@ -211,8 +224,8 @@
             <!-- Populated by JavaScript -->
           </div>
           <div style="display: flex; gap: 6px; margin-top: 8px;">
-            <button id="btn-add-magic-item" class="btn-add" style="flex: 1; padding: 4px; height: 28px; font-size: 10.5px;">+ Tambah Item</button>
-            <button id="btn-reset-magic" class="btn-quick-toggle is-restricted" style="flex: 1; padding: 4px; height: 28px; font-size: 10.5px;">Selesaikan Task</button>
+            <button id="btn-add-magic-item" class="btn-secondary" style="flex: 1; height: 28px; font-size: 10.5px;">+ Tambah Item</button>
+            <button id="btn-reset-magic" class="btn-secondary" style="flex: 1; height: 28px; font-size: 10.5px; color: #f87171; border-color: rgba(248, 113, 113, 0.25);">Tutup Task</button>
           </div>
           <button id="btn-start-magic-focus" class="btn-add" style="margin-top: 8px; width: 100%; height: 34px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff;">🚀 Mulai Sesi Fokus Sekarang</button>
         </div>
