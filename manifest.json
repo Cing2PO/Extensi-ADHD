@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "ADHD Standalone Focus Check",
+  "name": "Flow Tether : Sistem Pembantu Produktivitas Penyandang ADHD",
   "version": "1.0.0",
-  "description": "A standalone client-side browser sensor that detects doomscrolling and intervenes with soft-block overlays.",
+  "description": "Flow Tether : Sistem Pembantu Produktivitas Penyandang ADHD - Asisten fokus dan pendeteksi doomscrolling cerdas.",
   "permissions": [
     "activeTab",
     "scripting",
@@ -26,9 +26,19 @@
       "run_at": "document_start"
     }
   ],
+  "icons": {
+    "16": "src/icons/icon16.png",
+    "32": "src/icons/icon32.png",
+    "48": "src/icons/icon48.png",
+    "128": "src/icons/icon128.png"
+  },
   "web_accessible_resources": [
     {
       "resources": [
+        "src/icons/icon16.png",
+        "src/icons/icon32.png",
+        "src/icons/icon48.png",
+        "src/icons/icon128.png",
         "src/overlay.css",
         "src/config.js",
         "src/content.js",
@@ -49,6 +59,12 @@
   ],
   "action": {
     "default_popup": "src/popup.html",
-    "default_title": "ADHD Standalone Focus Check"
+    "default_title": "Flow Tether : Sistem Pembantu Produktivitas Penyandang ADHD",
+    "default_icon": {
+      "16": "src/icons/icon16.png",
+      "32": "src/icons/icon32.png",
+      "48": "src/icons/icon48.png",
+      "128": "src/icons/icon128.png"
+    }
   }
 }
