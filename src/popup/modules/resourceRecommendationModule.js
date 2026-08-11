@@ -6,13 +6,14 @@
 
 import { fetchResourceRecommendations } from '../services/apiService.js';
 import { getStorage, setStorage } from '../services/storageService.js';
+import { SVG_ICONS } from '../../shared/icons.js';
 
 const TYPE_CONFIG = {
-  Documentation: { icon: '📖', label: 'Dokumentasi', colorClass: 'type-docs' },
-  Video: { icon: '🎥', label: 'Video Tutorial', colorClass: 'type-video' },
-  Article: { icon: '📄', label: 'Artikel & Panduan', colorClass: 'type-article' },
-  Tool: { icon: '🛠️', label: 'Alat / Editor', colorClass: 'type-tool' },
-  Search: { icon: '🔍', label: 'Pencarian Terarah', colorClass: 'type-search' }
+  Documentation: { iconSvg: SVG_ICONS.doc, label: 'Dokumentasi', colorClass: 'type-docs' },
+  Video: { iconSvg: SVG_ICONS.video, label: 'Video Tutorial', colorClass: 'type-video' },
+  Article: { iconSvg: SVG_ICONS.article, label: 'Artikel & Panduan', colorClass: 'type-article' },
+  Tool: { iconSvg: SVG_ICONS.tool, label: 'Alat / Editor', colorClass: 'type-tool' },
+  Search: { iconSvg: SVG_ICONS.search, label: 'Pencarian Terarah', colorClass: 'type-search' }
 };
 
 /**
@@ -85,17 +86,17 @@ function renderEmptyState() {
   return `
     <div class="resource-empty-card">
       <div class="resource-empty-info">
-        <span class="resource-empty-icon">💡</span>
+        <span class="resource-empty-icon" style="display:flex;align-items:center;justify-content:center;width:24px;height:24px;">
+          ${SVG_ICONS.bulb}
+        </span>
         <div class="resource-empty-desc">
           <div class="resource-empty-title">Referensi Belajar & Tools AI</div>
           <div class="resource-empty-sub">Minta Gemini AI untuk mengkurasi tutorial, dokumentasi resmi, dan alat praktis untuk langkah tugas ini.</div>
         </div>
       </div>
-      <button type="button" class="btn-request-ai-resource">
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon>
-        </svg>
-        <span>✨ Minta Rekomendasi AI</span>
+      <button type="button" class="btn-request-ai-resource" style="display:flex;align-items:center;gap:6px;">
+        <span style="display:inline-flex;width:12px;height:12px;">${SVG_ICONS.sparkles}</span>
+        <span>Minta Rekomendasi AI</span>
       </button>
     </div>
   `;
@@ -106,14 +107,14 @@ function renderEmptyState() {
  */
 function renderResourceList(resources) {
   const itemsHtml = resources.map((item) => {
-    const typeInfo = TYPE_CONFIG[item.type] || { icon: '🔗', label: item.type || 'Referensi', colorClass: 'type-docs' };
+    const typeInfo = TYPE_CONFIG[item.type] || { iconSvg: SVG_ICONS.link, label: item.type || 'Referensi', colorClass: 'type-docs' };
     const domain = getHostname(item.url);
 
     return `
       <a href="${item.url}" target="_blank" rel="noopener noreferrer" class="resource-card" title="Buka ${item.title}">
         <div class="resource-card-left">
           <span class="resource-type-badge ${typeInfo.colorClass}">
-            <span class="resource-badge-icon">${typeInfo.icon}</span>
+            <span class="resource-badge-icon" style="display:inline-flex;width:12px;height:12px;align-items:center;">${typeInfo.iconSvg}</span>
             <span class="resource-badge-label">${typeInfo.label}</span>
           </span>
           <div class="resource-title">${escapeHtml(item.title || 'Materi Belajar')}</div>
@@ -140,7 +141,10 @@ function renderResourceList(resources) {
   return `
     <div class="resource-list-container">
       <div class="resource-list-header">
-        <span class="resource-list-title">💡 Referensi Terkurasi:</span>
+        <span class="resource-list-title" style="display:flex;align-items:center;gap:4px;">
+          <span style="display:inline-flex;width:12px;height:12px;">${SVG_ICONS.bulb}</span>
+          Referensi Terkurasi:
+        </span>
         <button type="button" class="btn-refresh-resources" title="Kurasi ulang rekomendasi dengan AI">
           <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
             <polyline points="23 4 23 10 17 10"></polyline>
@@ -172,15 +176,17 @@ async function requestStepResources(step, panel) {
   } catch (err) {
     panel.innerHTML = `
       <div class="resource-error-box">
-        <span class="resource-error-text">⚠️ ${escapeHtml(err.message || 'Gagal memuat rekomendasi.')}</span>
+        <span class="resource-error-text" style="display:flex;align-items:center;gap:4px;">
+          <span style="display:inline-flex;width:12px;height:12px;color:var(--cancel);">${SVG_ICONS.alert}</span>
+          ${escapeHtml(err.message || 'Gagal memuat rekomendasi.')}
+        </span>
         <button type="button" class="btn-retry-resource">Coba Lagi</button>
       </div>
     `;
 
     const retryBtn = panel.querySelector('.btn-retry-resource');
     if (retryBtn) {
-      retryBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
+      retryBtn.addEventListener('click', () => {
         requestStepResources(step, panel);
       });
     }
@@ -188,66 +194,81 @@ async function requestStepResources(step, panel) {
 }
 
 /**
- * Attaches event listeners inside the panel (Request AI & Refresh buttons)
+ * Attaches event listeners for user interaction within the recommendation panel
  */
 function attachPanelListeners(step, panel) {
-  // Prevent any click inside panel from bubbling up and closing the dropdown
-  panel.addEventListener('click', (e) => {
-    e.stopPropagation();
-  });
-
   const requestBtn = panel.querySelector('.btn-request-ai-resource');
   if (requestBtn) {
-    requestBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
+    requestBtn.addEventListener('click', () => {
       requestStepResources(step, panel);
     });
   }
 
   const refreshBtn = panel.querySelector('.btn-refresh-resources');
   if (refreshBtn) {
-    refreshBtn.addEventListener('click', (e) => {
-      e.stopPropagation();
+    refreshBtn.addEventListener('click', () => {
       requestStepResources(step, panel);
     });
   }
 }
 
 /**
- * Toggles the dropdown under a specific to-do step item
- * @param {Object} step Step object ({ id, text, minutes, resources })
- * @param {HTMLElement} stepLiElement The <li> container of the step
+ * Initializes and mounts the recommendation panel into a target step DOM node
  */
-export function toggleStepDropdown(step, stepLiElement) {
-  if (!step || !stepLiElement) return;
+export function initResourceRecommendation(step, panelElement) {
+  if (!panelElement) return;
 
-  let panel = stepLiElement.querySelector('.magic-step-resources-panel');
-
-  // If already open -> collapse & remove
-  if (panel) {
-    stepLiElement.classList.remove('is-dropdown-open');
-    panel.classList.add('collapsing');
-    setTimeout(() => {
-      if (panel && panel.parentElement) {
-        panel.remove();
-      }
-    }, 200);
-    return;
-  }
-
-  // Open dropdown
-  stepLiElement.classList.add('is-dropdown-open');
-  panel = document.createElement('div');
-  panel.className = 'magic-step-resources-panel';
-  stepLiElement.appendChild(panel);
-
-  // If resources already cached -> render list
   if (Array.isArray(step.resources) && step.resources.length > 0) {
-    panel.innerHTML = renderResourceList(step.resources);
+    panelElement.innerHTML = renderResourceList(step.resources);
   } else {
-    // Show empty state with dedicated "Minta Rekomendasi AI" CTA button
-    panel.innerHTML = renderEmptyState();
+    panelElement.innerHTML = renderEmptyState();
   }
 
-  attachPanelListeners(step, panel);
+  attachPanelListeners(step, panelElement);
+}
+
+/**
+ * Toggles the resource recommendation dropdown panel inside a step list item.
+ * Creates and mounts the panel on first open, then initializes content.
+ *
+ * @param {Object} step   - The step data object (with .text, .resources, etc.)
+ * @param {HTMLElement} stepLi - The <li> DOM element for this step
+ */
+export function toggleStepDropdown(step, stepLi) {
+  if (!stepLi) return;
+
+  let panel = stepLi.querySelector('.step-resource-panel');
+
+  // Create panel on first open
+  if (!panel) {
+    panel = document.createElement('div');
+    panel.className = 'step-resource-panel';
+    panel.style.cssText = `
+      display: none;
+      margin-top: 6px;
+      border-radius: 10px;
+      overflow: hidden;
+    `;
+    stepLi.appendChild(panel);
+  }
+
+  const isOpen = panel.style.display !== 'none';
+
+  // Animate the chevron SVG inside the dropdown hint
+  const chevronSvg = stepLi.querySelector('.step-dropdown-chevron svg');
+  if (chevronSvg) {
+    chevronSvg.style.transition = 'transform 0.2s ease';
+    chevronSvg.style.transform = isOpen ? 'rotate(0deg)' : 'rotate(180deg)';
+  }
+
+  if (isOpen) {
+    panel.style.display = 'none';
+  } else {
+    panel.style.display = 'block';
+    // Only initialize content on first open (when panel is empty)
+    if (!panel.hasAttribute('data-initialized')) {
+      panel.setAttribute('data-initialized', '1');
+      initResourceRecommendation(step, panel);
+    }
+  }
 }

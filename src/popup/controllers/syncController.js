@@ -119,7 +119,7 @@ export function initSyncController(callbacks = {}) {
     if (syncAuthNotice) syncAuthNotice.classList.add('hidden');
     if (syncQrContainer) syncQrContainer.classList.remove('hidden');
     if (syncRoomIdDisplay) syncRoomIdDisplay.textContent = cleanRoomId || '-';
-    if (btnGenerateQr) btnGenerateQr.textContent = '🔄 Refresh QR Code';
+    if (btnGenerateQr) btnGenerateQr.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg> Refresh QR Code';
 
     generateQrCode(qrContent || cleanRoomId);
   }
@@ -130,7 +130,7 @@ export function initSyncController(callbacks = {}) {
   function hideSyncUI() {
     if (syncQrCanvas) syncQrCanvas.innerHTML = '';
     if (syncRoomIdDisplay) syncRoomIdDisplay.textContent = '-';
-    if (btnGenerateQr) btnGenerateQr.textContent = '🔄 Refresh QR Code';
+    if (btnGenerateQr) btnGenerateQr.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg> Refresh QR Code';
     updateStatusUI(false);
   }
 
@@ -170,7 +170,7 @@ export function initSyncController(callbacks = {}) {
       const data = await response.json();
 
       if (response.status === 401 && !isRetry) {
-        logToUI('🔄 Access token expired. Refreshing token...', 'var(--accent)');
+        logToUI('Access token expired. Refreshing token...', 'var(--accent)');
         await refreshAuthToken();
         return await requestRoomId(true);
       }
@@ -207,7 +207,7 @@ export function initSyncController(callbacks = {}) {
 
     if (btnGenerateQr) {
       btnGenerateQr.disabled = true;
-      btnGenerateQr.textContent = '⏳ Memperbarui...';
+      btnGenerateQr.textContent = 'Memperbarui...';
     }
 
     try {
@@ -239,7 +239,7 @@ export function initSyncController(callbacks = {}) {
     } finally {
       if (btnGenerateQr) {
         btnGenerateQr.disabled = false;
-        btnGenerateQr.textContent = '🔄 Refresh QR Code';
+        btnGenerateQr.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg> Refresh QR Code';
       }
     }
   }

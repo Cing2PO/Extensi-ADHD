@@ -100,7 +100,7 @@ export function initAuthController(callbacks = {}) {
       if (btnHeaderAuth) btnHeaderAuth.classList.add('is-logged-in');
       if (btnLogout) btnLogout.classList.remove('hidden');
     } else {
-      if (userChipName) userChipName.textContent = '🔑 Login';
+      if (userChipName) userChipName.textContent = 'Login';
       if (btnHeaderAuth) btnHeaderAuth.classList.remove('is-logged-in');
       if (btnLogout) btnLogout.classList.add('hidden');
     }

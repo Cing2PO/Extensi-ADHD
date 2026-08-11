@@ -53,10 +53,10 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
         const isHidden = magicAccordionBody.classList.contains('hidden');
         if (isHidden) {
           magicAccordionBody.classList.remove('hidden');
-          if (accordionArrow) accordionArrow.textContent = '▲';
+          if (accordionArrow) accordionArrow.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>';
         } else {
           magicAccordionBody.classList.add('hidden');
-          if (accordionArrow) accordionArrow.textContent = '▼';
+          if (accordionArrow) accordionArrow.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
         }
       }
     });
@@ -348,7 +348,7 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
 
         if (window.Swal) {
           window.Swal.fire({
-            title: 'Fokus Dimulai! 🚀',
+            title: 'Fokus Dimulai!',
             text: `Target: "${firstTaskText}". Floating Timer sekarang aktif di halaman web Anda!`,
             icon: 'success',
             timer: 1800,
@@ -410,7 +410,7 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
   function openCreateAccordion() {
     if (magicAccordionBody) {
       magicAccordionBody.classList.remove('hidden');
-      if (accordionArrow) accordionArrow.textContent = '▲';
+      if (accordionArrow) accordionArrow.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>';
     }
     if (magicTaskInput) {
       setTimeout(() => magicTaskInput.focus(), 100);

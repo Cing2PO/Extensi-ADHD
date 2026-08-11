@@ -75,20 +75,26 @@ export class FloatingPomodoroWidget {
           </div>
 
           <div class="adhd-pomo-task-box">
-            <span class="adhd-pomo-task-label">🎯 Target Saat Ini</span>
+            <span class="adhd-pomo-task-label" style="display:flex;align-items:center;gap:4px;">
+              <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>
+              Target Saat Ini
+            </span>
             <div class="adhd-pomo-task-text" id="adhd-pomo-task-text">Belum ada tugas aktif</div>
           </div>
 
           <div class="adhd-pomo-timer-display" id="adhd-pomo-modal-time">25:00</div>
 
-          <div class="adhd-pomo-debug-box" style="margin-bottom: 10px; padding: 8px 10px; background: rgba(20, 184, 166, 0.08); border: 1px dashed rgba(45, 212, 191, 0.3); border-radius: 10px; font-size: 11px;">
-            <div style="display: flex; justify-content: space-between; align-items: center; color: #2dd4bf; font-weight: 700;">
-              <span>🔍 Sensor Website</span>
+          <div class="adhd-pomo-debug-box" style="margin-bottom: 10px; padding: 8px 10px; background: rgba(42, 198, 122, 0.08); border: 1px dashed rgba(42, 198, 122, 0.3); border-radius: 10px; font-size: 11px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; color: #2ac67a; font-weight: 700;">
+              <span style="display:flex;align-items:center;gap:4px;">
+                <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+                Sensor Website
+              </span>
               <span id="adhd-pomo-debug-domain" style="color: #f1f5f9; font-weight: 600;">mendeteksi...</span>
             </div>
             <div style="display: flex; justify-content: space-between; align-items: center; color: #94a3b8; margin-top: 4px; font-size: 10px;">
-              <span>📜 Scroll / Swipe:</span>
-              <span id="adhd-pomo-debug-scroll" style="color: #34d399; font-weight: 700;">0 px</span>
+              <span>Scroll / Swipe:</span>
+              <span id="adhd-pomo-debug-scroll" style="color: #2ac67a; font-weight: 700;">0 px</span>
             </div>
           </div>
 
@@ -98,7 +104,7 @@ export class FloatingPomodoroWidget {
               <button class="adhd-pomo-ctrl-btn btn-skip-phase" id="adhd-pomo-btn-skip" style="flex: 1;">Skip ➔</button>
             </div>
             <div style="display: flex; gap: 6px; margin-top: 6px;">
-              <button class="adhd-pomo-ctrl-btn btn-done-task" id="adhd-pomo-btn-done" style="flex: 1; background: rgba(16, 185, 129, 0.2); border: 1px solid rgba(16, 185, 129, 0.4); color: #34d399;">Selesai Tugas ✓</button>
+              <button class="adhd-pomo-ctrl-btn btn-done-task" id="adhd-pomo-btn-done" style="flex: 1; background: rgba(42, 198, 122, 0.2); border: 1px solid rgba(42, 198, 122, 0.4); color: #2ac67a;">Selesai Tugas</button>
               <button class="adhd-pomo-ctrl-btn btn-stop-session" id="adhd-pomo-btn-stop" style="flex: 1; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #fca5a5;">Stop Sesi</button>
             </div>
           </div>
@@ -287,9 +293,9 @@ export class FloatingPomodoroWidget {
     }
     if (scrollEl) {
       if (metrics.isShortVideo) {
-        scrollEl.textContent = `🎬 ${metrics.swipeCount || 0} Video (${(metrics.totalScrollPx || 0).toLocaleString()} px)`;
+        scrollEl.textContent = `${metrics.swipeCount || 0} Video (${(metrics.totalScrollPx || 0).toLocaleString()} px)`;
       } else if (metrics.totalScrollPx !== undefined) {
-        scrollEl.textContent = `📜 ${(metrics.totalScrollPx || 0).toLocaleString()} px (pos: ${metrics.scrollY || 0}px)`;
+        scrollEl.textContent = `${(metrics.totalScrollPx || 0).toLocaleString()} px (pos: ${metrics.scrollY || 0}px)`;
       }
     }
   }

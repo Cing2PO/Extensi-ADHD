@@ -123,7 +123,11 @@ export function renderMagicSteps({ container, magicTaskState, callbacks, stepCou
     dropdownHint.className = 'step-dropdown-hint';
     dropdownHint.title = 'Klik to-do ini untuk melihat referensi materi & tools AI';
     dropdownHint.innerHTML = `
-      <span class="step-dropdown-chevron">▼</span>
+      <span class="step-dropdown-chevron">
+        <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="6 9 12 15 18 9"></polyline>
+        </svg>
+      </span>
       <span class="step-dropdown-label">Referensi & Tools</span>
     `;
 
@@ -135,7 +139,13 @@ export function renderMagicSteps({ container, magicTaskState, callbacks, stepCou
       syncBtn.innerHTML = '<span class="focus-pulse-dot"></span> Fokus Aktif';
       syncBtn.title = 'Sedang fokus pada tugas ini';
     } else {
-      syncBtn.innerHTML = '🎯 Fokus';
+      syncBtn.innerHTML = `
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:2px;">
+          <circle cx="12" cy="12" r="10"></circle>
+          <circle cx="12" cy="12" r="6"></circle>
+          <circle cx="12" cy="12" r="2"></circle>
+        </svg> Fokus
+      `;
       syncBtn.title = 'Set sebagai fokus aktif sekarang dan mulai timer';
     }
 

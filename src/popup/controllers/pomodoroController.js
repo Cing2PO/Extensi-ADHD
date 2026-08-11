@@ -42,9 +42,9 @@ export function initPomodoroController({ onStartFocusTab, getMagicTaskState, get
       if (magicPomodoroStatus) magicPomodoroStatus.textContent = 'Belum Dimulai';
       if (magicPomodoroTimer) magicPomodoroTimer.textContent = '25:00';
       if (btnPausePomodoro) {
-        btnPausePomodoro.textContent = '⏱️ Mulai Sesi Pomodoro';
+        btnPausePomodoro.innerHTML = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:3px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Mulai Sesi Pomodoro';
         btnPausePomodoro.style.background = 'var(--primary)';
-        btnPausePomodoro.style.color = '#ffffff';
+        btnPausePomodoro.style.color = 'var(--font-on-primary)';
         btnPausePomodoro.style.fontWeight = 'bold';
       }
       if (btnResetPomodoro) {

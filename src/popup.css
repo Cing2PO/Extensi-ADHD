@@ -1,5 +1,5 @@
 @import url('colors.css');
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap');
 
 * {
   box-sizing: border-box;
@@ -8,9 +8,9 @@
 }
 
 body {
-      font-family: 'Outfit', sans-serif;
-      background: var(--bg-gradient);
-      color: var(--text-primary);
+  font-family: 'Rubik', sans-serif;
+  background: var(--bg-gradient);
+  color: var(--text-primary);
       width: 290px;
       height: 440px;
       /* Fixed height for consistent layout */
