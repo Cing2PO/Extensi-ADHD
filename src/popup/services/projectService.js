@@ -211,21 +211,34 @@ export async function resumeProject(projectId, availableMinutes, options = {}, i
       throw new Error(data.message || `Gagal memuat sisa to-do proyek (HTTP ${response.status})`);
     }
 
-    const rawTodos = data.todos || [];
-    const steps = rawTodos.map(item => ({
+    const rawTodos = data.todos || data.schedule || [];
+    const todos = rawTodos.map(item => ({
       id: item.id,
-      text: item.task || item.text,
-      minutes: item.estimatedMinutes || item.estimated_minutes || 15,
-      completed: !!item.isDone,
+      text: typeof item === 'string' ? item : (item.task || item.text || item.title || item.name || item.activity || item.description),
+      minutes: typeof item === 'object' ? (item.estimatedMinutes || item.estimated_minutes || item.minutes || item.duration || 15) : 15,
+      completed: !!(item.isDone || item.completed),
+      isDone: !!(item.isDone || item.completed),
+      selected: item.selected !== false
+    }));
+
+    const rawSchedule = data.schedule || [];
+    const schedule = rawSchedule.map(item => ({
+      id: item.id,
+      text: typeof item === 'string' ? item : (item.task || item.text || item.title || item.name || item.activity || item.description),
+      minutes: typeof item === 'object' ? (item.estimatedMinutes || item.estimated_minutes || item.minutes || item.duration || 15) : 15,
+      completed: !!(item.isDone || item.completed),
+      isDone: !!(item.isDone || item.completed),
+      type: item.type || 'work',
       selected: item.selected !== false
     }));
 
     return {
       projectId: data.projectId || projectId,
       projectName: data.projectName || 'Proyek Lanjutan',
-      steps,
-      config: data.config,
-      schedule: data.schedule
+      todos,
+      steps: todos,
+      schedule,
+      config: data.config
     };
   } catch (err) {
     clearTimeout(timeoutId);

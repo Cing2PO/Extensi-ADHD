@@ -58,13 +58,13 @@ export function initProjectController(callbacks = {}) {
     let steps = [];
 
     // Case 1: Local project / active task with steps
-    if (project.steps && Array.isArray(project.steps)) {
+    if (project.steps && Array.isArray(project.steps) && project.steps.length > 0) {
       steps = project.steps;
     } else {
-      // Case 2: Fetch steps from backend
+      // Case 2: Fetch all todos from backend
       try {
         const resumedData = await resumeProject(project.id, 999);
-        steps = resumedData.steps || [];
+        steps = resumedData.todos || resumedData.steps || [];
       } catch (err) {
         console.warn('[ProjectController] Error loading project todos for preview:', err);
         steps = [
@@ -133,10 +133,15 @@ export function initProjectController(callbacks = {}) {
     try {
       const resumedData = await resumeProject(project.id, durationMin);
 
+      // Use generated schedule for active focus session steps
+      const activeSteps = (resumedData.schedule && resumedData.schedule.length > 0)
+        ? resumedData.schedule
+        : (resumedData.todos || resumedData.steps || []);
+
       const magicTaskState = {
         projectId: resumedData.projectId,
         taskName: resumedData.projectName,
-        steps: resumedData.steps,
+        steps: activeSteps,
         currentStepIndex: -1,
         completed: false,
         totalMinutes: durationMin

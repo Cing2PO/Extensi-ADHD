@@ -108,15 +108,19 @@ export function renderMagicSteps({ container, magicTaskState, callbacks, stepCou
     const footerRow = document.createElement('div');
     footerRow.className = 'magic-step-footer';
 
+    const isBreak = step.type === 'break' || (step.text && step.text.toLowerCase().includes('istirahat'));
     const timeBadge = document.createElement('div');
     timeBadge.className = 'magic-step-time-badge';
+    if (isBreak) {
+      timeBadge.style.cssText = 'background: rgba(255, 193, 7, 0.15); color: #ffc107; border: 1px solid rgba(255, 193, 7, 0.3);';
+    }
     timeBadge.title = `Estimasi durasi: ${step.minutes || 10} menit`;
     timeBadge.innerHTML = `
       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"></circle>
         <polyline points="12 6 12 12 16 14"></polyline>
       </svg>
-      <span>${step.minutes || 10}m</span>
+      <span>${isBreak ? 'Istirahat ' : ''}${step.minutes || 10}m</span>
     `;
 
     const dropdownHint = document.createElement('div');

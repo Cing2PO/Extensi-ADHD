@@ -54,7 +54,7 @@ export async function fetchPublicMagicTodos(taskText, totalMinutes, options = {}
       throw new Error(errorMsg);
     }
 
-    const rawSteps = data.todos || data.steps || data.milestones || data.data;
+    const rawSteps = data.schedule || data.todos || data.steps || data.milestones || data.data;
     if (!Array.isArray(rawSteps) || rawSteps.length === 0) {
       throw new Error('API tidak mengembalikan langkah tugas yang valid.');
     }
@@ -62,8 +62,8 @@ export async function fetchPublicMagicTodos(taskText, totalMinutes, options = {}
     const perTaskMinutes = Math.max(5, Math.round(totalMinutes / rawSteps.length));
     return rawSteps.map(item => ({
       id: typeof item === 'object' ? item.id : undefined,
-      text: typeof item === 'string' ? item : (item.task || item.text || item.title || item.name),
-      minutes: typeof item === 'object' ? (item.estimatedMinutes || item.estimated_minutes || item.minutes || perTaskMinutes) : perTaskMinutes
+      text: typeof item === 'string' ? item : (item.task || item.text || item.title || item.name || item.activity || item.description),
+      minutes: typeof item === 'object' ? (item.estimatedMinutes || item.estimated_minutes || item.minutes || item.duration || perTaskMinutes) : perTaskMinutes
     }));
   } catch (err) {
     clearTimeout(timeoutId);
@@ -133,7 +133,7 @@ export async function fetchMagicTodos(taskText, totalMinutes, options = {}, isRe
       throw new Error(errorMsg);
     }
 
-    const rawSteps = data.todos || data.steps || data.milestones || data.data;
+    const rawSteps = data.schedule || data.todos || data.steps || data.milestones || data.data;
     if (!Array.isArray(rawSteps) || rawSteps.length === 0) {
       throw new Error('API tidak mengembalikan langkah tugas yang valid.');
     }
@@ -141,8 +141,8 @@ export async function fetchMagicTodos(taskText, totalMinutes, options = {}, isRe
     const perTaskMinutes = Math.max(5, Math.round(totalMinutes / rawSteps.length));
     return rawSteps.map(item => ({
       id: typeof item === 'object' ? item.id : undefined,
-      text: typeof item === 'string' ? item : (item.task || item.text || item.title || item.name),
-      minutes: typeof item === 'object' ? (item.estimatedMinutes || item.estimated_minutes || item.minutes || perTaskMinutes) : perTaskMinutes
+      text: typeof item === 'string' ? item : (item.task || item.text || item.title || item.name || item.activity || item.description),
+      minutes: typeof item === 'object' ? (item.estimatedMinutes || item.estimated_minutes || item.minutes || item.duration || perTaskMinutes) : perTaskMinutes
     }));
   } catch (err) {
     clearTimeout(timeoutId);
