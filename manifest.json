@@ -39,6 +39,7 @@
         "src/icons/icon32.png",
         "src/icons/icon48.png",
         "src/icons/icon128.png",
+        "src/colors.css",
         "src/overlay.css",
         "src/config.js",
         "src/content.js",
@@ -50,6 +51,7 @@
         "src/content/modules/softBlockOverlay.js",
         "src/content/modules/floatingPomodoroWidget.js",
         "src/content/modules/storageSync.js",
+        "src/shared/colors.js",
         "src/shared/constants.js",
         "src/shared/storageWrapper.js",
         "src/shared/pomodoroUtils.js"

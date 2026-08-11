@@ -43,7 +43,7 @@ export function initPomodoroController({ onStartFocusTab, getMagicTaskState, get
       if (magicPomodoroTimer) magicPomodoroTimer.textContent = '25:00';
       if (btnPausePomodoro) {
         btnPausePomodoro.textContent = '⏱️ Mulai Sesi Pomodoro';
-        btnPausePomodoro.style.background = 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)';
+        btnPausePomodoro.style.background = 'var(--primary)';
         btnPausePomodoro.style.color = '#ffffff';
         btnPausePomodoro.style.fontWeight = 'bold';
       }

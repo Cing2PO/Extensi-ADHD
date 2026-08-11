@@ -86,7 +86,7 @@ export function initSyncController(callbacks = {}) {
     if (!syncQrCanvas) return;
     const cleanContent = String(qrContent || '').trim();
     if (!cleanContent || cleanContent === '[object Object]') {
-      syncQrCanvas.innerHTML = `<span style="color: #f87171; font-size: 10px;">Token QR tidak valid</span>`;
+      syncQrCanvas.innerHTML = `<span style="color: var(--cancel); font-size: 10px;">Token QR tidak valid</span>`;
       return;
     }
 
@@ -97,16 +97,16 @@ export function initSyncController(callbacks = {}) {
           text: cleanContent,
           width: 155,
           height: 155,
-          colorDark: '#f8fafc',
-          colorLight: '#0f172a',
+          colorDark: '#ffffff',
+          colorLight: '#020805',
           correctLevel: QRCode.CorrectLevel.M
         });
       } catch (err) {
         console.error('[Sync Controller] QR Code error:', err);
-        syncQrCanvas.innerHTML = `<span style="color: #f87171; font-size: 10px;">Gagal membuat QR Code</span>`;
+        syncQrCanvas.innerHTML = `<span style="color: var(--cancel); font-size: 10px;">Gagal membuat QR Code</span>`;
       }
     } else {
-      syncQrCanvas.innerHTML = `<span style="color: #f87171; font-size: 10px;">QR Library tidak tersedia</span>`;
+      syncQrCanvas.innerHTML = `<span style="color: var(--cancel); font-size: 10px;">QR Library tidak tersedia</span>`;
     }
   }
 
@@ -142,7 +142,7 @@ export function initSyncController(callbacks = {}) {
 
     // Use already cached roomId from auth session if available
     if (sessionRoomId && typeof sessionRoomId === 'string' && sessionRoomId.trim() !== '' && sessionRoomId !== '[object Object]') {
-      logToUI(`Using cached Room ID: ${sessionRoomId}`, '#34d399');
+      logToUI(`Using cached Room ID: ${sessionRoomId}`, 'var(--primary)');
       return sessionRoomId.trim();
     }
 
@@ -151,7 +151,7 @@ export function initSyncController(callbacks = {}) {
     }
 
     const url = ENV_CONFIG.SYNC_ROOM_URL;
-    logToUI(`Requesting roomId from: ${url}`, '#fbbf24');
+    logToUI(`Requesting roomId from: ${url}`, 'var(--accent)');
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 15000);
@@ -170,7 +170,7 @@ export function initSyncController(callbacks = {}) {
       const data = await response.json();
 
       if (response.status === 401 && !isRetry) {
-        logToUI('🔄 Access token expired. Refreshing token...', '#f59e0b');
+        logToUI('🔄 Access token expired. Refreshing token...', 'var(--accent)');
         await refreshAuthToken();
         return await requestRoomId(true);
       }
@@ -203,7 +203,7 @@ export function initSyncController(callbacks = {}) {
    */
   async function startSyncFlow(forceRefresh = false) {
     const flowStart = performance.now();
-    logToUI(forceRefresh ? 'Refreshing QR Code token...' : 'Starting auto-sync flow...', '#818cf8');
+    logToUI(forceRefresh ? 'Refreshing QR Code token...' : 'Starting auto-sync flow...', 'var(--primary)');
 
     if (btnGenerateQr) {
       btnGenerateQr.disabled = true;
@@ -223,18 +223,18 @@ export function initSyncController(callbacks = {}) {
       try {
         const loginToken = await generateQrToken();
         qrContent = loginToken;
-        logToUI('QR login token created successfully', '#34d399');
+        logToUI('QR login token created successfully', 'var(--primary)');
       } catch (qrErr) {
-        logToUI(`Using roomId fallback for QR: ${qrErr.message}`, '#f59e0b');
+        logToUI(`Using roomId fallback for QR: ${qrErr.message}`, 'var(--accent)');
       }
 
       // Step 4: Show QR Code
       showSyncUI(roomId, qrContent);
       updateStatusUI(true);
 
-      logToUI(`Sync ready in ${(performance.now() - flowStart).toFixed(0)}ms`, '#10b981');
+      logToUI(`Sync ready in ${(performance.now() - flowStart).toFixed(0)}ms`, 'var(--primary)');
     } catch (err) {
-      logToUI(`Sync error: ${err.message}`, '#f87171');
+      logToUI(`Sync error: ${err.message}`, 'var(--cancel)');
       updateStatusUI(false);
     } finally {
       if (btnGenerateQr) {

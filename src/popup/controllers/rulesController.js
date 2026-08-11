@@ -170,7 +170,7 @@ export function initRulesController({ onStartPomodoro }) {
     }
 
     if (blacklist.length === 0) {
-      blacklistScrollArea.innerHTML = '<div style="font-size: 10px; color:#64748b; text-align:center; padding:12px 0; width: 100%;">Belum ada domain blacklist.</div>';
+      blacklistScrollArea.innerHTML = '<div style="font-size: 10px; color:var(--text-muted); text-align:center; padding:12px 0; width: 100%;">Belum ada domain blacklist.</div>';
       return;
     }
 
@@ -189,7 +189,7 @@ export function initRulesController({ onStartPomodoro }) {
         itemEl.className = `blacklist-item-compact ${itemObj.enabled ? 'is-blocked' : 'disabled'}`;
 
         itemEl.innerHTML = `
-          <svg style="width: 12px; height: 12px; color: ${itemObj.enabled ? '#2dd4bf' : '#64748b'}; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <svg style="width: 12px; height: 12px; color: ${itemObj.enabled ? 'var(--primary)' : 'var(--text-muted)'}; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18" />

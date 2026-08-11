@@ -1,3 +1,4 @@
+@import url('colors.css');
 @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap');
 
 /* Isolated Shadow DOM context resetting */
@@ -18,9 +19,9 @@
   left: 0;
   width: 100vw;
   height: 100vh;
-  background: radial-gradient(circle at top right, rgba(20, 184, 166, 0.18), transparent 60%),
-              radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.12), transparent 60%),
-              rgba(9, 13, 22, 0.96);
+  background: radial-gradient(circle at top right, rgba(42, 198, 122, 0.18), transparent 60%),
+              radial-gradient(circle at bottom left, rgba(14, 129, 73, 0.12), transparent 60%),
+              rgba(2, 8, 5, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
   z-index: 2147483647; /* Absolute maximum z-index priority */
@@ -40,8 +41,8 @@
 
 /* Elegant Glassmorphic Dialog Card matching Extension Popup */
 .focus-card {
-  background: linear-gradient(135deg, rgba(17, 24, 39, 0.85) 0%, rgba(10, 15, 30, 0.9) 100%);
-  border: 1px solid rgba(45, 212, 191, 0.25);
+  background: linear-gradient(135deg, rgba(6, 20, 13, 0.88) 0%, rgba(2, 10, 6, 0.95) 100%);
+  border: 1px solid rgba(42, 198, 122, 0.25);
   border-radius: 24px;
   padding: 40px 32px;
   width: 420px;
@@ -49,7 +50,7 @@
   text-align: center;
   box-shadow: 
     0 20px 50px rgba(0, 0, 0, 0.6), 
-    0 0 40px rgba(20, 184, 166, 0.15);
+    0 0 40px rgba(42, 198, 122, 0.15);
   transform: translateY(16px) scale(0.96);
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
   display: flex;
@@ -61,18 +62,18 @@
   transform: translateY(0) scale(1);
 }
 
-/* Soft alerting icon container matching Teal theme */
+/* Soft alerting icon container matching Emerald theme */
 .focus-icon-container {
   width: 56px;
   height: 56px;
   border-radius: 50%;
-  background: rgba(20, 184, 166, 0.12);
-  border: 1px solid rgba(45, 212, 191, 0.3);
+  background: rgba(42, 198, 122, 0.12);
+  border: 1px solid rgba(42, 198, 122, 0.3);
   margin-bottom: 24px;
   display: flex;
   align-items: center;
   justify-content: center;
-  color: #2dd4bf;
+  color: #2ac67a;
   animation: subtle-pulse 3s infinite ease-in-out;
 }
 
@@ -86,7 +87,7 @@
   margin: 0 0 10px 0;
   font-size: 24px;
   font-weight: 700;
-  color: #f1f5f9;
+  color: var(--text-primary);
   letter-spacing: -0.5px;
 }
 
@@ -94,7 +95,7 @@
   margin: 0 0 32px 0;
   font-size: 15px;
   line-height: 1.5;
-  color: #94a3b8;
+  color: var(--text-muted);
 }
 
 /* Button columns */
@@ -119,17 +120,18 @@
   justify-content: center;
 }
 
-/* Yes, I am working button matching Teal/Emerald Gradient */
+/* Yes, I am working button matching Emerald Gradient */
 .btn-working {
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  color: #ffffff;
-  box-shadow: 0 4px 14px rgba(20, 184, 166, 0.35);
+  background: var(--primary);
+  color: #000000;
+  font-weight: 800;
+  box-shadow: 0 4px 14px rgba(42, 198, 122, 0.35);
 }
 
 .btn-working:hover {
-  background: linear-gradient(135deg, #2dd4bf 0%, #14b8a6 100%);
+  background: linear-gradient(135deg, #39d58a 0%, #2ac67a 100%);
   transform: translateY(-1px);
-  box-shadow: 0 6px 20px rgba(20, 184, 166, 0.5);
+  box-shadow: 0 6px 20px rgba(42, 198, 122, 0.5);
 }
 
 .btn-working:active {
@@ -140,13 +142,13 @@
 .btn-exit {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.1);
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 .btn-exit:hover {
   background: rgba(239, 68, 68, 0.1);
   border-color: rgba(239, 68, 68, 0.3);
-  color: #fca5a5;
+  color: var(--cancel);
   transform: translateY(-1px);
 }
 
@@ -157,13 +159,13 @@
 /* Soft pulsing animation for indicator icon */
 @keyframes subtle-pulse {
   0% {
-    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0.25);
+    box-shadow: 0 0 0 0 rgba(42, 198, 122, 0.25);
   }
   70% {
-    box-shadow: 0 0 0 12px rgba(45, 212, 191, 0);
+    box-shadow: 0 0 0 12px rgba(42, 198, 122, 0);
   }
   100% {
-    box-shadow: 0 0 0 0 rgba(45, 212, 191, 0);
+    box-shadow: 0 0 0 0 rgba(42, 198, 122, 0);
   }
 }
 
@@ -186,13 +188,13 @@
   align-items: center;
   gap: 8px;
   padding: 8px 16px;
-  background: rgba(9, 13, 22, 0.94);
+  background: rgba(2, 8, 5, 0.94);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  border: 1px solid rgba(45, 212, 191, 0.35);
+  border: 1px solid rgba(42, 198, 122, 0.35);
   border-radius: 999px;
-  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(20, 184, 166, 0.15);
-  color: #f1f5f9;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(42, 198, 122, 0.15);
+  color: var(--text-primary);
   cursor: grab;
   transition: transform 0.15s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
@@ -203,22 +205,22 @@
 
 .adhd-pomo-pill:hover {
   transform: translateY(-2px);
-  border-color: rgba(45, 212, 191, 0.6);
-  box-shadow: 0 14px 30px -5px rgba(0, 0, 0, 0.7), 0 0 20px rgba(20, 184, 166, 0.25);
+  border-color: rgba(42, 198, 122, 0.6);
+  box-shadow: 0 14px 30px -5px rgba(0, 0, 0, 0.7), 0 0 20px rgba(42, 198, 122, 0.25);
 }
 
 .adhd-pomo-pill-dot {
   width: 8px;
   height: 8px;
   border-radius: 50%;
-  background: #2dd4bf;
-  box-shadow: 0 0 10px #2dd4bf;
+  background: #2ac67a;
+  box-shadow: 0 0 10px #2ac67a;
   animation: pomo-pulse 2s infinite ease-in-out;
 }
 
 .adhd-pomo-pill-dot.break {
-  background: #38bdf8;
-  box-shadow: 0 0 10px #38bdf8;
+  background: var(--secondary);
+  box-shadow: 0 0 10px var(--secondary);
 }
 
 @keyframes pomo-pulse {
@@ -231,7 +233,7 @@
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  color: #94a3b8;
+  color: var(--text-secondary);
 }
 
 .adhd-pomo-pill-time {
@@ -248,14 +250,14 @@
   margin-top: 8px;
   right: 0;
   width: 270px;
-  background: rgba(9, 13, 22, 0.96);
+  background: rgba(2, 8, 5, 0.96);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border: 1px solid rgba(45, 212, 191, 0.3);
+  border: 1px solid rgba(42, 198, 122, 0.3);
   border-radius: 20px;
   padding: 16px;
-  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(20, 184, 166, 0.12);
-  color: #f1f5f9;
+  box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.7), 0 0 30px rgba(42, 198, 122, 0.12);
+  color: #e4f1eb;
   animation: pomo-pop 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   transform-origin: top right;
 }
@@ -282,25 +284,25 @@
 }
 
 .adhd-pomo-status-badge.work {
-  color: #2dd4bf;
+  color: #2ac67a;
 }
 
 .adhd-pomo-status-badge.break {
-  color: #38bdf8;
+  color: var(--secondary);
 }
 
 .adhd-pomo-task-box {
   margin-top: 10px;
   padding: 10px;
-  background: rgba(17, 24, 39, 0.6);
-  border: 1px solid rgba(45, 212, 191, 0.15);
+  background: rgba(6, 20, 13, 0.6);
+  border: 1px solid rgba(42, 198, 122, 0.15);
   border-radius: 12px;
 }
 
 .adhd-pomo-task-label {
   font-size: 10px;
   font-weight: 700;
-  color: #2dd4bf;
+  color: #2ac67a;
   text-transform: uppercase;
   letter-spacing: 0.5px;
   display: block;
@@ -309,7 +311,7 @@
 .adhd-pomo-task-text {
   font-size: 12px;
   font-weight: 600;
-  color: #f1f5f9;
+  color: #e4f1eb;
   margin-top: 4px;
   line-height: 1.4;
   word-break: break-word;
@@ -350,19 +352,20 @@
 }
 
 .adhd-pomo-ctrl-btn.btn-toggle-run {
-  background: linear-gradient(135deg, #14b8a6 0%, #0d9488 100%);
-  color: #ffffff;
+  background: var(--primary);
+  color: #000000;
+  font-weight: 800;
 }
 
 .adhd-pomo-ctrl-btn.btn-skip-phase {
   background: rgba(148, 163, 184, 0.15);
-  color: #cbd5e1;
+  color: var(--text-secondary);
 }
 
 .adhd-pomo-btn-icon {
   background: transparent;
   border: none;
-  color: #94a3b8;
+  color: var(--text-muted);
   width: 22px;
   height: 22px;
   border-radius: 6px;
@@ -376,7 +379,7 @@
 
 .adhd-pomo-btn-icon:hover {
   background: rgba(255, 255, 255, 0.12);
-  color: #f1f5f9;
+  color: var(--text-primary);
 }
 
 .adhd-pomo-btn-icon svg {
