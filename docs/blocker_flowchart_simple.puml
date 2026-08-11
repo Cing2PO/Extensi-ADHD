@@ -1,0 +1,44 @@
+@startuml Extension_Blocker_Simple
+skinparam ActivityBackgroundColor #F9FAFB
+skinparam ActivityBorderColor #4B5563
+skinparam ActivityFontName SansSerif
+skinparam ArrowColor #2563EB
+skinparam DecisionBackgroundColor #FEF3C7
+skinparam DecisionBorderColor #D97706
+
+title Alur Kerja Sederhana Pemblokiran Browser (Extension Blocker)
+
+start
+:Pengguna Membuka Halaman Web;
+
+if (Domain Terdaftar di Blacklist ATAU Sesi Pomodoro 'Work'?) then (Ya)
+  :Mulai Monitor Aktivitas Scroll & Swipe (Heuristics Engine);
+  
+  repeat
+    :Hitung Skor Doomscroll berdasarkan Kecepatan Scroll / Swipe Video;
+    
+    if (Skor Doomscroll >= Batas Threshold?) then (Ya)
+      :Tampilkan Overlay Pemblokiran Layar Penuh;
+      :Kirim Event Terenkripsi ke WebSocket Backend;
+      
+      if (Tindakan Pengguna pada Overlay?) then ("Keep Working")
+        :Reset Skor Doomscroll ke 0;
+        :Sembunyikan Overlay;
+      else ("Get Me Out")
+        :Redirect ke Halaman Kosong (about:blank);
+        stop
+      endif
+      
+    else (Tidak)
+      :Kurangi Skor Doomscroll (Score Decay);
+    endif
+    
+  repeat while (Pengguna Masih Membuka Halaman Web?) is (Ya)
+  -> Tidak;
+
+else (Tidak)
+  :Abaikan & Izinkan Akses Normal;
+endif
+
+stop
+@enduml

@@ -207,16 +207,17 @@ import { getStorageData, setStorageData, parseBlacklist } from './content/module
       heuristicsEngine.setThreshold(items.sensitivity || 'balanced');
       const blacklist = parseBlacklist(items.blacklist);
 
-      const isPomodoroWorkBlock = !!(pomodoroSession?.isActive && pomodoroSession.isRunning && pomodoroSession.phase === 'work');
+      const isPomodoroActive = !!(pomodoroSession && pomodoroSession.isActive);
+      const isPomodoroBreak = isPomodoroActive && pomodoroSession.phase === 'break';
+      const isPomodoroPaused = isPomodoroActive && !pomodoroSession.isRunning && pomodoroSession.phase === 'work';
       const isBlacklisted = isDomainBlacklisted(window.location.hostname, blacklist);
 
-      if (!isProtectionActive) {
-        heuristicsEngine.stop();
-        overlayManager.removeOverlay();
-        return;
-      }
-
-      const shouldRun = isPomodoroWorkBlock || isBlacklisted;
+      // Blocker is ACTIVE when:
+      // 1. Anti-Doomscroll Shield is ON (isProtectionActive !== false)
+      // 2. We are NOT currently in a Pomodoro break phase or paused state
+      // 3. Domain is blacklisted / distraction site (or Pomodoro work phase is active)
+      const isBreakOrPaused = isPomodoroBreak || isPomodoroPaused;
+      const shouldRun = isProtectionActive && !isBreakOrPaused && (isBlacklisted || (isPomodoroActive && pomodoroSession.phase === 'work'));
 
       if (shouldRun) {
         heuristicsEngine.start();

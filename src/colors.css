@@ -7,7 +7,8 @@
  */
 
 :root,
-:root[data-theme="dark"] {
+:root[data-theme="dark"],
+:host {
   /* Exact Base Palette Tokens */
   --color-text: #ffffff;
   --color-background: #020805;
@@ -80,8 +81,8 @@
   --scroll-thumb-hover: rgba(42, 198, 122, 0.50);
   --border-header: rgba(42, 198, 122, 0.15);
   --bg-gradient: radial-gradient(circle at top right, rgba(42, 198, 122, 0.16), transparent 60%),
-                 radial-gradient(circle at bottom left, rgba(14, 129, 73, 0.20), transparent 60%),
-                 var(--background);
+    radial-gradient(circle at bottom left, rgba(14, 129, 73, 0.20), transparent 60%),
+    var(--background);
 }
 
 :root[data-theme="light"],
@@ -158,6 +159,6 @@ body.light-theme {
   --scroll-thumb-hover: rgba(0, 0, 0, 0.35);
   --border-header: rgba(57, 213, 138, 0.25);
   --bg-gradient: radial-gradient(circle at top right, rgba(57, 213, 138, 0.14), transparent 60%),
-                 radial-gradient(circle at bottom left, rgba(126, 241, 186, 0.22), transparent 60%),
-                 var(--background);
+    radial-gradient(circle at bottom left, rgba(126, 241, 186, 0.22), transparent 60%),
+    var(--background);
 }

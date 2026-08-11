@@ -8,7 +8,9 @@
   box-sizing: border-box;
 }
 
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: inherit;
 }
 
@@ -20,11 +22,12 @@
   width: 100vw;
   height: 100vh;
   background: radial-gradient(circle at top right, rgba(42, 198, 122, 0.18), transparent 60%),
-              radial-gradient(circle at bottom left, rgba(14, 129, 73, 0.12), transparent 60%),
-              rgba(2, 8, 5, 0.96);
+    radial-gradient(circle at bottom left, rgba(14, 129, 73, 0.12), transparent 60%),
+    rgba(2, 8, 5, 0.96);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
-  z-index: 2147483647; /* Absolute maximum z-index priority */
+  z-index: 2147483647;
+  /* Absolute maximum z-index priority */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -48,8 +51,8 @@
   width: 420px;
   max-width: 90%;
   text-align: center;
-  box-shadow: 
-    0 20px 50px rgba(0, 0, 0, 0.6), 
+  box-shadow:
+    0 20px 50px rgba(0, 0, 0, 0.6),
     0 0 40px rgba(42, 198, 122, 0.15);
   transform: translateY(16px) scale(0.96);
   transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
@@ -87,7 +90,7 @@
   margin: 0 0 10px 0;
   font-size: 24px;
   font-weight: 700;
-  color: var(--text-primary);
+  color: var(--text-primary, #ffffff);
   letter-spacing: -0.5px;
 }
 
@@ -95,7 +98,12 @@
   margin: 0 0 32px 0;
   font-size: 15px;
   line-height: 1.5;
-  color: var(--text-muted);
+  color: var(--text-secondary, rgba(255, 255, 255, 0.90));
+}
+
+.focus-description strong {
+  color: var(--primary, #2ac67a);
+  font-weight: 700;
 }
 
 /* Button columns */
@@ -140,9 +148,9 @@
 
 /* No, get me out button */
 .btn-exit {
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: var(--text-secondary);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: var(--text-primary, #ffffff);
 }
 
 .btn-exit:hover {
@@ -161,9 +169,11 @@
   0% {
     box-shadow: 0 0 0 0 rgba(42, 198, 122, 0.25);
   }
+
   70% {
     box-shadow: 0 0 0 12px rgba(42, 198, 122, 0);
   }
+
   100% {
     box-shadow: 0 0 0 0 rgba(42, 198, 122, 0);
   }
@@ -224,8 +234,17 @@
 }
 
 @keyframes pomo-pulse {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.4; transform: scale(0.85); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.4;
+    transform: scale(0.85);
+  }
 }
 
 .adhd-pomo-pill-phase {
@@ -263,8 +282,15 @@
 }
 
 @keyframes pomo-pop {
-  from { opacity: 0; transform: scale(0.9) translateY(-6px); }
-  to { opacity: 1; transform: scale(1) translateY(0); }
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(-6px);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
 }
 
 .adhd-pomo-modal-header {

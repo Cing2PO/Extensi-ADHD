@@ -1,0 +1,55 @@
+@startuml Blocker_Extension_Sequence
+autonumber
+actor "User (Browser)" as User
+participant "Content Script\n(content.js)" as Content
+participant "Heuristics Engine\n(heuristicsEngine.js)" as Engine
+participant "Overlay Manager\n(overlayManager.js)" as Overlay
+participant "Background Worker\n(background.js)" as Background
+participant "WebSocket / Backend" as WS
+
+== 1. Inisialisasi & Cek Domain ==
+User -> Content : Buka Web / Navigasi Halaman
+Content -> Content : Ambil Blacklist & Status Proteksi dari Storage
+alt Protection Inactive / Domain Aman
+    Content -> Content : Matikan Protection
+else Domain Blacklisted / Pomodoro Work Block
+    Content -> Engine : heuristicsEngine.start()
+    Engine -> Engine : Start Event Listeners (Scroll, Swipe, Tick)
+end
+
+== 2. Monitoring & Kalkulasi Doomscroll ==
+loop Setiap Interaksi Scroll / Swipe / Tick (500ms)
+    User -> Engine : Melakukan Scroll / Swipe Video
+    Engine -> Engine : Hitung distractionScore (+SWIPE_PENALTY / Velocity)
+    alt Inaktif
+        Engine -> Engine : Score Decay (-250 / tick)
+    end
+end
+
+== 3. Trigger Blocker Overlay ==
+Engine -> Engine : distractionScore >= doomscrollThreshold
+Engine -> Overlay : showOverlay(currentTask)
+Overlay -> User : Tampilkan Fullscreen Refocus Overlay
+Engine -> Background : chrome.runtime.sendMessage({ action: 'doomscrollDetected', ... })
+
+== 4. Enkripsi & Sinkronisasi Real-time ==
+Background -> Background : Enkripsi Payload dengan AES (encryption.js)
+alt WebSocket Connected
+    Background -> WS : socket.send(encryptedPayload)
+    WS --> Background : Server ACK / Cross-Platform Sync
+else Offline
+    Background -> Background : Buffer Offline Event
+end
+
+== 5. Respon Interaksi Pengguna ==
+alt Klik "Keep Working"
+    User -> Overlay : Click "Keep Working"
+    Overlay -> Engine : resetScore()
+    Overlay -> Content : Increment refocusCount & Simpan Storage
+    Overlay -> User : Sembunyikan Overlay
+else Klik "Get Me Out"
+    User -> Overlay : Click "Get Me Out"
+    Overlay -> User : window.location.href = 'about:blank'
+end
+
+@enduml

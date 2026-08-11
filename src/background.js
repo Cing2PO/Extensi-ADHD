@@ -158,14 +158,44 @@ function sendSyncMessage(message, callback) {
   });
 }
 
+// --- BLOCKER STATE & WEBSOCKET SYNC ---
+let lastBlockerState = null;
+
+function evaluateAndEmitBlockerState(session, isProtectionActive = true) {
+  const isPomodoroBreak = !!(session && session.isActive && session.phase === 'break');
+  const isPomodoroPaused = !!(session && session.isActive && !session.isRunning && session.phase === 'work');
+  const isBreakOrPaused = isPomodoroBreak || isPomodoroPaused;
+
+  const isBlockerActive = (isProtectionActive !== false) && !isBreakOrPaused;
+  const newState = isBlockerActive ? 'on' : 'off';
+
+  if (lastBlockerState !== newState) {
+    lastBlockerState = newState;
+    console.log(`[Background SW] Blocker state changed to: ${newState.toUpperCase()} (Shield: ${isProtectionActive !== false}, Break/Paused: ${isBreakOrPaused}). Emitting via WebSocket...`);
+    sendSyncMessage(newState);
+  }
+}
+
 // Start background socket on boot
 connectBackgroundWebSocket();
 
-// Listen for syncRoomId updates in storage
+// Initial state evaluation on boot
+chrome.storage.local.get(['pomodoroSession', 'isProtectionActive'], (items) => {
+  evaluateAndEmitBlockerState(items.pomodoroSession, items.isProtectionActive);
+});
+
+// Listen for syncRoomId and pomodoroSession updates in storage
 chrome.storage.onChanged.addListener((changes, areaName) => {
-  if (areaName === 'local' && changes.syncRoomId) {
-    console.log('[Background SW] syncRoomId changed, re-syncing socket...');
-    connectBackgroundWebSocket();
+  if (areaName === 'local') {
+    if (changes.syncRoomId) {
+      console.log('[Background SW] syncRoomId changed, re-syncing socket...');
+      connectBackgroundWebSocket();
+    }
+    if (changes.pomodoroSession || changes.isProtectionActive) {
+      chrome.storage.local.get(['pomodoroSession', 'isProtectionActive'], (items) => {
+        evaluateAndEmitBlockerState(items.pomodoroSession, items.isProtectionActive);
+      });
+    }
   }
 });
 

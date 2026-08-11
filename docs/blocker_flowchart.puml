@@ -1,0 +1,90 @@
+@startuml Blocker_Extension_Flowchart
+skinparam ActivityBackgroundColor #F9FAFB
+skinparam ActivityBorderColor #4B5563
+skinparam ActivityFontName SansSerif
+skinparam ActivityFontSize 12
+skinparam ArrowColor #2563EB
+skinparam ArrowFontColor #1F2937
+skinparam DecisionBackgroundColor #FEF3C7
+skinparam DecisionBorderColor #D97706
+
+title Alur Kerja (Flowchart) Pemblokiran (Blocker) pada Ekstensi ADHD Focus Coach
+
+start
+:Pengguna Membuka Halaman Web di Browser;
+
+partition "1. Inisialisasi & Pemeriksaan Domain (content.js & domainMatcher.js)" {
+  :Memuat Konfigurasi & State dari chrome.storage.local\n(blacklist, isProtectionActive, sensitivity, pomodoroSession);
+
+  if (isProtectionActive == true?) then (Ya)
+    :Periksa Hostname Web Halaman Saat Ini;
+    :Jalankan isDomainBlacklisted(hostname, blacklist);
+    
+    if (Domain Terdaftar di Blacklist ATAU Sesi Pomodoro Aktif di Fase 'Work'?) then (Ya)
+      :Aktifkan HeuristicsEngine (heuristicsEngine.start());
+    else (Tidak)
+      :Matikan Heuristics Engine & Hapus Overlay jika Ada;
+      stop
+    endif
+  else (Tidak)
+    :Matikan Heuristics Engine & Hapus Overlay;
+    stop
+  endif
+}
+
+partition "2. Monitoring Interaksi & Kalkulasi Skor Doomscroll (heuristicsEngine.js)" {
+  fork
+    :Monitor Event Scroll, Touch, & Keypress (Panah, Space, PageDown);
+  fork again
+    :Monitor Perubahan URL (Shorts/Reels/TikTok Swipe);
+  fork again
+    :Menjalankan Heuristics Tick (setiap 500ms);
+  end fork
+
+  repeat
+    if (Pengguna melakukan Swipe Video Pendek / Scroll Cepat?) then (Ya)
+      :Tambahkan SWIPE_PENALTY_SCORE (+1500) / Scroll Velocity Weight ke distractionScore;
+    else (Tidak Ada Aktivitas Berlebihan)
+      :Terapkan Score Decay (-250 per tick) pada distractionScore;
+    endif
+
+    :Bandingkan distractionScore dengan doomscrollThreshold\n(Strict: 3000 | Balanced: 8000 | Lenient: 14000);
+
+  repeat while (distractionScore < doomscrollThreshold?) is (Ya / Lanjut Monitor)
+  -> Tidak (Skor Melampaui Batas Threshold);
+}
+
+partition "3. Eksekusi Pemblokiran & Tampilan Overlay (overlayManager.js)" {
+  :Tampilkan Fullscreen Overlay Blocker ("Take a Breath & Refocus");
+  :Kirim Pesan 'doomscrollDetected' ke Background Worker (background.js);
+}
+
+partition "4. Komunikasi Background & Sinkronisasi WebSocket (background.js)" {
+  :Background Worker Menerima Payload (domain, score, task, timestamp);
+  :Enkripsi Payload Menggunakan utility encryption.js (AES Hex);
+  
+  if (Koneksi WebSocket Terhubung?) then (Ya)
+    :Kirim Payload Terenkripsi ke Server WebSocket / Reverb;
+    :Kirim Notifikasi Sinkronisasi Cross-Platform ke Mobile App;
+  else (Tidak)
+    :Simpan Status Event dalam Buffer Offline;
+  endif
+}
+
+partition "5. Respon & Tindakan Pengguna pada Overlay Pemblokiran" {
+  if (Pilihan Tindakan Pengguna?) then ("Keep Working / Refocus")
+    :Reset distractionScore = 0;
+    :Tambahkan Nilai refocusCount (+1);
+    :Sembunyikan Overlay Blocker;
+    :Lanjutkan Monitoring Heuristik;
+  elseif ("Get Me Out")
+    :Redirect Browser ke 'about:blank';
+    stop
+  else ("Interaksi Widget Pomodoro Floating")
+    :Update Sesi Pomodoro (Toggle/Skip/Done);
+    :Simpan Perubahan ke chrome.storage.local;
+  endif
+}
+
+stop
+@enduml
