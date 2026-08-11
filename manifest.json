@@ -37,7 +37,12 @@
         "src/content/modules/domainMatcher.js",
         "src/content/modules/heuristicsEngine.js",
         "src/content/modules/overlayManager.js",
-        "src/content/modules/storageSync.js"
+        "src/content/modules/softBlockOverlay.js",
+        "src/content/modules/floatingPomodoroWidget.js",
+        "src/content/modules/storageSync.js",
+        "src/shared/constants.js",
+        "src/shared/storageWrapper.js",
+        "src/shared/pomodoroUtils.js"
       ],
       "matches": ["http://*/*", "https://*/*"]
     }

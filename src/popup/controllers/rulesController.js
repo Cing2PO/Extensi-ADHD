@@ -1,5 +1,9 @@
 /**
- * Rules Controller Module - Handles Blacklist Domain CRUD, Active Site Detection & Sensitivity Slider
+ * Rules Controller Module - Handles Guard Shield, Blacklist Domain CRUD,
+ * Active Site Detection & Sensitivity Slider
+ * 
+ * Settings modal, Pomodoro config, and floating toggle have been extracted
+ * to settingsController.js for single-responsibility separation.
  */
 
 import { setStorage, SENSITIVITY_STEPS, SENSITIVITY_VALUES, DEFAULT_BLACKLIST } from '../services/storageService.js';
@@ -11,10 +15,6 @@ export function initRulesController({ onStartPomodoro }) {
   const sensitivitySlider = document.getElementById('sensitivity-slider');
   const sliderValLabel = document.getElementById('slider-val-label');
 
-  const btnSettingsGear = document.getElementById('btn-settings-gear');
-  const settingsModal = document.getElementById('settings-modal');
-  const btnCloseSettingsModal = document.getElementById('btn-close-settings-modal');
-
   const activeSiteLabel = document.getElementById('active-site-label');
   const activeHostDisplay = document.getElementById('active-host');
   const btnQuickToggle = document.getElementById('btn-quick-toggle');
@@ -22,10 +22,6 @@ export function initRulesController({ onStartPomodoro }) {
   const addForm = document.getElementById('add-form');
   const manualDomainInput = document.getElementById('manual-domain-input');
   const blacklistScrollArea = document.getElementById('blacklist-scroll-area');
-
-  const pomodoroWorkInput = document.getElementById('pomodoro-work-input');
-  const pomodoroBreakInput = document.getElementById('pomodoro-break-input');
-  const floatingPomodoroToggle = document.getElementById('floating-pomodoro-toggle');
 
   const btnStartQuickPomodoro = document.getElementById('btn-start-quick-pomodoro');
   const btnStartPomodoroRules = document.getElementById('btn-start-pomodoro-rules');
@@ -43,7 +39,7 @@ export function initRulesController({ onStartPomodoro }) {
     }, { passive: false });
   }
 
-  // --- Auto-Sync Listeners ---
+  // --- Guard Shield Toggle ---
   if (protectionToggle) {
     protectionToggle.addEventListener('change', () => {
       setStorage({ isProtectionActive: protectionToggle.checked });
@@ -58,46 +54,7 @@ export function initRulesController({ onStartPomodoro }) {
     });
   }
 
-  function openSettingsModal() {
-    if (settingsModal) settingsModal.classList.remove('hidden');
-    document.body.classList.add('modal-open');
-  }
-
-  function closeSettingsModal() {
-    if (settingsModal) settingsModal.classList.add('hidden');
-    document.body.classList.remove('modal-open');
-  }
-
-  if (btnSettingsGear) {
-    btnSettingsGear.addEventListener('click', openSettingsModal);
-  }
-
-  if (btnCloseSettingsModal) {
-    btnCloseSettingsModal.addEventListener('click', closeSettingsModal);
-  }
-
-  if (floatingPomodoroToggle) {
-    floatingPomodoroToggle.addEventListener('change', () => {
-      setStorage({ showFloatingWidget: floatingPomodoroToggle.checked });
-    });
-  }
-
-  if (pomodoroWorkInput) {
-    pomodoroWorkInput.addEventListener('change', () => {
-      const val = Math.max(1, Math.min(90, parseInt(pomodoroWorkInput.value, 10) || 25));
-      pomodoroWorkInput.value = val;
-      setStorage({ pomodoroWorkMinutes: val });
-    });
-  }
-
-  if (pomodoroBreakInput) {
-    pomodoroBreakInput.addEventListener('change', () => {
-      const val = Math.max(1, Math.min(30, parseInt(pomodoroBreakInput.value, 10) || 5));
-      pomodoroBreakInput.value = val;
-      setStorage({ pomodoroBreakMinutes: val });
-    });
-  }
-
+  // --- Sensitivity Slider ---
   if (sensitivitySlider) {
     sensitivitySlider.addEventListener('input', () => {
       const step = parseInt(sensitivitySlider.value, 10);
@@ -312,6 +269,7 @@ export function initRulesController({ onStartPomodoro }) {
     }
   }
 
+  // --- Add Domain Form ---
   if (addForm) {
     addForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -358,6 +316,7 @@ export function initRulesController({ onStartPomodoro }) {
     });
   }
 
+  // --- Pomodoro Quick Start Buttons ---
   if (btnStartQuickPomodoro && onStartPomodoro) {
     btnStartQuickPomodoro.addEventListener('click', onStartPomodoro);
   }
@@ -378,6 +337,7 @@ export function initRulesController({ onStartPomodoro }) {
     });
   }
 
+  // --- Initial State Hydration ---
   function setInitialRules({ items }) {
     if (protectionToggle) {
       protectionToggle.checked = items.isProtectionActive !== false;
@@ -401,10 +361,6 @@ export function initRulesController({ onStartPomodoro }) {
       blacklist = DEFAULT_BLACKLIST;
       setStorage({ blacklist: DEFAULT_BLACKLIST });
     }
-
-    if (pomodoroWorkInput) pomodoroWorkInput.value = items.pomodoroWorkMinutes || 25;
-    if (pomodoroBreakInput) pomodoroBreakInput.value = items.pomodoroBreakMinutes || 5;
-    if (floatingPomodoroToggle) floatingPomodoroToggle.checked = items.showFloatingWidget !== false;
 
     renderBlacklistArea();
     detectActiveTabDomain();

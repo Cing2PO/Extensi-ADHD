@@ -11,6 +11,7 @@ import { initRulesController } from './popup/controllers/rulesController.js';
 import { initAuthController } from './popup/controllers/authController.js';
 import { initProjectController } from './popup/controllers/projectController.js';
 import { initSyncController } from './popup/controllers/syncController.js';
+import { initSettingsController } from './popup/controllers/settingsController.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize UI navigation
@@ -82,6 +83,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Initialize Settings Controller
+  const settingsController = initSettingsController();
+
   // Load Initial Settings & Hydrate Controllers
   getStorage([
     'isProtectionActive',
@@ -99,17 +103,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Theme Manager
     initThemeManager(items.theme || 'dark');
 
-    // 2. Magic To-Do & Pomodoro Controller
+    // 2. Settings Controller
+    settingsController.setInitialSettings({ items });
+
+    // 3. Magic To-Do & Pomodoro Controller
     magicTodoController.setInitialStates({
       magicState: items.magicTaskState || null,
       pomoSession: items.pomodoroSession || null
     });
 
-    // 3. Focus Dashboard Controller
+    // 4. Focus Dashboard Controller
     focusController.renderFocusTab(items.currentTask || '', items.magicTaskState || null);
     projectController.refreshAllProjects();
 
-    // 4. Rules & Blacklist Controller
+    // 5. Rules & Blacklist Controller
     rulesController.setInitialRules({ items });
 
     // Refocus Counter
