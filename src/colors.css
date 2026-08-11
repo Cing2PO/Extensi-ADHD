@@ -1,0 +1,163 @@
+/**
+ * Flow Tether Strict Color System
+ * Single Source of Truth for all CSS colors across popup, overlays, and components.
+ * 
+ * ONLY uses the 5 user-defined palette colors + red cancel color.
+ * Fonts strictly use solid Black and White for maximum contrast and readability.
+ */
+
+:root,
+:root[data-theme="dark"] {
+  /* Exact Base Palette Tokens */
+  --color-text: #ffffff;
+  --color-background: #020805;
+  --color-primary: #2ac67a;
+  --color-secondary: #0e8149;
+  --color-accent: #04be64;
+  --color-cancel: #ef4444;
+
+  /* Strict Black & White Typography Tokens */
+  --font-white: #ffffff;
+  --font-black: #000000;
+  --font-on-primary: #000000;
+  --font-on-accent: #000000;
+  --font-on-secondary: #000000;
+  --font-on-dark: #ffffff;
+  --font-on-light: #000000;
+
+  /* RGB channels for clean alpha compositing */
+  --color-text-rgb: 255, 255, 255;
+  --color-background-rgb: 2, 8, 5;
+  --color-primary-rgb: 42, 198, 122;
+  --color-secondary-rgb: 14, 129, 73;
+  --color-accent-rgb: 4, 190, 100;
+  --color-cancel-rgb: 239, 68, 68;
+
+  /* Base Semantic Tokens */
+  --text: var(--color-text);
+  --background: var(--color-background);
+  --primary: var(--color-primary);
+  --secondary: var(--color-secondary);
+  --accent: var(--color-accent);
+  --cancel: var(--color-cancel);
+
+  /* Typography Hierarchies */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.85);
+  --text-muted: rgba(255, 255, 255, 0.60);
+
+  /* Surface & Container Tokens */
+  --card-bg: rgba(14, 129, 73, 0.16);
+  --card-border: rgba(42, 198, 122, 0.22);
+  --input-bg: rgba(2, 8, 5, 0.92);
+  --input-border: rgba(42, 198, 122, 0.30);
+  --nav-bg: rgba(2, 8, 5, 0.96);
+
+  /* Interactive Elements */
+  --tab-unselected: rgba(255, 255, 255, 0.50);
+  --tab-hover: #ffffff;
+  --accent-label: #ffffff;
+  --accent-text: #ffffff;
+  --text-green: #2ac67a;
+
+  /* Button Tokens (Black text on bold primary green) */
+  --btn-primary-bg: var(--primary);
+  --btn-primary-text: #000000;
+  --btn-secondary-bg: var(--secondary);
+  --btn-secondary-text: #ffffff;
+
+  /* Controls & Highlights */
+  --switch-bg: rgba(255, 255, 255, 0.12);
+  --switch-slider: rgba(255, 255, 255, 0.70);
+  --item-bg: rgba(42, 198, 122, 0.06);
+  --item-border: rgba(42, 198, 122, 0.16);
+  --shadow-color: rgba(0, 0, 0, 0.85);
+
+  /* Specialized Cards & Overlays */
+  --focus-card-bg: linear-gradient(135deg, rgba(14, 129, 73, 0.35) 0%, rgba(2, 8, 5, 0.98) 100%);
+  --active-site-bg: rgba(42, 198, 122, 0.08);
+  --scroll-thumb: rgba(42, 198, 122, 0.25);
+  --scroll-thumb-hover: rgba(42, 198, 122, 0.50);
+  --border-header: rgba(42, 198, 122, 0.15);
+  --bg-gradient: radial-gradient(circle at top right, rgba(42, 198, 122, 0.16), transparent 60%),
+                 radial-gradient(circle at bottom left, rgba(14, 129, 73, 0.20), transparent 60%),
+                 var(--background);
+}
+
+:root[data-theme="light"],
+body.light-theme {
+  /* Exact Base Palette Tokens */
+  --color-text: #000000;
+  --color-background: #f7fdfa;
+  --color-primary: #39d58a;
+  --color-secondary: #7ef1ba;
+  --color-accent: #41fba1;
+  --color-cancel: #ef4444;
+
+  /* Strict Black & White Typography Tokens */
+  --font-white: #ffffff;
+  --font-black: #000000;
+  --font-on-primary: #000000;
+  --font-on-accent: #000000;
+  --font-on-secondary: #000000;
+  --font-on-dark: #ffffff;
+  --font-on-light: #000000;
+
+  /* RGB channels for clean alpha compositing */
+  --color-text-rgb: 0, 0, 0;
+  --color-background-rgb: 247, 253, 250;
+  --color-primary-rgb: 57, 213, 138;
+  --color-secondary-rgb: 126, 241, 186;
+  --color-accent-rgb: 65, 251, 161;
+  --color-cancel-rgb: 239, 68, 68;
+
+  /* Base Semantic Tokens */
+  --text: var(--color-text);
+  --background: var(--color-background);
+  --primary: var(--color-primary);
+  --secondary: var(--color-secondary);
+  --accent: var(--color-accent);
+  --cancel: var(--color-cancel);
+
+  /* Typography Hierarchies */
+  --text-primary: #000000;
+  --text-secondary: rgba(0, 0, 0, 0.75);
+  --text-muted: rgba(0, 0, 0, 0.50);
+
+  /* Surface & Container Tokens */
+  --card-bg: #ffffff;
+  --card-border: rgba(57, 213, 138, 0.35);
+  --input-bg: #ffffff;
+  --input-border: rgba(57, 213, 138, 0.45);
+  --nav-bg: rgba(247, 253, 250, 0.98);
+
+  /* Interactive Elements */
+  --tab-unselected: rgba(0, 0, 0, 0.45);
+  --tab-hover: #000000;
+  --accent-label: #000000;
+  --accent-text: #000000;
+  --text-green: #0e8149;
+
+  /* Button Tokens (Black text on bold primary green) */
+  --btn-primary-bg: var(--primary);
+  --btn-primary-text: #000000;
+  --btn-secondary-bg: var(--secondary);
+  --btn-secondary-text: #000000;
+
+  /* Controls & Highlights */
+  --switch-bg: rgba(0, 0, 0, 0.12);
+  --switch-slider: rgba(0, 0, 0, 0.50);
+  --item-bg: rgba(126, 241, 186, 0.18);
+  --item-border: rgba(57, 213, 138, 0.25);
+  --shadow-color: rgba(0, 0, 0, 0.08);
+
+  /* Specialized Cards & Overlays */
+  --focus-card-bg: linear-gradient(135deg, #ffffff 0%, rgba(126, 241, 186, 0.20) 100%);
+  --active-site-bg: rgba(126, 241, 186, 0.25);
+  --scroll-thumb: rgba(0, 0, 0, 0.18);
+  --scroll-thumb-hover: rgba(0, 0, 0, 0.35);
+  --border-header: rgba(57, 213, 138, 0.25);
+  --bg-gradient: radial-gradient(circle at top right, rgba(57, 213, 138, 0.14), transparent 60%),
+                 radial-gradient(circle at bottom left, rgba(126, 241, 186, 0.22), transparent 60%),
+                 var(--background);
+}

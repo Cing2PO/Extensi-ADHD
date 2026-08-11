@@ -5,7 +5,7 @@
 import { ENV_CONFIG } from '../../config.js';
 import { getStorage, setStorage } from './storageService.js';
 
-export const AUTH_STORAGE_KEYS = ['accessToken', 'refreshToken', 'currentUser'];
+export const AUTH_STORAGE_KEYS = ['accessToken', 'refreshToken', 'currentUser', 'syncRoomId'];
 
 /**
  * Get current authenticated user session data from local storage
@@ -15,19 +15,25 @@ export async function getAuthSession() {
   return {
     accessToken: data.accessToken || null,
     refreshToken: data.refreshToken || null,
-    currentUser: data.currentUser || null
+    currentUser: data.currentUser || null,
+    roomId: data.syncRoomId || null
   };
 }
 
 /**
  * Save auth session data to chrome local storage
  */
-export async function saveAuthSession({ accessToken, refreshToken, user }) {
-  await setStorage({
+export async function saveAuthSession({ accessToken, refreshToken, user, roomId }) {
+  const payload = {
     accessToken: accessToken || null,
     refreshToken: refreshToken || null,
     currentUser: user || null
-  });
+  };
+  // Only overwrite syncRoomId if a new one was provided
+  if (roomId) {
+    payload.syncRoomId = roomId;
+  }
+  await setStorage(payload);
 }
 
 /**
@@ -74,9 +80,10 @@ export async function loginUser(email, password) {
     const accessToken = data.accessToken || data.tokens?.accessToken || data.data?.accessToken;
     const refreshToken = data.refreshToken || data.tokens?.refreshToken || data.data?.refreshToken;
     const user = data.user || data.data?.user;
+    const roomId = data.roomId || null;
 
-    await saveAuthSession({ accessToken, refreshToken, user });
-    return { user, accessToken, refreshToken };
+    await saveAuthSession({ accessToken, refreshToken, user, roomId });
+    return { user, accessToken, refreshToken, roomId };
   } catch (err) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
@@ -121,9 +128,10 @@ export async function registerUser(name, email, password) {
     const accessToken = data.accessToken || data.tokens?.accessToken || data.data?.accessToken;
     const refreshToken = data.refreshToken || data.tokens?.refreshToken || data.data?.refreshToken;
     const user = data.user || data.data?.user;
+    const roomId = data.roomId || null;
 
-    await saveAuthSession({ accessToken, refreshToken, user });
-    return { user, accessToken, refreshToken };
+    await saveAuthSession({ accessToken, refreshToken, user, roomId });
+    return { user, accessToken, refreshToken, roomId };
   } catch (err) {
     clearTimeout(timeoutId);
     if (err.name === 'AbortError') {
@@ -206,4 +214,59 @@ export async function logoutUser() {
   }
 
   await clearAuthSession();
+}
+
+/**
+ * Generate a one-time QR login token for cross-device pairing.
+ * The generated token can be encoded into a QR code for mobile to scan.
+ * @returns {Promise<string>} The one-time login token (hex string)
+ */
+export async function generateQrToken() {
+  const { accessToken } = await getAuthSession();
+  if (!accessToken) {
+    throw new Error('Login diperlukan untuk membuat QR Code.');
+  }
+
+  const url = ENV_CONFIG.AUTH_GENERATE_QR_URL;
+  const timeoutMs = ENV_CONFIG.API_TIMEOUT_MS || 35000;
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': `Bearer ${accessToken}`
+      },
+      signal: controller.signal
+    });
+
+    clearTimeout(timeoutId);
+    const data = await response.json();
+
+    if (!response.ok || !data.success) {
+      const errorMsg = data.message || data.error || `Gagal generate QR token (HTTP ${response.status})`;
+      throw new Error(errorMsg);
+    }
+
+    const loginToken = data.loginTokens || data.loginToken || data.token;
+    if (!loginToken) {
+      throw new Error('Server tidak mengembalikan login token.');
+    }
+
+    console.log('[Auth Service] QR login token generated successfully.');
+    return loginToken;
+  } catch (err) {
+    clearTimeout(timeoutId);
+    if (err.name === 'AbortError') {
+      throw new Error('Timeout saat membuat QR token.');
+    }
+    if (err.message === 'Failed to fetch' || err instanceof TypeError) {
+      throw new Error(`Gagal terhubung ke server backend (${url}).`);
+    }
+    throw err;
+  }
 }

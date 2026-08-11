@@ -11,6 +11,7 @@ import { initRulesController } from './popup/controllers/rulesController.js';
 import { initAuthController } from './popup/controllers/authController.js';
 import { initProjectController } from './popup/controllers/projectController.js';
 import { initSyncController } from './popup/controllers/syncController.js';
+import { initSettingsController } from './popup/controllers/settingsController.js';
 
 document.addEventListener('DOMContentLoaded', () => {
   // Initialize UI navigation
@@ -27,10 +28,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Initialize Sync Controller reference
+  let syncController = null;
+
   // Initialize Auth Controller
   const authController = initAuthController({
-    onLoginSuccess: () => {
+    onLoginSuccess: (result) => {
       projectController.refreshAllProjects();
+      if (syncController && result?.roomId) {
+        syncController.autoSyncOnLogin(result.roomId);
+      }
+    },
+    onLogout: () => {
+      if (syncController) {
+        syncController.disconnectSync();
+      }
     }
   });
 
@@ -65,7 +77,14 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Initialize Sync Controller (WebSocket + QR Code)
-  const syncController = initSyncController();
+  syncController = initSyncController({
+    onRequestAuth: () => {
+      authController.openAuthModal('login');
+    }
+  });
+
+  // Initialize Settings Controller
+  const settingsController = initSettingsController();
 
   // Load Initial Settings & Hydrate Controllers
   getStorage([
@@ -84,17 +103,20 @@ document.addEventListener('DOMContentLoaded', () => {
     // 1. Theme Manager
     initThemeManager(items.theme || 'dark');
 
-    // 2. Magic To-Do & Pomodoro Controller
+    // 2. Settings Controller
+    settingsController.setInitialSettings({ items });
+
+    // 3. Magic To-Do & Pomodoro Controller
     magicTodoController.setInitialStates({
       magicState: items.magicTaskState || null,
       pomoSession: items.pomodoroSession || null
     });
 
-    // 3. Focus Dashboard Controller
+    // 4. Focus Dashboard Controller
     focusController.renderFocusTab(items.currentTask || '', items.magicTaskState || null);
     projectController.refreshAllProjects();
 
-    // 4. Rules & Blacklist Controller
+    // 5. Rules & Blacklist Controller
     rulesController.setInitialRules({ items });
 
     // Refocus Counter
@@ -115,9 +137,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (domainEl && metrics.domain) domainEl.textContent = metrics.domain;
         if (scrollEl) {
           if (metrics.isShortVideo) {
-            scrollEl.textContent = `🎬 ${metrics.swipeCount || 0} Video (${(metrics.totalScrollPx || 0).toLocaleString()} px)`;
+            scrollEl.textContent = `${metrics.swipeCount || 0} Video (${(metrics.totalScrollPx || 0).toLocaleString()} px)`;
           } else if (metrics.totalScrollPx !== undefined) {
-            scrollEl.textContent = `📜 ${(metrics.totalScrollPx || 0).toLocaleString()} px (pos: ${metrics.scrollY || 0}px)`;
+            scrollEl.textContent = `${(metrics.totalScrollPx || 0).toLocaleString()} px (pos: ${metrics.scrollY || 0}px)`;
           }
         }
       }

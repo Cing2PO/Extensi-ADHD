@@ -1,12 +1,17 @@
 /**
- * Magic To-Do Controller Module - Handles AI Task Breakdown & Checklist Renders
+ * Magic To-Do Controller Module - Orchestrates AI Task Breakdown & Checklist
+ * 
+ * Delegates to:
+ * - pomodoroController.js for timer state & rendering
+ * - magicStepsRenderer.js for checklist DOM rendering
  */
 
 import { fetchMagicTodos } from '../services/apiService.js';
 import { setStorage } from '../services/storageService.js';
 import { getSwalTheme } from '../modules/themeManager.js';
-import { markTodoDoneOnBackend, deleteTodoOnBackend } from '../services/projectService.js';
-import { sendTimerEvent, getConnectionStatus } from '../services/websocketService.js';
+import { sendTimerEvent } from '../services/websocketService.js';
+import { renderMagicSteps } from '../modules/magicStepsRenderer.js';
+import { initPomodoroController } from './pomodoroController.js';
 
 export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
   const magicIdleView = document.getElementById('magic-idle-view');
@@ -30,36 +35,34 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
   const btnResetMagic = document.getElementById('btn-reset-magic');
   const btnNewMagic = document.getElementById('btn-new-magic');
   const btnStartMagicFocus = document.getElementById('btn-start-magic-focus');
-
-  const magicPomodoroPanel = document.getElementById('magic-pomodoro-panel');
-  const magicPomodoroStatus = document.getElementById('magic-pomodoro-status');
-  const magicPomodoroTimer = document.getElementById('magic-pomodoro-timer');
-  const btnPausePomodoro = document.getElementById('btn-pause-pomodoro');
-  const btnResetPomodoro = document.getElementById('btn-reset-pomodoro');
-  const pomodoroWorkInput = document.getElementById('pomodoro-work-input');
-  const pomodoroBreakInput = document.getElementById('pomodoro-break-input');
   const floatingPomodoroToggle = document.getElementById('floating-pomodoro-toggle');
 
   let magicTaskState = null;
-  let pomodoroSession = null;
-  let pomodoroTimerInterval = null;
 
+  // Initialize Pomodoro Controller (delegated)
+  const pomodoro = initPomodoroController({
+    onStartFocusTab,
+    getMagicTaskState: () => magicTaskState,
+    getDurationInput: () => Number(magicDurationInput?.value) || 60
+  });
+
+  // --- ACCORDION TOGGLE ---
   if (btnToggleMagicAccordion) {
     btnToggleMagicAccordion.addEventListener('click', () => {
       if (magicAccordionBody) {
         const isHidden = magicAccordionBody.classList.contains('hidden');
         if (isHidden) {
           magicAccordionBody.classList.remove('hidden');
-          if (accordionArrow) accordionArrow.textContent = '▲';
+          if (accordionArrow) accordionArrow.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>';
         } else {
           magicAccordionBody.classList.add('hidden');
-          if (accordionArrow) accordionArrow.textContent = '▼';
+          if (accordionArrow) accordionArrow.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>';
         }
       }
     });
   }
 
-  // Interactive Duration Chips Synchronizer
+  // --- DURATION CHIPS ---
   const durationChips = document.querySelectorAll('.duration-chip');
   if (durationChips.length && magicDurationInput) {
     durationChips.forEach(chip => {
@@ -85,203 +88,7 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
     });
   }
 
-  function buildPomodoroPlan(totalMinutes) {
-    const plan = [];
-    const workMin = Math.max(1, parseInt(pomodoroWorkInput?.value, 10) || 25);
-    const breakMin = Math.max(1, parseInt(pomodoroBreakInput?.value, 10) || 5);
-    let remaining = Math.max(workMin, Number(totalMinutes) || 60);
-
-    while (remaining > 0) {
-      const workMinutes = Math.min(workMin, remaining);
-      plan.push({ type: 'work', minutes: workMinutes });
-      remaining -= workMinutes;
-
-      if (remaining <= 0) break;
-
-      const breakMinutes = Math.min(breakMin, remaining);
-      if (breakMinutes > 0) {
-        plan.push({ type: 'break', minutes: breakMinutes });
-        remaining -= breakMinutes;
-      }
-    }
-
-    return plan;
-  }
-
-  function formatPomodoroTime(totalSeconds) {
-    const safeSeconds = Math.max(0, Math.floor(totalSeconds));
-    const minutes = String(Math.floor(safeSeconds / 60)).padStart(2, '0');
-    const seconds = String(safeSeconds % 60).padStart(2, '0');
-    return `${minutes}:${seconds}`;
-  }
-
-  function getPomodoroRemainingSeconds(session) {
-    if (!session || !session.isActive) return 0;
-    if (!session.isRunning) {
-      return session.pausedRemainingSeconds != null ? session.pausedRemainingSeconds : 0;
-    }
-    if (!session.targetTimestamp) return 0;
-    return Math.max(0, Math.ceil((session.targetTimestamp - Date.now()) / 1000));
-  }
-
-  function renderPomodoroPanel() {
-    if (!magicPomodoroTimer && !magicPomodoroStatus) return;
-
-    if (!pomodoroSession || !pomodoroSession.isActive) {
-      if (magicPomodoroStatus) magicPomodoroStatus.textContent = 'Belum Dimulai';
-      if (magicPomodoroTimer) magicPomodoroTimer.textContent = '25:00';
-      if (btnPausePomodoro) {
-        btnPausePomodoro.textContent = '⏱️ Mulai Sesi Pomodoro';
-        btnPausePomodoro.style.background = 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)';
-        btnPausePomodoro.style.color = '#ffffff';
-        btnPausePomodoro.style.fontWeight = 'bold';
-      }
-      if (btnResetPomodoro) {
-        btnResetPomodoro.classList.add('hidden');
-      }
-      return;
-    }
-
-    if (btnResetPomodoro) {
-      btnResetPomodoro.classList.remove('hidden');
-    }
-
-    const currentBlock = pomodoroSession.plan?.[pomodoroSession.currentIndex] || null;
-    const phaseLabel = pomodoroSession.phase === 'break' ? 'Istirahat' : 'Kerja';
-    const remSec = getPomodoroRemainingSeconds(pomodoroSession);
-    const timerText = formatPomodoroTime(remSec);
-
-    if (magicPomodoroStatus) {
-      magicPomodoroStatus.textContent = `${phaseLabel} • ${currentBlock?.minutes || 25} menit`;
-    }
-
-    if (magicPomodoroTimer) {
-      magicPomodoroTimer.textContent = timerText;
-    }
-
-    if (btnPausePomodoro) {
-      btnPausePomodoro.textContent = pomodoroSession.isRunning ? 'Pause' : 'Lanjut';
-      btnPausePomodoro.style.background = '';
-      btnPausePomodoro.style.color = '';
-      btnPausePomodoro.style.fontWeight = '';
-    }
-  }
-
-  function savePomodoroSession() {
-    setStorage({ pomodoroSession }).then(() => {
-      renderPomodoroPanel();
-    });
-  }
-
-  function startPomodoroTimer() {
-    if (pomodoroTimerInterval) {
-      clearInterval(pomodoroTimerInterval);
-    }
-
-    pomodoroTimerInterval = setInterval(() => {
-      if (!pomodoroSession || !pomodoroSession.isActive) return;
-
-      const remSec = getPomodoroRemainingSeconds(pomodoroSession);
-      renderPomodoroPanel();
-
-      if (pomodoroSession.isRunning && remSec <= 0) {
-        if (pomodoroSession.currentIndex + 1 < (pomodoroSession.plan || []).length) {
-          pomodoroSession.currentIndex += 1;
-          const nextBlock = pomodoroSession.plan[pomodoroSession.currentIndex];
-          pomodoroSession.phase = nextBlock.type;
-          pomodoroSession.targetTimestamp = Date.now() + (nextBlock.minutes * 60 * 1000);
-          pomodoroSession.pausedRemainingSeconds = null;
-          savePomodoroSession();
-
-          // Emit phase change to WebSocket
-          sendTimerEvent({
-            type: 'timer_phase_change',
-            task: magicTaskState?.steps?.[magicTaskState.currentStepIndex]?.text || 'Sesi Fokus',
-            remainingSeconds: nextBlock.minutes * 60,
-            phase: nextBlock.type
-          });
-        } else {
-          pomodoroSession.isActive = false;
-          pomodoroSession.isRunning = false;
-          pomodoroSession.phase = 'done';
-          pomodoroSession.targetTimestamp = null;
-          pomodoroSession.pausedRemainingSeconds = 0;
-          savePomodoroSession();
-
-          // Emit timer stop to WebSocket
-          sendTimerEvent({ type: 'timer_stop', phase: 'done' });
-
-          if (window.Swal) {
-            window.Swal.fire({
-              title: 'Pomodoro selesai!',
-              text: 'Sesi fokus Anda telah rampung. Istirahatlah sejenak atau mulai lagi.',
-              icon: 'success',
-              timer: 1800,
-              showConfirmButton: false,
-              ...getSwalTheme()
-            });
-          }
-        }
-      }
-    }, 1000);
-  }
-
-  function resetPomodoroSession() {
-    if (pomodoroTimerInterval) {
-      clearInterval(pomodoroTimerInterval);
-      pomodoroTimerInterval = null;
-    }
-    pomodoroSession = null;
-
-    // Emit timer stop to WebSocket
-    sendTimerEvent({ type: 'timer_stop' });
-
-    setStorage({ pomodoroSession: null, currentTask: '' }).then(() => {
-      renderPomodoroPanel();
-      if (onStartFocusTab) onStartFocusTab('');
-    });
-  }
-
-  function startNewPomodoroSession() {
-    const workM = Math.max(1, parseInt(pomodoroWorkInput?.value, 10) || 25);
-    const breakM = Math.max(1, parseInt(pomodoroBreakInput?.value, 10) || 5);
-
-    const plan = [
-      { type: 'work', minutes: workM },
-      { type: 'break', minutes: breakM },
-      { type: 'work', minutes: workM },
-      { type: 'break', minutes: breakM }
-    ];
-
-    const defaultTask = (magicTaskState && magicTaskState.taskName) || 'Sesi Fokus Mandiri';
-
-    pomodoroSession = {
-      isActive: true,
-      isRunning: true,
-      totalMinutes: workM * 2 + breakM * 2,
-      plan,
-      currentIndex: 0,
-      phase: 'work',
-      targetTimestamp: Date.now() + (workM * 60 * 1000),
-      pausedRemainingSeconds: null,
-      showFloatingWidget: floatingPomodoroToggle ? floatingPomodoroToggle.checked : true
-    };
-
-    setStorage({ pomodoroSession, currentTask: defaultTask }).then(() => {
-      renderPomodoroPanel();
-      startPomodoroTimer();
-      if (onStartFocusTab) onStartFocusTab(defaultTask);
-
-      // Emit timer start to WebSocket
-      sendTimerEvent({
-        type: 'timer_start',
-        task: defaultTask,
-        remainingSeconds: workM * 60,
-        phase: 'work'
-      });
-    });
-  }
-
+  // --- STATE UI RENDERING ---
   function renderMagicStateUI() {
     if (magicInputPanel) magicInputPanel.classList.add('hidden');
     if (magicLoadingPanel) magicLoadingPanel.classList.add('hidden');
@@ -292,7 +99,7 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
       if (magicIdleView) magicIdleView.classList.remove('hidden');
       if (magicActiveView) magicActiveView.classList.add('hidden');
       if (magicInputPanel) magicInputPanel.classList.remove('hidden');
-      renderPomodoroPanel();
+      pomodoro.renderPomodoroPanel();
       return;
     }
 
@@ -300,261 +107,128 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
       if (magicIdleView) magicIdleView.classList.remove('hidden');
       if (magicActiveView) magicActiveView.classList.add('hidden');
       if (magicCongratsPanel) magicCongratsPanel.classList.remove('hidden');
-      renderPomodoroPanel();
+      pomodoro.renderPomodoroPanel();
     } else {
       if (magicIdleView) magicIdleView.classList.add('hidden');
       if (magicActiveView) magicActiveView.classList.remove('hidden');
       if (magicResultsPanel) magicResultsPanel.classList.remove('hidden');
-      renderMagicSteps();
-      renderPomodoroPanel();
+      renderSteps();
+      pomodoro.renderPomodoroPanel();
     }
   }
 
-  function autoResizeTextarea(el) {
-    if (!el) return;
-    el.style.height = 'auto';
-    el.style.height = `${Math.max(18, el.scrollHeight)}px`;
+  // --- STEP RENDERING (DELEGATED) ---
+  function renderSteps() {
+    renderMagicSteps({
+      container: magicStepsList,
+      magicTaskState,
+      stepCountLabel: magicStepCountLabel,
+      callbacks: {
+        onTextChanged: (index, newText) => {
+          setStorage({ magicTaskState });
+        },
+        onStepCompleted: handleStepCompleted,
+        onStepUnchecked: handleStepUnchecked,
+        onStepDeleted: handleStepDeleted,
+        onStepFocused: handleStepFocused
+      }
+    });
   }
 
-  function renderMagicSteps() {
-    if (!magicStepsList) return;
-    magicStepsList.innerHTML = '';
-    if (!magicTaskState || !magicTaskState.steps) return;
+  function handleStepCompleted(index, step, nextIndex) {
+    if (nextIndex < magicTaskState.steps.length) {
+      magicTaskState.currentStepIndex = nextIndex;
+      magicTaskState.completed = false;
+      const nextStepText = magicTaskState.steps[nextIndex].text;
+      const nextStepMin = magicTaskState.steps[nextIndex].minutes || 25;
+      const totalMinutes = magicTaskState.totalMinutes || Number(magicDurationInput?.value) || 60;
 
-    const activeIndex = typeof magicTaskState.currentStepIndex === 'number' ? magicTaskState.currentStepIndex : -1;
-
-    magicTaskState.steps.forEach((step, index) => {
-      const li = document.createElement('li');
-      li.className = 'magic-step-item';
-
-      const isCompleted = (activeIndex >= 0 && index < activeIndex) || !!step.isDone || !!step.completed || magicTaskState.completed;
-      const isCurrentActive = (activeIndex >= 0 && activeIndex === index && !magicTaskState.completed && !isCompleted);
-
-      if (isCurrentActive) {
-        li.classList.add('active-focus-step');
-      }
-      if (isCompleted) {
-        li.classList.add('completed-step');
-      }
-
-      // Top Row Container (Checkbox + Textarea + Delete Button)
-      const mainRow = document.createElement('div');
-      mainRow.className = 'magic-step-main';
-
-      // Custom Checkbox
-      const cbWrapper = document.createElement('label');
-      cbWrapper.className = 'magic-custom-checkbox-wrapper';
-      cbWrapper.title = isCompleted ? 'Tandai belum selesai' : 'Tandai selesai';
-
-      const checkbox = document.createElement('input');
-      checkbox.type = 'checkbox';
-      checkbox.className = 'magic-step-checkbox';
-      checkbox.checked = isCompleted;
-
-      const cbCustom = document.createElement('span');
-      cbCustom.className = 'magic-custom-checkbox';
-
-      cbWrapper.appendChild(checkbox);
-      cbWrapper.appendChild(cbCustom);
-
-      // Textarea Container
-      const textWrap = document.createElement('div');
-      textWrap.className = 'magic-step-text-wrap';
-
-      const textarea = document.createElement('textarea');
-      textarea.className = 'magic-step-textarea';
-      textarea.spellcheck = false;
-      textarea.rows = 1;
-      textarea.value = step.text || '';
-      textarea.placeholder = 'Tuliskan butir tugas...';
-
-      textWrap.appendChild(textarea);
-
-      // Delete Button
-      const deleteBtn = document.createElement('button');
-      deleteBtn.type = 'button';
-      deleteBtn.className = 'btn-delete-step';
-      deleteBtn.title = 'Hapus to-do ini';
-      deleteBtn.innerHTML = `
-        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="18" y1="6" x2="6" y2="18"></line>
-          <line x1="6" y1="6" x2="18" y2="18"></line>
-        </svg>
-      `;
-
-      mainRow.appendChild(cbWrapper);
-      mainRow.appendChild(textWrap);
-      mainRow.appendChild(deleteBtn);
-
-      // Bottom Row Container (Time Badge + Focus Trigger)
-      const footerRow = document.createElement('div');
-      footerRow.className = 'magic-step-footer';
-
-      const timeBadge = document.createElement('div');
-      timeBadge.className = 'magic-step-time-badge';
-      timeBadge.title = `Estimasi durasi: ${step.minutes || 10} menit`;
-      timeBadge.innerHTML = `
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="12" cy="12" r="10"></circle>
-          <polyline points="12 6 12 12 16 14"></polyline>
-        </svg>
-        <span>${step.minutes || 10}m</span>
-      `;
-
-      const syncBtn = document.createElement('button');
-      syncBtn.type = 'button';
-      syncBtn.className = 'btn-sync-focus';
-      if (isCurrentActive) {
-        syncBtn.classList.add('is-active');
-        syncBtn.innerHTML = '<span class="focus-pulse-dot"></span> Fokus Aktif';
-        syncBtn.title = 'Sedang fokus pada tugas ini';
-      } else {
-        syncBtn.innerHTML = '🎯 Fokus';
-        syncBtn.title = 'Set sebagai fokus aktif sekarang dan mulai timer';
-      }
-
-      footerRow.appendChild(timeBadge);
-      footerRow.appendChild(syncBtn);
-
-      li.appendChild(mainRow);
-      li.appendChild(footerRow);
-      magicStepsList.appendChild(li);
-
-      // Auto-resize on initial render
-      setTimeout(() => autoResizeTextarea(textarea), 0);
-
-      // Listeners
-      textarea.addEventListener('input', () => {
-        magicTaskState.steps[index].text = textarea.value;
-        autoResizeTextarea(textarea);
-        setStorage({ magicTaskState });
+      const session = pomodoro.createMagicPomodoroSession({
+        totalMinutes,
+        currentIndex: nextIndex,
+        stepMinutes: nextStepMin
       });
 
-      checkbox.addEventListener('change', () => {
-        if (checkbox.checked) {
-          step.completed = true;
-          step.isDone = true;
-          if (step.id) {
-            markTodoDoneOnBackend(step.id);
-          }
-          const nextIndex = index + 1;
-          if (nextIndex < magicTaskState.steps.length) {
-            magicTaskState.currentStepIndex = nextIndex;
-            magicTaskState.completed = false;
-            const nextStepText = magicTaskState.steps[nextIndex].text;
-            const nextStepMin = magicTaskState.steps[nextIndex].minutes || 25;
-
-            const totalMinutes = magicTaskState.totalMinutes || Number(magicDurationInput?.value) || 60;
-            const plan = buildPomodoroPlan(totalMinutes);
-            pomodoroSession = {
-              isActive: true,
-              isRunning: true,
-              totalMinutes,
-              plan,
-              currentIndex: nextIndex < plan.length ? nextIndex : 0,
-              phase: 'work',
-              targetTimestamp: Date.now() + (nextStepMin * 60 * 1000),
-              pausedRemainingSeconds: null,
-              showFloatingWidget: true
-            };
-
-            setStorage({
-              magicTaskState,
-              currentTask: nextStepText,
-              pomodoroSession,
-              showFloatingWidget: true
-            }).then(() => {
-              startPomodoroTimer();
-              if (onStartFocusTab) onStartFocusTab(nextStepText);
-              renderMagicStateUI();
-            });
-          } else {
-            magicTaskState.completed = true;
-            magicTaskState.currentStepIndex = magicTaskState.steps.length;
-            setStorage({
-              magicTaskState,
-              currentTask: '',
-              pomodoroSession: null
-            }).then(() => {
-              renderMagicStateUI();
-            });
-          }
-        } else {
-          step.completed = false;
-          step.isDone = false;
-          magicTaskState.currentStepIndex = index;
-          magicTaskState.completed = false;
-          setStorage({
-            magicTaskState,
-            currentTask: step.text
-          }).then(() => {
-            renderMagicStateUI();
-          });
-        }
+      setStorage({
+        magicTaskState,
+        currentTask: nextStepText,
+        pomodoroSession: session,
+        showFloatingWidget: true
+      }).then(() => {
+        pomodoro.startPomodoroTimer();
+        if (onStartFocusTab) onStartFocusTab(nextStepText);
+        renderMagicStateUI();
       });
-
-      deleteBtn.addEventListener('click', () => {
-        if (step.id) {
-          deleteTodoOnBackend(step.id);
-        }
-        magicTaskState.steps.splice(index, 1);
-        if (magicTaskState.currentStepIndex >= magicTaskState.steps.length) {
-          magicTaskState.currentStepIndex = Math.max(0, magicTaskState.steps.length - 1);
-        }
-        setStorage({ magicTaskState }).then(() => {
-          renderMagicStateUI();
-        });
+    } else {
+      magicTaskState.completed = true;
+      magicTaskState.currentStepIndex = magicTaskState.steps.length;
+      setStorage({
+        magicTaskState,
+        currentTask: '',
+        pomodoroSession: null
+      }).then(() => {
+        renderMagicStateUI();
       });
+    }
+  }
 
-      syncBtn.addEventListener('click', () => {
-        const stepFocusText = step.text;
-        const stepMinutes = step.minutes || 25;
-        magicTaskState.currentStepIndex = index;
-        magicTaskState.completed = false;
+  function handleStepUnchecked(index, step) {
+    magicTaskState.currentStepIndex = index;
+    magicTaskState.completed = false;
+    setStorage({
+      magicTaskState,
+      currentTask: step.text
+    }).then(() => {
+      renderMagicStateUI();
+    });
+  }
 
-        // Selalu set/reset targetTimestamp agar timer Pomodoro berhitung mundur secara real-time
-        const totalMinutes = magicTaskState.totalMinutes || Number(magicDurationInput?.value) || 60;
-        const plan = buildPomodoroPlan(totalMinutes);
-        pomodoroSession = {
-          isActive: true,
-          isRunning: true,
-          totalMinutes,
-          plan,
-          currentIndex: index < plan.length ? index : 0,
-          phase: 'work',
-          targetTimestamp: Date.now() + (stepMinutes * 60 * 1000),
-          pausedRemainingSeconds: null,
-          showFloatingWidget: true
-        };
+  function handleStepDeleted(index, step) {
+    magicTaskState.steps.splice(index, 1);
+    if (magicTaskState.currentStepIndex >= magicTaskState.steps.length) {
+      magicTaskState.currentStepIndex = Math.max(0, magicTaskState.steps.length - 1);
+    }
+    setStorage({ magicTaskState }).then(() => {
+      renderMagicStateUI();
+    });
+  }
 
-        if (floatingPomodoroToggle) {
-          floatingPomodoroToggle.checked = true;
-        }
+  function handleStepFocused(index, step) {
+    const stepFocusText = step.text;
+    const stepMinutes = step.minutes || 25;
+    magicTaskState.currentStepIndex = index;
+    magicTaskState.completed = false;
 
-        setStorage({
-          magicTaskState,
-          currentTask: stepFocusText,
-          pomodoroSession,
-          showFloatingWidget: true
-        }).then(() => {
-          startPomodoroTimer();
-          if (onStartFocusTab) onStartFocusTab(stepFocusText);
-          renderMagicStateUI();
-        });
-      });
+    const totalMinutes = magicTaskState.totalMinutes || Number(magicDurationInput?.value) || 60;
+    const session = pomodoro.createMagicPomodoroSession({
+      totalMinutes,
+      currentIndex: index,
+      stepMinutes
     });
 
-    if (magicStepCountLabel) {
-      magicStepCountLabel.textContent = `${magicTaskState.steps.length} item`;
+    if (floatingPomodoroToggle) {
+      floatingPomodoroToggle.checked = true;
     }
+
+    setStorage({
+      magicTaskState,
+      currentTask: stepFocusText,
+      pomodoroSession: session,
+      showFloatingWidget: true
+    }).then(() => {
+      pomodoro.startPomodoroTimer();
+      if (onStartFocusTab) onStartFocusTab(stepFocusText);
+      renderMagicStateUI();
+    });
   }
 
+  // --- RESET ---
   function resetMagicState() {
     magicTaskState = null;
     if (magicTaskInput) magicTaskInput.value = '';
     if (magicDurationInput) magicDurationInput.value = '60';
     setStorage({ magicTaskState: null, pomodoroSession: null, currentTask: '' }).then(() => {
-      pomodoroSession = null;
+      pomodoro.setSession(null);
       renderMagicStateUI();
     });
   }
@@ -581,12 +255,9 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
         if (magicInputPanel) magicInputPanel.classList.add('hidden');
         if (magicLoadingPanel) magicLoadingPanel.classList.remove('hidden');
 
-        const workMin = parseInt(pomodoroWorkInput?.value, 10) || 25;
-        const breakMin = parseInt(pomodoroBreakInput?.value, 10) || 5;
-
         const generatedSteps = await fetchMagicTodos(taskText, totalMinutes, {
-          workMinutes: workMin,
-          breakMinutes: breakMin
+          workMinutes: pomodoro.getWorkMinutes(),
+          breakMinutes: pomodoro.getBreakMinutes()
         });
 
         magicTaskState = {
@@ -647,18 +318,11 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
       const stepMin = magicTaskState.steps[activeIdx]?.minutes || 25;
       const totalMinutes = magicTaskState.totalMinutes || Number(magicDurationInput?.value) || 60;
 
-      const plan = buildPomodoroPlan(totalMinutes);
-      pomodoroSession = {
-        isActive: true,
-        isRunning: true,
+      const session = pomodoro.createMagicPomodoroSession({
         totalMinutes,
-        plan,
-        currentIndex: activeIdx < plan.length ? activeIdx : 0,
-        phase: 'work',
-        targetTimestamp: Date.now() + (stepMin * 60 * 1000),
-        pausedRemainingSeconds: null,
-        showFloatingWidget: true
-      };
+        currentIndex: activeIdx,
+        stepMinutes: stepMin
+      });
 
       if (floatingPomodoroToggle) {
         floatingPomodoroToggle.checked = true;
@@ -667,10 +331,10 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
       setStorage({
         magicTaskState,
         currentTask: firstTaskText,
-        pomodoroSession: pomodoroSession,
+        pomodoroSession: session,
         showFloatingWidget: true
       }).then(() => {
-        startPomodoroTimer();
+        pomodoro.startPomodoroTimer();
         if (onStartFocusTab) onStartFocusTab(firstTaskText);
         renderMagicStateUI();
 
@@ -684,7 +348,7 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
 
         if (window.Swal) {
           window.Swal.fire({
-            title: 'Fokus Dimulai! 🚀',
+            title: 'Fokus Dimulai!',
             text: `Target: "${firstTaskText}". Floating Timer sekarang aktif di halaman web Anda!`,
             icon: 'success',
             timer: 1800,
@@ -728,52 +392,8 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
 
   if (btnNewMagic) {
     btnNewMagic.addEventListener('click', () => {
-      resetPomodoroSession();
+      pomodoro.resetPomodoroSession();
       resetMagicState();
-    });
-  }
-
-  if (btnPausePomodoro) {
-    btnPausePomodoro.addEventListener('click', () => {
-      if (!pomodoroSession || !pomodoroSession.isActive) {
-        startNewPomodoroSession();
-        return;
-      }
-      if (pomodoroSession.isRunning) {
-        const remSec = getPomodoroRemainingSeconds(pomodoroSession);
-        pomodoroSession.isRunning = false;
-        pomodoroSession.pausedRemainingSeconds = remSec;
-        pomodoroSession.targetTimestamp = null;
-
-        // Emit timer pause to WebSocket
-        sendTimerEvent({
-          type: 'timer_pause',
-          task: magicTaskState?.steps?.[magicTaskState?.currentStepIndex]?.text || 'Sesi Fokus',
-          remainingSeconds: remSec,
-          phase: pomodoroSession.phase
-        });
-      } else {
-        const remSec = pomodoroSession.pausedRemainingSeconds != null ? pomodoroSession.pausedRemainingSeconds : ((pomodoroSession.plan?.[pomodoroSession.currentIndex]?.minutes || 25) * 60);
-        pomodoroSession.isRunning = true;
-        pomodoroSession.targetTimestamp = Date.now() + (remSec * 1000);
-        pomodoroSession.pausedRemainingSeconds = null;
-
-        // Emit timer resume (start) to WebSocket
-        sendTimerEvent({
-          type: 'timer_start',
-          task: magicTaskState?.steps?.[magicTaskState?.currentStepIndex]?.text || 'Sesi Fokus',
-          remainingSeconds: remSec,
-          phase: pomodoroSession.phase
-        });
-      }
-      savePomodoroSession();
-      startPomodoroTimer();
-    });
-  }
-
-  if (btnResetPomodoro) {
-    btnResetPomodoro.addEventListener('click', () => {
-      resetPomodoroSession();
     });
   }
 
@@ -790,7 +410,7 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
   function openCreateAccordion() {
     if (magicAccordionBody) {
       magicAccordionBody.classList.remove('hidden');
-      if (accordionArrow) accordionArrow.textContent = '▲';
+      if (accordionArrow) accordionArrow.innerHTML = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="18 15 12 9 6 15"/></svg>';
     }
     if (magicTaskInput) {
       setTimeout(() => magicTaskInput.focus(), 100);
@@ -799,15 +419,15 @@ export function initMagicTodoController({ onStartFocusTab, onRequestAuth }) {
 
   function setInitialStates({ magicState, pomoSession }) {
     magicTaskState = magicState;
-    pomodoroSession = pomoSession;
+    pomodoro.setSession(pomoSession);
     renderMagicStateUI();
-    startPomodoroTimer();
+    pomodoro.startPomodoroTimer();
   }
 
   return {
     setInitialStates,
     renderMagicStateUI,
-    startNewPomodoroSession,
+    startNewPomodoroSession: pomodoro.startNewPomodoroSession,
     openCreateAccordion
   };
 }

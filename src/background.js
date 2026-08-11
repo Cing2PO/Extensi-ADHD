@@ -7,9 +7,11 @@
 
 import { ENV_CONFIG } from './config.js';
 
-console.log("[Background Service Worker] Initializing...");
-
-const SOCKET_SERVER_WS = "wss://extensi-adhd-websocket.onrender.com/socket.io/?EIO=4&transport=websocket";
+function getSocketServerWsUrl() {
+  const baseUrl = ENV_CONFIG.SOCKET_IO_URL || 'https://extensi-adhd-websocket.onrender.com';
+  const wsBase = baseUrl.replace(/^http:\/\//i, 'ws://').replace(/^https:\/\//i, 'wss://').replace(/\/+$/, '');
+  return `${wsBase}/socket.io/?EIO=4&transport=websocket`;
+}
 
 let ws = null;
 let currentRoomId = null;
@@ -48,10 +50,11 @@ function connectBackgroundWebSocket() {
     currentRoomId = cleanRoomId;
     disconnectBackgroundWebSocket();
 
-    console.log(`[Background SW] Connecting Native WebSocket: ${SOCKET_SERVER_WS} (Room: ${cleanRoomId})`);
+    const socketServerWs = getSocketServerWsUrl();
+    console.log(`[Background SW] Connecting Native WebSocket: ${socketServerWs} (Room: ${cleanRoomId})`);
 
     try {
-      ws = new WebSocket(SOCKET_SERVER_WS);
+      ws = new WebSocket(socketServerWs);
 
       ws.onopen = () => {
         console.log('[Background SW] WebSocket Connected to Socket.IO server.');

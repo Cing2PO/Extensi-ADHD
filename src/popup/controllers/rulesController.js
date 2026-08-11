@@ -1,5 +1,9 @@
 /**
- * Rules Controller Module - Handles Blacklist Domain CRUD, Active Site Detection & Sensitivity Slider
+ * Rules Controller Module - Handles Guard Shield, Blacklist Domain CRUD,
+ * Active Site Detection & Sensitivity Slider
+ * 
+ * Settings modal, Pomodoro config, and floating toggle have been extracted
+ * to settingsController.js for single-responsibility separation.
  */
 
 import { setStorage, SENSITIVITY_STEPS, SENSITIVITY_VALUES, DEFAULT_BLACKLIST } from '../services/storageService.js';
@@ -11,10 +15,6 @@ export function initRulesController({ onStartPomodoro }) {
   const sensitivitySlider = document.getElementById('sensitivity-slider');
   const sliderValLabel = document.getElementById('slider-val-label');
 
-  const btnSettingsGear = document.getElementById('btn-settings-gear');
-  const settingsModal = document.getElementById('settings-modal');
-  const btnCloseSettingsModal = document.getElementById('btn-close-settings-modal');
-
   const activeSiteLabel = document.getElementById('active-site-label');
   const activeHostDisplay = document.getElementById('active-host');
   const btnQuickToggle = document.getElementById('btn-quick-toggle');
@@ -22,10 +22,6 @@ export function initRulesController({ onStartPomodoro }) {
   const addForm = document.getElementById('add-form');
   const manualDomainInput = document.getElementById('manual-domain-input');
   const blacklistScrollArea = document.getElementById('blacklist-scroll-area');
-
-  const pomodoroWorkInput = document.getElementById('pomodoro-work-input');
-  const pomodoroBreakInput = document.getElementById('pomodoro-break-input');
-  const floatingPomodoroToggle = document.getElementById('floating-pomodoro-toggle');
 
   const btnStartQuickPomodoro = document.getElementById('btn-start-quick-pomodoro');
   const btnStartPomodoroRules = document.getElementById('btn-start-pomodoro-rules');
@@ -43,7 +39,7 @@ export function initRulesController({ onStartPomodoro }) {
     }, { passive: false });
   }
 
-  // --- Auto-Sync Listeners ---
+  // --- Guard Shield Toggle ---
   if (protectionToggle) {
     protectionToggle.addEventListener('change', () => {
       setStorage({ isProtectionActive: protectionToggle.checked });
@@ -58,46 +54,7 @@ export function initRulesController({ onStartPomodoro }) {
     });
   }
 
-  function openSettingsModal() {
-    if (settingsModal) settingsModal.classList.remove('hidden');
-    document.body.classList.add('modal-open');
-  }
-
-  function closeSettingsModal() {
-    if (settingsModal) settingsModal.classList.add('hidden');
-    document.body.classList.remove('modal-open');
-  }
-
-  if (btnSettingsGear) {
-    btnSettingsGear.addEventListener('click', openSettingsModal);
-  }
-
-  if (btnCloseSettingsModal) {
-    btnCloseSettingsModal.addEventListener('click', closeSettingsModal);
-  }
-
-  if (floatingPomodoroToggle) {
-    floatingPomodoroToggle.addEventListener('change', () => {
-      setStorage({ showFloatingWidget: floatingPomodoroToggle.checked });
-    });
-  }
-
-  if (pomodoroWorkInput) {
-    pomodoroWorkInput.addEventListener('change', () => {
-      const val = Math.max(1, Math.min(90, parseInt(pomodoroWorkInput.value, 10) || 25));
-      pomodoroWorkInput.value = val;
-      setStorage({ pomodoroWorkMinutes: val });
-    });
-  }
-
-  if (pomodoroBreakInput) {
-    pomodoroBreakInput.addEventListener('change', () => {
-      const val = Math.max(1, Math.min(30, parseInt(pomodoroBreakInput.value, 10) || 5));
-      pomodoroBreakInput.value = val;
-      setStorage({ pomodoroBreakMinutes: val });
-    });
-  }
-
+  // --- Sensitivity Slider ---
   if (sensitivitySlider) {
     sensitivitySlider.addEventListener('input', () => {
       const step = parseInt(sensitivitySlider.value, 10);
@@ -213,7 +170,7 @@ export function initRulesController({ onStartPomodoro }) {
     }
 
     if (blacklist.length === 0) {
-      blacklistScrollArea.innerHTML = '<div style="font-size: 10px; color:#64748b; text-align:center; padding:12px 0; width: 100%;">Belum ada domain blacklist.</div>';
+      blacklistScrollArea.innerHTML = '<div style="font-size: 10px; color:var(--text-muted); text-align:center; padding:12px 0; width: 100%;">Belum ada domain blacklist.</div>';
       return;
     }
 
@@ -232,7 +189,7 @@ export function initRulesController({ onStartPomodoro }) {
         itemEl.className = `blacklist-item-compact ${itemObj.enabled ? 'is-blocked' : 'disabled'}`;
 
         itemEl.innerHTML = `
-          <svg style="width: 12px; height: 12px; color: ${itemObj.enabled ? '#2dd4bf' : '#64748b'}; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <svg style="width: 12px; height: 12px; color: ${itemObj.enabled ? 'var(--primary)' : 'var(--text-muted)'}; flex-shrink: 0;" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
              <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
              <path stroke-linecap="round" stroke-linejoin="round" d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
              <path stroke-linecap="round" stroke-linejoin="round" d="M3 12h18" />
@@ -312,6 +269,7 @@ export function initRulesController({ onStartPomodoro }) {
     }
   }
 
+  // --- Add Domain Form ---
   if (addForm) {
     addForm.addEventListener('submit', (e) => {
       e.preventDefault();
@@ -358,6 +316,7 @@ export function initRulesController({ onStartPomodoro }) {
     });
   }
 
+  // --- Pomodoro Quick Start Buttons ---
   if (btnStartQuickPomodoro && onStartPomodoro) {
     btnStartQuickPomodoro.addEventListener('click', onStartPomodoro);
   }
@@ -378,6 +337,7 @@ export function initRulesController({ onStartPomodoro }) {
     });
   }
 
+  // --- Initial State Hydration ---
   function setInitialRules({ items }) {
     if (protectionToggle) {
       protectionToggle.checked = items.isProtectionActive !== false;
@@ -401,10 +361,6 @@ export function initRulesController({ onStartPomodoro }) {
       blacklist = DEFAULT_BLACKLIST;
       setStorage({ blacklist: DEFAULT_BLACKLIST });
     }
-
-    if (pomodoroWorkInput) pomodoroWorkInput.value = items.pomodoroWorkMinutes || 25;
-    if (pomodoroBreakInput) pomodoroBreakInput.value = items.pomodoroBreakMinutes || 5;
-    if (floatingPomodoroToggle) floatingPomodoroToggle.checked = items.showFloatingWidget !== false;
 
     renderBlacklistArea();
     detectActiveTabDomain();

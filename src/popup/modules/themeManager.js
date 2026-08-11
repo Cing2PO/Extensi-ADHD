@@ -3,6 +3,7 @@
  */
 
 import { setStorage } from '../services/storageService.js';
+import { THEME_COLORS } from '../../shared/colors.js';
 
 export function initThemeManager(savedTheme = 'dark') {
   const themeToggle = document.getElementById('theme-toggle');
@@ -23,6 +24,7 @@ export function initThemeManager(savedTheme = 'dark') {
   });
 
   function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
     if (theme === 'light') {
       document.body.classList.add('light-theme');
       if (sunIcon) sunIcon.classList.add('hidden');
@@ -38,11 +40,12 @@ export function initThemeManager(savedTheme = 'dark') {
 }
 
 export function getSwalTheme() {
-  const isLight = document.body.classList.contains('light-theme');
+  const isLight = document.documentElement.getAttribute('data-theme') === 'light' || document.body.classList.contains('light-theme');
+  const palette = isLight ? THEME_COLORS.light : THEME_COLORS.dark;
   return {
-    background: isLight ? '#ffffff' : '#1e293b',
-    color: isLight ? '#0f172a' : '#f8fafc',
-    confirmButtonColor: '#0d9488',
-    cancelButtonColor: '#ef4444'
+    background: palette.background,
+    color: palette.text,
+    confirmButtonColor: palette.primary,
+    cancelButtonColor: palette.cancel
   };
 }

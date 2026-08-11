@@ -4,7 +4,8 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ADHD Focus Coach</title>
+  <title>Flow Tether : Sistem Pembantu Produktivitas Penyandang ADHD</title>
+  <link href="colors.css" rel="stylesheet">
   <link href="popup.css" rel="stylesheet">
 </head>
 
@@ -12,11 +13,8 @@
   <!-- Header Bar: Brand, Sync Pill, Auth Button, Theme & Settings -->
   <header>
     <div class="brand">
-      <svg class="brand-logo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path stroke-linecap="round" stroke-linejoin="round"
-          d="M9 12.75 11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 0 1-1.043 3.296 3.745 3.745 0 0 1-3.296 1.043A3.745 3.745 0 0 1 12 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 0 1-3.296-1.043 3.745 3.745 0 0 1-1.043-3.296A3.745 3.745 0 0 1 3 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 0 1 1.043-3.296 3.746 3.746 0 0 1 3.296-1.043A3.746 3.746 0 0 1 12 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 0 1 3.296 1.043 3.746 3.746 0 0 1 1.043 3.296A3.745 3.745 0 0 1 21 12Z" />
-      </svg>
-      <span class="brand-title">Focus Coach</span>
+      <img src="icons/icon48.png" alt="Flow Tether Logo" class="brand-logo-img">
+      <span class="brand-title">Flow Tether</span>
     </div>
 
     <!-- Right Header Actions (Sync Pill, Auth, Theme, Settings) -->
@@ -60,56 +58,56 @@
           <!-- Quick Pomodoro Small Card -->
           <div class="card matrix-card card-pomodoro">
             <div class="matrix-card-header">
-              <span class="matrix-title">⏱️ Pomodoro</span>
+              <span class="matrix-title"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Pomodoro</span>
               <span class="matrix-badge">25m</span>
             </div>
-            <button id="btn-start-quick-pomodoro" class="btn-matrix-action">▶️ Mulai Sesi</button>
+            <button id="btn-start-quick-pomodoro" class="btn-matrix-action"><svg class="ui-icon" viewBox="0 0 24 24" fill="currentColor" style="width:10px;height:10px;display:inline-block;vertical-align:middle;margin-right:2px;"><polygon points="6 3 20 12 6 21 6 3"/></svg> Mulai Sesi</button>
           </div>
 
           <!-- Quick Sync Small Card -->
           <div class="card matrix-card card-sync">
             <div class="matrix-card-header">
-              <span class="matrix-title">📱 Sync HP</span>
+              <span class="matrix-title"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg> Sync HP</span>
               <span class="matrix-badge sync-pill">Pairing</span>
             </div>
-            <button id="btn-dashboard-sync" class="btn-matrix-action btn-sync-action">🔗 Buka QR</button>
+            <button id="btn-dashboard-sync" class="btn-matrix-action btn-sync-action"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Buka QR</button>
           </div>
         </div>
 
         <!-- 2. Row 2: Shortcut Magic To-Do (Banner Card) -->
         <div class="card magic-banner-card">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 3px;">
-            <span class="card-label" style="color: #c4b5fd; display: flex; align-items: center; gap: 5px; font-size: 11px;">
-              🪄 Pecah Tugas Baru (AI)
+            <span class="card-label" class="magic-card-title">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg> Pecah Tugas Baru (AI)
             </span>
-            <span style="font-size: 8px; color: #a78bfa; font-weight: 700; background: rgba(167, 139, 250, 0.15); padding: 1.5px 5px; border-radius: 4px;">Magic To-Do</span>
+            <span class="magic-pill-badge">Magic To-Do</span>
           </div>
-          <p style="font-size: 8.5px; color: #94a3b8; margin-bottom: 6px; line-height: 1.2;">Ubah beban tugas raksasa jadi milestone mikro.</p>
-          <button id="btn-dashboard-create-magic" class="btn-add" style="width: 100%; height: 26px; font-size: 9.5px; font-weight: 700; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: #ffffff; border-radius: 7px;">🪄 Buat To-Do List Baru</button>
+          <p class="magic-banner-desc">Ubah beban tugas raksasa jadi milestone mikro.</p>
+          <button id="btn-dashboard-create-magic" class="btn-add" class="btn-matrix-action" style="width: 100%; height: 26px; font-size: 9.5px; border-radius: 7px;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg> Buat To-Do List Baru</button>
         </div>
 
         <!-- 3. Row 3: Shortcut Blocker / Guard Card -->
-        <div class="card guard-summary-card" style="padding: 8px 10px; background: rgba(20, 184, 166, 0.08); border: 1px solid rgba(45, 212, 191, 0.25); border-radius: 10px;">
+        <div class="card guard-summary-card" class="card guard-summary-card">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-weight: 700; font-size: 10.5px; color: #2dd4bf; display: flex; align-items: center; gap: 5px;">
-              <span style="width: 5px; height: 5px; border-radius: 50%; background: #2dd4bf; display: inline-block; box-shadow: 0 0 6px #2dd4bf;"></span>
-              🛡️ Anti-Doomscroll Guard
+            <span class="guard-title">
+              <span class="status-dot-active"></span>
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Anti-Doomscroll Guard
             </span>
             <button id="btn-go-to-guard-tab" class="btn-auth-chip" style="font-size: 8.5px; padding: 2.5px 8px;">Kelola ➔</button>
           </div>
-          <div style="display: flex; justify-content: space-between; color: #cbd5e1; margin-top: 4px; font-size: 9px;">
-            <span style="color: #94a3b8;">Situs Aktif:</span>
-            <span id="debug-active-domain" style="font-weight: 700; color: #f1f5f9; max-width: 150px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">Mencari...</span>
+          <div class="guard-site-row">
+            <span class="text-muted-label">Situs Aktif:</span>
+            <span id="debug-active-domain" class="guard-site-val">Mencari...</span>
           </div>
         </div>
 
         <!-- 4. Row 4: Saved Projects Preview Card -->
         <div class="card" id="focus-projects-preview-card" style="padding: 8px 10px; border-radius: 10px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span class="card-label" style="color: #cbd5e1; display: flex; align-items: center; gap: 4px; font-size: 11px;">
-              📁 Proyek Aktif Saya
+            <span class="card-label" style="color: var(--text-secondary); display: flex; align-items: center; gap: 4px; font-size: 11px;">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg> Proyek Aktif Saya
             </span>
-            <button id="btn-go-to-magic-link" style="background: none; border: none; font-size: 9px; color: #818cf8; cursor: pointer; font-weight: 700;">+ Buat Baru</button>
+            <button id="btn-go-to-magic-link" class="link-action" style="background: none; border: none; font-size: 9px; cursor: pointer; font-weight: 700; color: var(--primary);">+ Buat Baru</button>
           </div>
           <div id="focus-project-cards-list" class="project-cards-list">
             <!-- Populated programmatically -->
@@ -119,21 +117,21 @@
 
       <!-- ACTIVE FOCUS MODE -->
       <div id="focus-active-view" class="hidden">
-        <div class="card" style="padding: 14px; text-align: center; background: rgba(15, 23, 42, 0.7); border: 1px solid rgba(129, 140, 248, 0.3);">
-          <span class="card-label" style="font-size: 11px; color: #a78bfa; letter-spacing: 0.5px;">🟢 SESI FOKUS AKTIF</span>
-          <div id="magic-pomodoro-timer" style="margin-top: 6px; font-size: 38px; font-weight: 800; color: #f8fafc; letter-spacing: -1px; font-variant-numeric: tabular-nums;">25:00</div>
-          <span id="magic-pomodoro-status" style="font-size: 10.5px; color: #34d399; font-weight: 600; display: inline-block; margin-top: 2px; background: rgba(16, 185, 129, 0.15); padding: 2px 8px; border-radius: 8px;">Kerja • 25 menit</span>
+        <div class="card" style="padding: 14px; text-align: center; background: var(--card-bg); border: 1px solid var(--card-border);">
+          <span class="card-label" style="font-size: 11px; color: var(--primary); letter-spacing: 0.5px;"><span class="status-dot-active" style="display:inline-block;margin-right:4px;"></span>SESI FOKUS AKTIF</span>
+          <div id="magic-pomodoro-timer" style="margin-top: 6px; font-size: 38px; font-weight: 800; color: var(--text-primary); letter-spacing: -1px; font-variant-numeric: tabular-nums;">25:00</div>
+          <span id="magic-pomodoro-status" style="font-size: 10.5px; color: var(--font-on-primary); font-weight: 700; display: inline-block; margin-top: 2px; background: var(--primary); padding: 2px 8px; border-radius: 8px;">Kerja • 25 menit</span>
 
-          <div style="margin-top: 12px; padding: 10px; background: rgba(15, 23, 42, 0.85); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; text-align: left;">
-            <span style="font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.6px; color: #64748b; font-weight: 700;">Task Aktif Saat Ini</span>
-            <div id="focus-task-display" style="font-size: 11.5px; font-weight: 700; color: #f8fafc; margin-top: 3px;">Sesi Fokus Mandiri</div>
+          <div style="margin-top: 12px; padding: 10px; background: var(--input-bg); border: 1px solid var(--card-border); border-radius: 12px; text-align: left;">
+            <span style="font-size: 8.5px; text-transform: uppercase; letter-spacing: 0.6px; color: var(--text-muted); font-weight: 700;">Task Aktif Saat Ini</span>
+            <div id="focus-task-display" style="font-size: 11.5px; font-weight: 700; color: var(--text-primary); margin-top: 3px;">Sesi Fokus Mandiri</div>
           </div>
 
           <div style="display: flex; gap: 8px; margin-top: 12px;">
             <button id="btn-pause-pomodoro" class="btn-add" style="flex: 1; height: 32px; font-size: 11px;">Pause</button>
             <button id="btn-reset-pomodoro" class="btn-quick-toggle is-restricted" style="flex: 1; height: 32px; font-size: 11px;">Stop</button>
           </div>
-          <button id="btn-dashboard-complete" class="btn-add" style="margin-top: 6px; width: 100%; height: 32px; font-size: 11px; background: linear-gradient(135deg, #10b981 0%, #059669 100%);">✓ Selesai Task Ini</button>
+          <button id="btn-dashboard-complete" class="btn-add" style="margin-top: 6px; width: 100%; height: 32px; font-size: 11px; background: var(--primary); color: #000000; font-weight: 800;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><polyline points="20 6 9 17 4 12"/></svg> Selesai Task Ini</button>
         </div>
       </div>
     </section>
@@ -146,9 +144,11 @@
         <div class="card accordion-card" id="magic-accordion-card">
           <div class="accordion-header" id="btn-toggle-magic-accordion" style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
             <span class="card-label" style="display: flex; align-items: center; gap: 6px; font-size: 11.5px;">
-              🪄 Pecah Tugas Baru dengan AI
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg> Pecah Tugas Baru dengan AI
             </span>
-            <span id="accordion-arrow" style="font-size: 11px; color: #94a3b8;">▼</span>
+            <span id="accordion-arrow" style="display:flex;align-items:center;color:var(--text-muted);">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+            </span>
           </div>
           <div class="accordion-body hidden" id="magic-accordion-body" style="margin-top: 8px;">
             <div class="task-input-container" style="display: flex; flex-direction: column; gap: 8px;">
@@ -156,7 +156,7 @@
               
               <!-- Integrated Duration Row: Manual Input on Left + Horizontal Scrollable Chips on Right -->
               <div class="duration-row-container">
-                <label style="font-size: 9.5px; color: #94a3b8; font-weight: 700; margin-bottom: 3px; display: block;">Durasi Kerja Total</label>
+                <label style="font-size: 9.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 3px; display: block;">Durasi Kerja Total</label>
                 <div style="display: flex; align-items: center; gap: 6px;">
                   <div class="duration-manual-wrapper">
                     <input type="number" id="magic-duration-input" class="task-input duration-input-box" min="5" step="5" value="60">
@@ -172,7 +172,7 @@
                 </div>
               </div>
 
-              <button id="btn-negotiate" class="btn-add" style="margin-top: 2px; width: 100%; height: 32px; font-weight: 700;">🪄 Pecah Tugas dengan AI</button>
+              <button id="btn-negotiate" class="btn-add" style="margin-top: 2px; width: 100%; height: 32px; font-weight: 700;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg> Pecah Tugas dengan AI</button>
             </div>
           </div>
         </div>
@@ -180,10 +180,10 @@
         <!-- Saved Projects Library Container -->
         <div class="card" id="project-preview-container" style="margin-top: 6px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span class="card-label" style="color: #cbd5e1; display: flex; align-items: center; gap: 4px; font-size: 11px;">
-              📁 Perpustakaan Proyek (Database)
+            <span class="card-label" style="color: var(--text-secondary); display: flex; align-items: center; gap: 4px; font-size: 11px;">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"/></svg> Perpustakaan Proyek (Database)
             </span>
-            <span style="font-size: 9px; color: #94a3b8;">Klik untuk melanjutkan</span>
+            <span style="font-size: 9px; color: var(--text-muted);">Klik untuk melanjutkan</span>
           </div>
           <div id="project-cards-list" class="project-cards-list">
             <!-- Populated programmatically -->
@@ -193,10 +193,10 @@
         <!-- Completed Projects Container -->
         <div class="card" id="completed-projects-container" style="margin-top: 6px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span class="card-label" style="color: #10b981; display: flex; align-items: center; gap: 4px; font-size: 11px;">
-              ✅ Proyek Selesai
+            <span class="card-label" style="color: var(--primary); display: flex; align-items: center; gap: 4px; font-size: 11px;">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><polyline points="20 6 9 17 4 12"/></svg> Proyek Selesai
             </span>
-            <span id="completed-projects-count" style="font-size: 9px; color: #94a3b8; font-weight: 600;">0 selesai</span>
+            <span id="completed-projects-count" style="font-size: 9px; color: var(--text-muted); font-weight: 600;">0 selesai</span>
           </div>
           <div id="completed-projects-list" class="completed-projects-list">
             <!-- Populated programmatically -->
@@ -209,7 +209,7 @@
         <div class="magic-loading">
           <div class="magic-spinner"></div>
           <span class="card-label" style="animation: subtle-pulse 2s infinite ease-in-out;">Menegosiasikan dengan Gemini AI...</span>
-          <span style="font-size: 10.5px; color: #64748b;">Memecah beban tugas raksasa...</span>
+          <span style="font-size: 10.5px; color: var(--text-muted);">Memecah beban tugas raksasa...</span>
         </div>
       </div>
 
@@ -218,24 +218,24 @@
         <div class="card" id="magic-results-panel">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
             <span class="card-label" style="font-size: 11.5px;">Checklist Mikro-Tugas</span>
-            <span id="magic-step-count-label" style="font-size: 9.5px; font-weight: 700; color: #a78bfa; background: rgba(167, 139, 250, 0.15); padding: 2px 6px; border-radius: 6px;">0 item</span>
+            <span id="magic-step-count-label" style="font-size: 9.5px; font-weight: 700; color: var(--primary); background: rgba(167, 139, 250, 0.15); padding: 2px 6px; border-radius: 6px;">0 item</span>
           </div>
           <div class="magic-steps-list" id="magic-steps-list">
             <!-- Populated by JavaScript -->
           </div>
           <div style="display: flex; gap: 6px; margin-top: 8px;">
             <button id="btn-add-magic-item" class="btn-secondary" style="flex: 1; height: 28px; font-size: 10.5px;">+ Tambah Item</button>
-            <button id="btn-reset-magic" class="btn-secondary" style="flex: 1; height: 28px; font-size: 10.5px; color: #f87171; border-color: rgba(248, 113, 113, 0.25);">Tutup Task</button>
+            <button id="btn-reset-magic" class="btn-secondary" style="flex: 1; height: 28px; font-size: 10.5px; color: var(--cancel); border-color: rgba(248, 113, 113, 0.25);">Tutup Task</button>
           </div>
-          <button id="btn-start-magic-focus" class="btn-add" style="margin-top: 8px; width: 100%; height: 34px; font-size: 11px; font-weight: 700; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff;">🚀 Mulai Sesi Fokus Sekarang</button>
+          <button id="btn-start-magic-focus" class="btn-add" style="margin-top: 8px; width: 100%; height: 34px; font-size: 11px; font-weight: 700; background: var(--primary); color: #000000; font-weight: 800;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;display:inline-block;vertical-align:middle;margin-right:4px;"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg> Mulai Sesi Fokus Sekarang</button>
         </div>
       </div>
 
       <!-- Congratulations Banner -->
       <div class="congrats-card hidden" id="magic-congrats-panel">
-        <span style="font-size: 22px;">🎉</span>
-        <span class="card-label" style="color: #10b981; font-size: 12.5px;">Seluruh Todo Selesai!</span>
-        <span style="font-size: 10.5px; color: #94a3b8; line-height: 1.4;">Anda berhasil menyelesaikan seluruh milestone mikro!</span>
+        <div style="display:flex;justify-content:center;margin-bottom:6px;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2" style="width:28px;height:28px;"><circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/></svg></div>
+        <span class="card-label" style="color: var(--primary); font-size: 12.5px;">Seluruh Todo Selesai!</span>
+        <span style="font-size: 10.5px; color: var(--text-muted); line-height: 1.4;">Anda berhasil menyelesaikan seluruh milestone mikro!</span>
         <button id="btn-new-magic" class="btn-add" style="margin-top: 6px; width: 100%; height: 30px;">Mulai Tugas Baru</button>
       </div>
     </section>
@@ -245,10 +245,10 @@
       <!-- Master Shield Switch -->
       <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px;">
         <div>
-          <span class="card-label" style="color: #2dd4bf; display: flex; align-items: center; gap: 6px; font-size: 11.5px;">
-            🛡️ Anti-Doomscroll Shield
+          <span class="card-label" style="color: var(--primary); display: flex; align-items: center; gap: 6px; font-size: 11.5px;">
+            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Anti-Doomscroll Shield
           </span>
-          <span style="font-size: 9.5px; color: #94a3b8; display: block; margin-top: 2px;">Proteksi otomatis dari distraksi scroll</span>
+          <span style="font-size: 9.5px; color: var(--text-muted); display: block; margin-top: 2px;">Proteksi otomatis dari distraksi scroll</span>
         </div>
         <label class="switch">
           <input type="checkbox" id="guard-master-toggle" checked>
@@ -259,7 +259,7 @@
       <!-- Sensitivity Pills -->
       <div class="card slider-group" style="margin-top: 6px;">
         <div class="slider-header">
-          <span class="card-label" style="color: #cbd5e1; font-size: 11px;">Sensitivitas Deteksi</span>
+          <span class="card-label" style="color: var(--text-secondary); font-size: 11px;">Sensitivitas Deteksi</span>
           <span id="slider-val-label" class="slider-value">Balanced</span>
         </div>
         <input type="range" id="sensitivity-slider" min="1" max="3" value="2" step="1">
@@ -273,8 +273,8 @@
       <!-- Blacklist URL Manager (Horizontal 3-Row Preview) -->
       <div class="card" style="margin-top: 6px; padding: 10px;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-          <span class="card-label" style="color: #cbd5e1; font-size: 11px;">Domain Terlarang (Blacklist)</span>
-          <span id="blacklist-count-badge" style="font-size: 9px; font-weight: 700; color: #2dd4bf; background: rgba(45, 212, 191, 0.15); padding: 1px 6px; border-radius: 6px;">0 Aktif</span>
+          <span class="card-label" style="color: var(--text-secondary); font-size: 11px;">Domain Terlarang (Blacklist)</span>
+          <span id="blacklist-count-badge" style="font-size: 9px; font-weight: 700; color: var(--primary); background: rgba(45, 212, 191, 0.15); padding: 1px 6px; border-radius: 6px;">0 Aktif</span>
         </div>
         <form id="add-form" class="add-row" style="margin-bottom: 6px;">
           <input type="text" id="manual-domain-input" placeholder="Contoh: youtube.com" required autocomplete="off">
@@ -317,8 +317,8 @@
   <div id="sync-modal" class="modal-overlay hidden">
     <div class="modal-content auth-modal-card">
       <div class="modal-header">
-        <span class="card-label" style="font-size: 13px; color: #2dd4bf; display: flex; align-items: center; gap: 6px;">
-          📱 Sinkronisasi & Pairing HP
+        <span class="card-label" style="font-size: 13px; color: var(--primary); display: flex; align-items: center; gap: 6px;">
+          <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;display:inline-block;vertical-align:middle;margin-right:4px;"><rect width="14" height="20" x="5" y="2" rx="2" ry="2"/><path d="M12 18h.01"/></svg> Sinkronisasi & Pairing HP
         </span>
         <button id="btn-close-sync-modal" class="btn-close-modal" title="Tutup Modal">✕</button>
       </div>
@@ -326,59 +326,69 @@
       <div style="display: flex; flex-direction: column; gap: 10px;">
         <!-- Status Indicator Pill -->
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: rgba(255,255,255,0.04); border-radius: 10px;">
-          <span style="font-size: 11px; color: #cbd5e1;">Status WebSocket:</span>
+          <span style="font-size: 11px; color: var(--text-secondary);">Status WebSocket:</span>
           <div id="sync-status-badge" class="sync-status-badge sync-disconnected">
             <span class="sync-status-dot"></span>
             <span id="sync-status-text" style="font-size: 9px; font-weight: 700;">Terputus</span>
           </div>
         </div>
 
-        <p style="font-size: 10px; color: #94a3b8; line-height: 1.4;">Scan QR Code dari aplikasi Mobile ADHD untuk menyinkronkan status timer Pomodoro secara real-time.</p>
-        <button id="btn-generate-sync-qr" class="btn-add sync-qr-btn" style="width: 100%; height: 34px; font-size: 11px; font-weight: 700;">🔗 Generate QR Code</button>
+        <!-- Auth Required Notice (shown if not logged in) -->
+        <div id="sync-auth-notice" class="hidden" style="text-align: center; padding: 14px 10px; background: rgba(239, 68, 68, 0.08); border: 1px dashed rgba(239, 68, 68, 0.3); border-radius: 12px;">
+          <div style="display:flex;justify-content:center;margin-bottom:4px;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="var(--cancel)" stroke-width="2" style="width:26px;height:26px;"><rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></div>
+          <p style="font-size: 11px; color: var(--cancel); font-weight: 700; margin-bottom: 2px;">Login Diperlukan</p>
+          <p style="font-size: 10px; color: var(--text-muted); line-height: 1.4; margin-bottom: 10px;">Silakan masuk ke akun Anda terlebih dahulu untuk membuat QR Code pairing.</p>
+          <button id="btn-sync-to-login" class="btn-add" style="width: 100%; height: 32px; font-size: 11px; font-weight: 700; background: var(--secondary);"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><circle cx="7.5" cy="15.5" r="5.5"/><path d="m21 2-9.6 9.6"/><path d="m15.5 7.5 3 3L22 7l-3-3"/></svg> Masuk Akun Sekarang</button>
+        </div>
 
-        <!-- QR Code Display Container (hidden until generated) -->
-        <div id="sync-qr-container" class="hidden" style="margin-top: 4px;">
+        <!-- QR Code Display Container (default shown when logged in) -->
+        <div id="sync-qr-container" style="display: flex; flex-direction: column; gap: 8px;">
+          <p style="font-size: 10px; color: var(--text-muted); line-height: 1.4; text-align: center;">Pindai QR Code dari aplikasi <b>Mobile ADHD</b> untuk login instan dan menyinkronkan status timer secara real-time.</p>
           <div class="sync-qr-wrapper">
             <div id="sync-qr-canvas" class="sync-qr-canvas"></div>
           </div>
-          <div style="text-align: center; margin-top: 6px;">
-            <span style="font-size: 9px; color: #64748b;">Room ID:</span>
-            <span id="sync-room-id-display" style="font-size: 9.5px; color: #818cf8; font-weight: 700; font-family: monospace;"></span>
+          <div style="text-align: center; margin-top: 2px;">
+            <span style="font-size: 9px; color: var(--text-muted);">Room ID:</span>
+            <span id="sync-room-id-display" style="font-size: 9.5px; color: var(--primary); font-weight: 700; font-family: monospace;">-</span>
           </div>
-          <button id="btn-disconnect-sync" class="btn-disconnect-sync" style="margin-top: 8px; width: 100%; height: 28px; font-size: 10px;">🔌 Putuskan Koneksi</button>
+
+          <div style="display: flex; gap: 6px; margin-top: 4px;">
+            <button id="btn-generate-sync-qr" class="btn-add sync-qr-btn" style="flex: 1; height: 32px; font-size: 10.5px; font-weight: 800; background: var(--primary); color: #000000; border: none; border-radius: 8px;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 16h5v5"/></svg> Refresh QR Code</button>
+            <button id="btn-disconnect-sync" class="btn-disconnect-sync" style="height: 32px; font-size: 10.5px; padding: 0 10px;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="m19 5 3-3"/><path d="m2 22 3-3"/><path d="M6.3 20.3a2.4 2.4 0 0 0 3.4 0L12 18l-6-6-2.3 2.3a2.4 2.4 0 0 0 0 3.4Z"/></svg> Putuskan</button>
+          </div>
         </div>
         
         <!-- Debugger HUD Collapsible Panel -->
         <div class="debugger-hud-panel" style="margin-top: 6px; border-top: 1px dashed rgba(255,255,255,0.1); padding-top: 8px;">
           <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px;">
-            <span style="font-size: 10px; font-weight: 700; color: #818cf8;">🛠️ WebSocket Debugger</span>
-            <span id="sync-latency-badge" style="font-size: 8px; font-family: monospace; color: #34d399; background: rgba(16, 185, 129, 0.15); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(16, 185, 129, 0.3);">RTT: -- ms</span>
+            <span style="font-size: 10px; font-weight: 700; color: var(--primary);"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg> WebSocket Debugger</span>
+            <span id="sync-latency-badge" style="font-size: 8px; font-family: monospace; color: var(--text-primary); background: rgba(var(--color-primary-rgb), 0.15); padding: 2px 6px; border-radius: 4px; border: 1px solid rgba(var(--color-primary-rgb), 0.3);">RTT: -- ms</span>
           </div>
 
           <!-- Quick Action Test Grid -->
           <div class="debug-actions-grid" style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; margin-bottom: 6px;">
-            <button id="btn-dbg-ping" class="btn-dbg" style="background: rgba(56, 189, 248, 0.15); border: 1px solid rgba(56, 189, 248, 0.3); color: #38bdf8; font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">🚀 Test Ping</button>
-            <button id="btn-dbg-alert" class="btn-dbg" style="background: rgba(245, 158, 11, 0.15); border: 1px solid rgba(245, 158, 11, 0.3); color: #fbbf24; font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">⚡ Shock Alert</button>
-            <button id="btn-dbg-focus-on" class="btn-dbg" style="background: rgba(16, 185, 129, 0.15); border: 1px solid rgba(16, 185, 129, 0.3); color: #34d399; font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">⏱️ Start Focus</button>
-            <button id="btn-dbg-focus-off" class="btn-dbg" style="background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;">🛑 Stop Focus</button>
+            <button id="btn-dbg-ping" class="btn-dbg" style="background: rgba(var(--color-primary-rgb), 0.15); border: 1px solid rgba(var(--color-primary-rgb), 0.3); color: var(--text-primary); font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="m12 15-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg> Test Ping</button>
+            <button id="btn-dbg-alert" class="btn-dbg" style="background: rgba(var(--color-secondary-rgb), 0.15); border: 1px solid rgba(var(--color-secondary-rgb), 0.3); color: var(--text-primary); font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;display:inline-block;vertical-align:middle;margin-right:2px;"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Shock Alert</button>
+            <button id="btn-dbg-focus-on" class="btn-dbg" style="background: rgba(var(--color-primary-rgb), 0.15); border: 1px solid rgba(var(--color-primary-rgb), 0.3); color: var(--text-primary); font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;display:inline-block;vertical-align:middle;margin-right:2px;"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Start Focus</button>
+            <button id="btn-dbg-focus-off" class="btn-dbg" style="background: rgba(var(--color-cancel-rgb), 0.15); border: 1px solid rgba(var(--color-cancel-rgb), 0.3); color: var(--cancel); font-size: 9px; padding: 5px; border-radius: 6px; font-weight: 600; cursor: pointer; text-align: center;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:10px;height:10px;display:inline-block;vertical-align:middle;margin-right:2px;"><circle cx="12" cy="12" r="10"/><rect width="6" height="6" x="9" y="9" rx="1"/></svg> Stop Focus</button>
           </div>
 
           <!-- Custom Message Input -->
           <div style="display: flex; gap: 4px; margin-bottom: 6px;">
-            <input type="text" id="input-dbg-custom-msg" placeholder="Ketik custom pesan..." style="flex: 1; height: 26px; font-size: 9px; background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 0 6px; color: #fff; outline: none;">
-            <button id="btn-dbg-send-custom" style="background: #4f46e5; border: none; color: #fff; font-size: 9px; font-weight: 600; padding: 0 8px; border-radius: 4px; cursor: pointer;">Kirim</button>
+            <input type="text" id="input-dbg-custom-msg" placeholder="Ketik custom pesan..." style="flex: 1; height: 26px; font-size: 9px; background: var(--input-bg); border: 1px solid rgba(255,255,255,0.15); border-radius: 4px; padding: 0 6px; color: #fff; outline: none;">
+            <button id="btn-dbg-send-custom" style="background: var(--secondary); border: none; color: #fff; font-size: 9px; font-weight: 600; padding: 0 8px; border-radius: 4px; cursor: pointer;">Kirim</button>
           </div>
 
           <!-- Terminal Toolbar & Log Container -->
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px;">
-            <span style="font-size: 8px; color: #64748b; font-family: monospace;">Live Packet Stream:</span>
+            <span style="font-size: 8px; color: var(--text-muted); font-family: monospace;">Live Packet Stream:</span>
             <div style="display: flex; gap: 4px;">
-              <button id="btn-dbg-copy-logs" style="background: transparent; border: none; color: #818cf8; font-size: 8px; cursor: pointer; text-decoration: underline;">Copy</button>
-              <span style="color: #334155; font-size: 8px;">•</span>
-              <button id="btn-dbg-clear-logs" style="background: transparent; border: none; color: #94a3b8; font-size: 8px; cursor: pointer; text-decoration: underline;">Clear</button>
+              <button id="btn-dbg-copy-logs" style="background: transparent; border: none; color: var(--primary); font-size: 8px; cursor: pointer; text-decoration: underline;">Copy</button>
+              <span style="color: var(--text-muted); font-size: 8px;">•</span>
+              <button id="btn-dbg-clear-logs" style="background: transparent; border: none; color: var(--text-muted); font-size: 8px; cursor: pointer; text-decoration: underline;">Clear</button>
             </div>
           </div>
-          <div id="sync-debug-log" style="height: 90px; max-height: 100px; overflow-y: auto; font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 8px; color: #94a3b8; background: #090d16; padding: 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word; line-height: 1.4;">
+          <div id="sync-debug-log" style="height: 90px; max-height: 100px; overflow-y: auto; font-family: 'SF Mono', Monaco, Consolas, monospace; font-size: 8px; color: var(--text-muted); background: var(--input-bg); padding: 6px; border-radius: 6px; border: 1px solid rgba(255,255,255,0.1); word-wrap: break-word; line-height: 1.4;">
             <!-- Real-time logs will be injected here -->
           </div>
         </div>
@@ -390,7 +400,7 @@
   <div id="settings-modal" class="modal-overlay hidden">
     <div class="modal-content auth-modal-card">
       <div class="modal-header">
-        <span class="card-label" style="font-size: 13px;">⚙️ Pengaturan & Preferensi</span>
+        <span class="card-label" style="font-size: 13px;"><svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:13px;height:13px;display:inline-block;vertical-align:middle;margin-right:3px;"><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></svg> Pengaturan & Preferensi</span>
         <button id="btn-close-settings-modal" class="btn-close-modal" title="Tutup Modal">✕</button>
       </div>
 
@@ -398,8 +408,8 @@
         <!-- Theme Switcher Row -->
         <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 10px; background: rgba(255,255,255,0.04); border-radius: 10px;">
           <div style="display: flex; flex-direction: column;">
-            <span style="font-size: 11px; color: #cbd5e1; font-weight: 600;">Tema Tampilan</span>
-            <span id="theme-status-text" style="font-size: 9.5px; color: #94a3b8;">Mode Gelap</span>
+            <span style="font-size: 11px; color: var(--text-secondary); font-weight: 600;">Tema Tampilan</span>
+            <span id="theme-status-text" style="font-size: 9.5px; color: var(--text-muted);">Mode Gelap</span>
           </div>
           <button id="theme-toggle" class="theme-btn" title="Ganti Tema Gelap / Terang" style="background: rgba(255, 255, 255, 0.08); border-radius: 8px; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid rgba(255,255,255,0.1);">
             <svg class="moon-icon hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.2">
@@ -413,14 +423,14 @@
 
         <!-- Pomodoro Config -->
         <div style="display: flex; flex-direction: column; gap: 6px;">
-          <span style="font-size: 11px; font-weight: 700; color: #cbd5e1;">Durasi Sesi Pomodoro</span>
+          <span style="font-size: 11px; font-weight: 700; color: var(--text-secondary);">Durasi Sesi Pomodoro</span>
           <div style="display: flex; gap: 8px;">
             <div style="flex: 1;">
-              <label for="pomodoro-work-input" style="font-size: 9px; color: #94a3b8;">Kerja (menit)</label>
+              <label for="pomodoro-work-input" style="font-size: 9px; color: var(--text-muted);">Kerja (menit)</label>
               <input type="number" id="pomodoro-work-input" class="task-input" min="1" max="90" value="25" style="text-align: center;">
             </div>
             <div style="flex: 1;">
-              <label for="pomodoro-break-input" style="font-size: 9px; color: #94a3b8;">Istirahat (menit)</label>
+              <label for="pomodoro-break-input" style="font-size: 9px; color: var(--text-muted);">Istirahat (menit)</label>
               <input type="number" id="pomodoro-break-input" class="task-input" min="1" max="30" value="5" style="text-align: center;">
             </div>
           </div>
@@ -428,7 +438,7 @@
 
         <!-- Floating Pomodoro Toggle -->
         <div style="display: flex; justify-content: space-between; align-items: center; padding-top: 4px;">
-          <span style="font-size: 11px; color: #cbd5e1;">Floating Timer di Web Page</span>
+          <span style="font-size: 11px; color: var(--text-secondary);">Floating Timer di Web Page</span>
           <label class="switch-small">
             <input type="checkbox" id="floating-pomodoro-toggle" checked>
             <span class="slider-small"></span>
@@ -480,7 +490,7 @@
           <input type="password" id="auth-reg-password" class="task-input" placeholder="Minimal 6 karakter" required>
         </div>
         <div id="auth-reg-error" class="auth-error-badge hidden"></div>
-        <button type="submit" id="btn-register-submit" class="btn-add" style="height: 36px; margin-top: 4px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); font-weight: 700;">Daftar Akun Baru</button>
+        <button type="submit" id="btn-register-submit" class="btn-add" style="height: 36px; margin-top: 4px; background: var(--primary); color: #000000; font-weight: 800; font-weight: 700;">Daftar Akun Baru</button>
       </form>
     </div>
   </div>
@@ -493,15 +503,15 @@
         <button id="btn-close-resume-modal" class="btn-close-modal" title="Tutup Modal">✕</button>
       </div>
       <div style="display: flex; flex-direction: column; gap: 8px;">
-        <span id="resume-modal-title" style="font-size: 12px; font-weight: 700; color: #f8fafc;">Lanjutkan Proyek</span>
+        <span id="resume-modal-title" style="font-size: 12px; font-weight: 700; color: var(--text-primary);">Lanjutkan Proyek</span>
 
         <!-- Preview List To-Do Proyek -->
         <div id="resume-todos-preview-box" style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 10px;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
-            <span class="card-label" style="font-size: 10px; color: #cbd5e1; display: flex; align-items: center; gap: 4px;">
-              📋 Daftar To-Do Proyek
+            <span class="card-label" style="font-size: 10px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
+              <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/></svg> Daftar To-Do Proyek
             </span>
-            <span id="resume-todos-count" style="font-size: 9px; color: #818cf8; font-weight: 600;">Memuat...</span>
+            <span id="resume-todos-count" style="font-size: 9px; color: var(--primary); font-weight: 600;">Memuat...</span>
           </div>
           <div id="resume-todos-list" style="max-height: 110px; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding-right: 2px;">
             <!-- Populated programmatically -->
@@ -512,7 +522,7 @@
           <label for="resume-duration-input">Waktu yang Anda miliki saat ini (menit)</label>
           <input type="number" id="resume-duration-input" class="task-input" min="10" step="5" value="30" placeholder="Contoh: 30">
         </div>
-        <button id="btn-confirm-resume" class="btn-add" style="height: 36px; margin-top: 4px; background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); color: #ffffff; font-weight: 700;">▶️ Lanjutkan Proyek</button>
+        <button id="btn-confirm-resume" class="btn-add" style="height: 36px; margin-top: 4px; background: var(--primary); color: #000000; font-weight: 800; font-weight: 700;"><svg class="ui-icon" viewBox="0 0 24 24" fill="currentColor" style="width:11px;height:11px;display:inline-block;vertical-align:middle;margin-right:3px;"><polygon points="6 3 20 12 6 21 6 3"/></svg> Lanjutkan Proyek</button>
       </div>
     </div>
   </div>

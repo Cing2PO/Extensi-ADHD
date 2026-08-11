@@ -1,36 +1,11 @@
 /**
- * Storage Sync Module - Synchronizes storage state for Content Scripts
+ * Storage Sync Module - Content script re-export of shared storage wrapper
+ * 
+ * All implementations are now in shared/ modules to eliminate duplication.
  */
 
-import { DEFAULT_BLACKLIST } from './domainMatcher.js';
-
-export function getStorageData(keys) {
-  return new Promise((resolve) => {
-    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-      chrome.storage.local.get(keys, (items) => {
-        if (chrome.runtime && chrome.runtime.lastError) {
-          resolve({});
-        } else {
-          resolve(items || {});
-        }
-      });
-    } else {
-      resolve({});
-    }
-  });
-}
-
-export function setStorageData(payload) {
-  return new Promise((resolve) => {
-    if (typeof chrome !== 'undefined' && chrome.storage && chrome.storage.local) {
-      chrome.storage.local.set(payload, () => {
-        resolve();
-      });
-    } else {
-      resolve();
-    }
-  });
-}
+import { DEFAULT_BLACKLIST } from '../../shared/constants.js';
+export { getStorage as getStorageData, setStorage as setStorageData } from '../../shared/storageWrapper.js';
 
 export function parseBlacklist(storedList) {
   if (storedList && Array.isArray(storedList)) {

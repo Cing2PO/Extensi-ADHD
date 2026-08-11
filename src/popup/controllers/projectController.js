@@ -36,8 +36,10 @@ export function initProjectController(callbacks = {}) {
       }
     }
     if (btnConfirmResume) {
-      btnConfirmResume.textContent = isCompleted ? '✓ Tutup Detail Proyek' : '▶️ Lanjutkan Proyek';
-      btnConfirmResume.style.background = isCompleted ? 'linear-gradient(135deg, #10b981 0%, #059669 100%)' : 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)';
+      btnConfirmResume.innerHTML = isCompleted
+        ? 'Tutup Detail Proyek'
+        : `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;margin-right:3px;"><polygon points="6 3 20 12 6 21 6 3"/></svg> Lanjutkan Proyek`;
+      btnConfirmResume.style.background = isCompleted ? 'var(--primary)' : 'var(--primary)';
     }
     if (resumeModal) {
       resumeModal.classList.remove('hidden');
@@ -50,7 +52,7 @@ export function initProjectController(callbacks = {}) {
 
   async function renderModalTodosPreview(project) {
     if (!resumeTodosList) return;
-    resumeTodosList.innerHTML = '<div style="font-size:10px; color:#94a3b8; text-align:center; padding:8px;">Memuat daftar to-do...</div>';
+    resumeTodosList.innerHTML = '<div style="font-size:10px; color:var(--text-muted); text-align:center; padding:8px;">Memuat daftar to-do...</div>';
     if (resumeTodosCount) resumeTodosCount.textContent = 'Memuat...';
 
     let steps = [];
@@ -74,7 +76,7 @@ export function initProjectController(callbacks = {}) {
 
     resumeTodosList.innerHTML = '';
     if (!steps || steps.length === 0) {
-      resumeTodosList.innerHTML = '<div style="font-size:10px; color:#94a3b8; text-align:center; padding:8px;">Tidak ada item to-do.</div>';
+      resumeTodosList.innerHTML = '<div style="font-size:10px; color:var(--text-muted); text-align:center; padding:8px;">Tidak ada item to-do.</div>';
       if (resumeTodosCount) resumeTodosCount.textContent = '0 item';
       return;
     }
@@ -90,12 +92,12 @@ export function initProjectController(callbacks = {}) {
       itemRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; background: rgba(255, 255, 255, 0.04); border-radius: 8px; font-size: 10px; gap: 8px;';
 
       const label = document.createElement('span');
-      label.style.cssText = `color: #e2e8f0; font-size: 10px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; ${isDone ? 'text-decoration: line-through; opacity: 0.5;' : ''}`;
+      label.style.cssText = `color: var(--text-primary); font-size: 10px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; ${isDone ? 'text-decoration: line-through; opacity: 0.5;' : ''}`;
       label.textContent = `${idx + 1}. ${step.text}`;
 
       const badge = document.createElement('span');
-      badge.style.cssText = `font-size: 9px; padding: 2px 6px; border-radius: 999px; font-weight: 600; white-space: nowrap; ${isDone ? 'background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3);' : 'background: rgba(245, 158, 11, 0.2); color: #f59e0b; border: 1px solid rgba(245, 158, 11, 0.3);'}`;
-      badge.textContent = isDone ? '✓ Selesai' : '⏳ Belum';
+      badge.style.cssText = `font-size: 9px; padding: 2px 6px; border-radius: 999px; font-weight: 600; white-space: nowrap; ${isDone ? 'background: rgba(var(--color-primary-rgb), 0.2); color: var(--primary); border: 1px solid rgba(var(--color-primary-rgb), 0.3);' : 'background: rgba(255, 255, 255, 0.08); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.15);'}`;
+      badge.textContent = isDone ? 'Selesai' : 'Belum';
 
       itemRow.appendChild(label);
       itemRow.appendChild(badge);
@@ -183,7 +185,7 @@ export function initProjectController(callbacks = {}) {
     } finally {
       if (btnConfirmResume) {
         btnConfirmResume.disabled = false;
-        btnConfirmResume.textContent = '▶️ Lanjutkan Proyek';
+        btnConfirmResume.innerHTML = `<svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;margin-right:3px;"><polygon points="6 3 20 12 6 21 6 3"/></svg> Lanjutkan Proyek`;
       }
     }
   }
@@ -229,7 +231,7 @@ export function initProjectController(callbacks = {}) {
           const actionBtn = document.createElement('button');
           actionBtn.type = 'button';
           actionBtn.className = 'btn-resume-project';
-          actionBtn.textContent = '▶️ Lanjutkan';
+          actionBtn.innerHTML = `<svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;margin-right:2px;"><polygon points="6 3 20 12 6 21 6 3"/></svg> Lanjutkan`;
 
           card.appendChild(titleBox);
           card.appendChild(actionBtn);
@@ -257,7 +259,7 @@ export function initProjectController(callbacks = {}) {
       }
 
       if (!completed || completed.length === 0) {
-        completedList.innerHTML = '<div style="font-size: 10px; color: #64748b; text-align: center; padding: 6px 0;">Belum ada proyek selesai</div>';
+        completedList.innerHTML = '<div style="font-size: 10px; color: var(--text-muted); text-align: center; padding: 6px 0;">Belum ada proyek selesai</div>';
         return;
       }
 
@@ -274,7 +276,7 @@ export function initProjectController(callbacks = {}) {
 
         const badge = document.createElement('span');
         badge.className = 'project-card-badge completed-badge';
-        badge.textContent = '✓ Selesai';
+        badge.textContent = 'Selesai';
 
         titleBox.appendChild(title);
         titleBox.appendChild(badge);
@@ -282,7 +284,7 @@ export function initProjectController(callbacks = {}) {
         const actionBtn = document.createElement('button');
         actionBtn.type = 'button';
         actionBtn.className = 'btn-resume-project btn-view-completed';
-        actionBtn.textContent = '👁️ Lihat';
+        actionBtn.innerHTML = `<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:2px;"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg> Lihat`;
 
         card.appendChild(titleBox);
         card.appendChild(actionBtn);

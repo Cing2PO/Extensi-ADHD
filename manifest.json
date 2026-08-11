@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
-  "name": "ADHD Standalone Focus Check",
+  "name": "Flow Tether : Sistem Pembantu Produktivitas Penyandang ADHD",
   "version": "1.0.0",
-  "description": "A standalone client-side browser sensor that detects doomscrolling and intervenes with soft-block overlays.",
+  "description": "Flow Tether : Sistem Pembantu Produktivitas Penyandang ADHD - Asisten fokus dan pendeteksi doomscrolling cerdas.",
   "permissions": [
     "activeTab",
     "scripting",
@@ -26,9 +26,20 @@
       "run_at": "document_start"
     }
   ],
+  "icons": {
+    "16": "src/icons/icon16.png",
+    "32": "src/icons/icon32.png",
+    "48": "src/icons/icon48.png",
+    "128": "src/icons/icon128.png"
+  },
   "web_accessible_resources": [
     {
       "resources": [
+        "src/icons/icon16.png",
+        "src/icons/icon32.png",
+        "src/icons/icon48.png",
+        "src/icons/icon128.png",
+        "src/colors.css",
         "src/overlay.css",
         "src/config.js",
         "src/content.js",
@@ -37,13 +48,25 @@
         "src/content/modules/domainMatcher.js",
         "src/content/modules/heuristicsEngine.js",
         "src/content/modules/overlayManager.js",
-        "src/content/modules/storageSync.js"
+        "src/content/modules/softBlockOverlay.js",
+        "src/content/modules/floatingPomodoroWidget.js",
+        "src/content/modules/storageSync.js",
+        "src/shared/colors.js",
+        "src/shared/constants.js",
+        "src/shared/storageWrapper.js",
+        "src/shared/pomodoroUtils.js"
       ],
       "matches": ["http://*/*", "https://*/*"]
     }
   ],
   "action": {
     "default_popup": "src/popup.html",
-    "default_title": "ADHD Standalone Focus Check"
+    "default_title": "Flow Tether : Sistem Pembantu Produktivitas Penyandang ADHD",
+    "default_icon": {
+      "16": "src/icons/icon16.png",
+      "32": "src/icons/icon32.png",
+      "48": "src/icons/icon48.png",
+      "128": "src/icons/icon128.png"
+    }
   }
 }

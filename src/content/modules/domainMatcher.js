@@ -2,14 +2,8 @@
  * Domain Matcher Module - Domain Blacklist Matching Logic
  */
 
-export const DEFAULT_BLACKLIST = [
-  { domain: 'youtube.com', enabled: true },
-  { domain: 'x.com', enabled: true },
-  { domain: 'twitter.com', enabled: true },
-  { domain: 'instagram.com', enabled: true },
-  { domain: 'tiktok.com', enabled: true },
-  { domain: 'facebook.com', enabled: true }
-];
+import { DEFAULT_BLACKLIST } from '../../shared/constants.js';
+export { DEFAULT_BLACKLIST };
 
 export function isDomainBlacklisted(hostname, blacklist) {
   if (!Array.isArray(blacklist) || blacklist.length === 0) return false;
