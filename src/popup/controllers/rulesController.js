@@ -12,8 +12,12 @@ import { getSwalTheme } from '../modules/themeManager.js';
 export function initRulesController({ onStartPomodoro }) {
   const protectionToggle = document.getElementById('protection-toggle');
   const guardMasterToggle = document.getElementById('guard-master-toggle');
-  const sensitivitySlider = document.getElementById('sensitivity-slider');
-  const sliderValLabel = document.getElementById('slider-val-label');
+  const shieldMasterCard = document.getElementById('shield-master-card');
+  const shieldStatusTitle = document.getElementById('shield-status-title');
+  const shieldStatusDesc = document.getElementById('shield-status-desc');
+  const sensitivityBadge = document.getElementById('sensitivity-badge');
+  const sensitivityInfoText = document.getElementById('sensitivity-info-text');
+  const presetCards = document.querySelectorAll('.sensitivity-preset-card');
 
   const activeSiteLabel = document.getElementById('active-site-label');
   const activeHostDisplay = document.getElementById('active-host');
@@ -29,6 +33,18 @@ export function initRulesController({ onStartPomodoro }) {
   let blacklist = [];
   let currentActiveDomain = null;
 
+  const SENSITIVITY_DESCRIPTIONS = {
+    lenient: 'Toleransi tinggi (25 Layar Feed / 25 Usapan Reels). Intervensi muncul lebih santai tanpa memutus kesenangan.',
+    balanced: 'Pengaturan seimbang (15 Layar Feed / 15 Usapan Reels). Pilihan optimal untuk penggunaan harian penderita ADHD.',
+    strict: 'Proteksi ketat (8 Layar Feed / 8 Usapan Reels). Intervensi muncul cepat untuk memutus distraksi saat jam produktif.'
+  };
+
+  const SENSITIVITY_LABELS = {
+    lenient: 'Lenient (Santai)',
+    balanced: 'Balanced (Seimbang)',
+    strict: 'Strict (Ketat)'
+  };
+
   // --- Horizontal Mouse Wheel Scroll for Blacklist ---
   if (blacklistScrollArea) {
     blacklistScrollArea.addEventListener('wheel', (e) => {
@@ -39,36 +55,74 @@ export function initRulesController({ onStartPomodoro }) {
     }, { passive: false });
   }
 
+  // --- Master Shield UI State ---
+  function updateMasterShieldUI(isActive) {
+    if (shieldMasterCard) {
+      if (isActive) {
+        shieldMasterCard.classList.remove('inactive');
+      } else {
+        shieldMasterCard.classList.add('inactive');
+      }
+    }
+    if (shieldStatusTitle) {
+      shieldStatusTitle.textContent = isActive ? 'Shield Aktif' : 'Shield Nonaktif';
+    }
+    if (shieldStatusDesc) {
+      shieldStatusDesc.textContent = isActive 
+        ? 'Memantau usapan berlebihan & batas waktu pasif.'
+        : 'Proteksi scroll & intervensi saat ini dinonaktifkan.';
+    }
+  }
+
   // --- Guard Shield Toggle ---
   if (protectionToggle) {
     protectionToggle.addEventListener('change', () => {
-      setStorage({ isProtectionActive: protectionToggle.checked });
-      if (guardMasterToggle) guardMasterToggle.checked = protectionToggle.checked;
+      const isActive = protectionToggle.checked;
+      setStorage({ isProtectionActive: isActive });
+      if (guardMasterToggle) guardMasterToggle.checked = isActive;
+      updateMasterShieldUI(isActive);
     });
   }
 
   if (guardMasterToggle) {
     guardMasterToggle.addEventListener('change', () => {
-      setStorage({ isProtectionActive: guardMasterToggle.checked });
-      if (protectionToggle) protectionToggle.checked = guardMasterToggle.checked;
+      const isActive = guardMasterToggle.checked;
+      setStorage({ isProtectionActive: isActive });
+      if (protectionToggle) protectionToggle.checked = isActive;
+      updateMasterShieldUI(isActive);
     });
   }
 
-  // --- Sensitivity Slider ---
-  if (sensitivitySlider) {
-    sensitivitySlider.addEventListener('input', () => {
-      const step = parseInt(sensitivitySlider.value, 10);
-      const sensitivityString = SENSITIVITY_STEPS[step] || 'balanced';
-      updateSliderLabel(sensitivityString);
-      setStorage({ sensitivity: sensitivityString });
-    });
-  }
+  // --- Sensitivity Preset Cards ---
+  function updateSensitivityUI(level) {
+    const activeLevel = (level || 'balanced').toLowerCase();
 
-  function updateSliderLabel(val) {
-    if (sliderValLabel) {
-      sliderValLabel.textContent = val.charAt(0).toUpperCase() + val.slice(1);
+    presetCards.forEach(card => {
+      if (card.getAttribute('data-level') === activeLevel) {
+        card.classList.add('active');
+      } else {
+        card.classList.remove('active');
+      }
+    });
+
+    if (sensitivityBadge) {
+      sensitivityBadge.textContent = SENSITIVITY_LABELS[activeLevel] || 'Balanced (Seimbang)';
+    }
+
+    if (sensitivityInfoText) {
+      sensitivityInfoText.textContent = SENSITIVITY_DESCRIPTIONS[activeLevel] || SENSITIVITY_DESCRIPTIONS.balanced;
     }
   }
+
+  presetCards.forEach(card => {
+    card.addEventListener('click', () => {
+      const selectedLevel = card.getAttribute('data-level');
+      if (selectedLevel) {
+        updateSensitivityUI(selectedLevel);
+        setStorage({ sensitivity: selectedLevel });
+      }
+    });
+  });
 
   // --- Quick Toggle Button & Domain Detection ---
   function extractDomainFromUrl(urlString) {
@@ -339,17 +393,17 @@ export function initRulesController({ onStartPomodoro }) {
 
   // --- Initial State Hydration ---
   function setInitialRules({ items }) {
+    const isProtectionActive = items.isProtectionActive !== false;
     if (protectionToggle) {
-      protectionToggle.checked = items.isProtectionActive !== false;
+      protectionToggle.checked = isProtectionActive;
     }
     if (guardMasterToggle) {
-      guardMasterToggle.checked = items.isProtectionActive !== false;
+      guardMasterToggle.checked = isProtectionActive;
     }
+    updateMasterShieldUI(isProtectionActive);
 
     const sensitivity = items.sensitivity || 'balanced';
-    const stepVal = SENSITIVITY_VALUES[sensitivity] || 2;
-    if (sensitivitySlider) sensitivitySlider.value = stepVal;
-    updateSliderLabel(sensitivity);
+    updateSensitivityUI(sensitivity);
 
     let storedList = items.blacklist;
     if (storedList) {
