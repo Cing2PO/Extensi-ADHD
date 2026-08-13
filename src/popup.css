@@ -1968,10 +1968,11 @@ body {
       margin: auto;
     }
 
+    :root[data-theme="light"] .auth-modal-card,
     body.light-theme .auth-modal-card {
       background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.12);
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(14, 129, 73, 0.20);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
     }
 
     .modal-header {
@@ -1996,10 +1997,24 @@ body {
       transition: all 0.15s ease;
     }
 
+    :root[data-theme="light"] .btn-close-modal,
+    body.light-theme .btn-close-modal {
+      background: rgba(0, 0, 0, 0.05);
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      color: var(--text-secondary);
+    }
+
     .btn-close-modal:hover {
       background: rgba(var(--color-cancel-rgb), 0.2);
       border-color: rgba(var(--color-cancel-rgb), 0.4);
       color: var(--cancel);
+    }
+
+    .todos-preview-box {
+      background: var(--input-bg);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 10px;
     }
 
     .auth-tabs {
@@ -2049,18 +2064,19 @@ body {
     }
 
     .auth-modal-card .task-input {
-      background: rgba(var(--color-background-rgb), 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.12);
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
       color: var(--text-primary);
       padding: 7px 10px;
       font-size: 11px;
       border-radius: 8px;
     }
 
+    :root[data-theme="light"] .auth-modal-card .task-input,
     body.light-theme .auth-modal-card .task-input {
-      background: var(--text-primary);
-      border: 1px solid rgba(0, 0, 0, 0.12);
-      color: var(--background);
+      background: var(--input-bg);
+      border: 1px solid var(--input-border);
+      color: var(--text-primary);
     }
 
     .auth-error-badge {

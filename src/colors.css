@@ -126,8 +126,8 @@ body.light-theme {
   /* Surface & Container Tokens (Crisp Solid White Surfaces) */
   --card-bg: #ffffff;
   --card-border: rgba(14, 129, 73, 0.16);
-  --input-bg: #ffffff;
-  --input-border: rgba(14, 129, 73, 0.30);
+  --input-bg: #f1f9f5;
+  --input-border: rgba(14, 129, 73, 0.25);
   --nav-bg: #ffffff;
 
   /* Interactive Elements */
