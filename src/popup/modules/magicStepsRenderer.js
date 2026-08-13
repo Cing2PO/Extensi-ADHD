@@ -116,9 +116,10 @@ export function renderMagicSteps({ container, magicTaskState, callbacks, stepCou
     }
     timeBadge.title = `Estimasi durasi: ${step.minutes || 10} menit`;
     timeBadge.innerHTML = `
-      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="10"></circle>
-        <polyline points="12 6 12 12 16 14"></polyline>
+      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:inline-block;vertical-align:middle;margin-right:2px;">
+        <line x1="10" x2="14" y1="2" y2="2"></line>
+        <line x1="12" x2="12" y1="14" y2="8"></line>
+        <circle cx="12" cy="14" r="8"></circle>
       </svg>
       <span>${isBreak ? 'Istirahat ' : ''}${step.minutes || 10}m</span>
     `;
@@ -144,10 +145,8 @@ export function renderMagicSteps({ container, magicTaskState, callbacks, stepCou
       syncBtn.title = 'Sedang fokus pada tugas ini';
     } else {
       syncBtn.innerHTML = `
-        <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block;vertical-align:middle;margin-right:2px;">
-          <circle cx="12" cy="12" r="10"></circle>
-          <circle cx="12" cy="12" r="6"></circle>
-          <circle cx="12" cy="12" r="2"></circle>
+        <svg width="10" height="10" viewBox="0 0 24 24" fill="currentColor" style="display:inline-block;vertical-align:middle;margin-right:2px;">
+          <polygon points="6 3 20 12 6 21 6 3"></polygon>
         </svg> Fokus
       `;
       syncBtn.title = 'Set sebagai fokus aktif sekarang dan mulai timer';

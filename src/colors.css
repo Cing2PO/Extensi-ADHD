@@ -9,25 +9,25 @@
 :root,
 :root[data-theme="dark"],
 :host {
-  /* Exact Base Palette Tokens */
-  --color-text: #ffffff;
+  /* Exact Base Palette Tokens (Harmonized with Mobile App Dark Palette) */
+  --color-text: #f8fafc;
   --color-background: #020805;
   --color-primary: #2ac67a;
   --color-secondary: #0e8149;
   --color-accent: #04be64;
   --color-cancel: #ef4444;
 
-  /* Strict Black & White Typography Tokens */
+  /* Strict High-Contrast Typography Tokens */
   --font-white: #ffffff;
   --font-black: #000000;
   --font-on-primary: #000000;
   --font-on-accent: #000000;
-  --font-on-secondary: #000000;
+  --font-on-secondary: #ffffff;
   --font-on-dark: #ffffff;
   --font-on-light: #000000;
 
   /* RGB channels for clean alpha compositing */
-  --color-text-rgb: 255, 255, 255;
+  --color-text-rgb: 248, 250, 252;
   --color-background-rgb: 2, 8, 5;
   --color-primary-rgb: 42, 198, 122;
   --color-secondary-rgb: 14, 129, 73;
@@ -42,74 +42,72 @@
   --accent: var(--color-accent);
   --cancel: var(--color-cancel);
 
-  /* Typography Hierarchies */
-  --text-primary: #ffffff;
-  --text-secondary: rgba(255, 255, 255, 0.85);
-  --text-muted: rgba(255, 255, 255, 0.60);
+  /* Typography Hierarchies (Slate Dark System) */
+  --text-primary: #f8fafc; /* Slate 50 */
+  --text-secondary: #cbd5e1; /* Slate 300 */
+  --text-muted: #94a3b8; /* Slate 400 */
 
-  /* Surface & Container Tokens */
-  --card-bg: rgba(14, 129, 73, 0.16);
+  /* Surface & Container Tokens (Solid Dark Emerald Surfaces) */
+  --card-bg: #06140d; /* Matching mobile surface */
   --card-border: rgba(42, 198, 122, 0.22);
-  --input-bg: rgba(2, 8, 5, 0.92);
+  --input-bg: #0c2417; /* Matching mobile surfaceLight */
   --input-border: rgba(42, 198, 122, 0.30);
-  --nav-bg: rgba(2, 8, 5, 0.96);
+  --nav-bg: #020805;
 
   /* Interactive Elements */
-  --tab-unselected: rgba(255, 255, 255, 0.50);
-  --tab-hover: #ffffff;
-  --accent-label: #ffffff;
-  --accent-text: #ffffff;
+  --tab-unselected: #94a3b8;
+  --tab-hover: #2ac67a;
+  --accent-label: #f8fafc;
+  --accent-text: #2ac67a;
   --text-green: #2ac67a;
 
-  /* Button Tokens (Black text on bold primary green) */
-  --btn-primary-bg: var(--primary);
+  /* Button Tokens (Black text on bold primary emerald green) */
+  --btn-primary-bg: #2ac67a;
   --btn-primary-text: #000000;
-  --btn-secondary-bg: var(--secondary);
-  --btn-secondary-text: #ffffff;
+  --btn-secondary-bg: rgba(42, 198, 122, 0.12);
+  --btn-secondary-text: #2ac67a;
 
   /* Controls & Highlights */
   --switch-bg: rgba(255, 255, 255, 0.12);
-  --switch-slider: rgba(255, 255, 255, 0.70);
-  --item-bg: rgba(42, 198, 122, 0.06);
-  --item-border: rgba(42, 198, 122, 0.16);
-  --shadow-color: rgba(0, 0, 0, 0.85);
+  --switch-slider: #2ac67a;
+  --item-bg: rgba(42, 198, 122, 0.08);
+  --item-border: rgba(42, 198, 122, 0.18);
+  --shadow-color: rgba(0, 0, 0, 0.70);
 
   /* Specialized Cards & Overlays */
-  --focus-card-bg: linear-gradient(135deg, rgba(14, 129, 73, 0.35) 0%, rgba(2, 8, 5, 0.98) 100%);
+  --focus-card-bg: #06140d;
   --active-site-bg: rgba(42, 198, 122, 0.08);
   --scroll-thumb: rgba(42, 198, 122, 0.25);
   --scroll-thumb-hover: rgba(42, 198, 122, 0.50);
   --border-header: rgba(42, 198, 122, 0.15);
-  --bg-gradient: radial-gradient(circle at top right, rgba(42, 198, 122, 0.16), transparent 60%),
-    radial-gradient(circle at bottom left, rgba(14, 129, 73, 0.20), transparent 60%),
-    var(--background);
+  --bg-gradient: #020805;
 }
 
 :root[data-theme="light"],
 body.light-theme {
-  /* Exact Base Palette Tokens */
-  --color-text: #000000;
+  /* Exact Base Palette Tokens (Harmonized with Mobile App) */
+  --color-text: #0f172a;
   --color-background: #f7fdfa;
-  --color-primary: #39d58a;
-  --color-secondary: #7ef1ba;
-  --color-accent: #41fba1;
+  --color-primary: #0e8149;
+  --color-secondary: #0e8149;
+  --color-accent: #047857;
   --color-cancel: #ef4444;
 
-  /* Strict Black & White Typography Tokens */
+  /* Strict High-Contrast Typography Tokens */
   --font-white: #ffffff;
   --font-black: #000000;
-  --font-on-primary: #000000;
-  --font-on-accent: #000000;
-  --font-on-secondary: #000000;
+  --font-on-primary: #ffffff;
+  --font-on-accent: #ffffff;
+  --font-on-secondary: #ffffff;
   --font-on-dark: #ffffff;
-  --font-on-light: #000000;
+  --font-on-light: #0f172a;
 
   /* RGB channels for clean alpha compositing */
-  --color-text-rgb: 0, 0, 0;
+  --color-text-rgb: 15, 23, 42;
   --color-background-rgb: 247, 253, 250;
-  --color-primary-rgb: 57, 213, 138;
-  --color-secondary-rgb: 126, 241, 186;
-  --color-accent-rgb: 65, 251, 161;
+  --color-primary-rgb: 14, 129, 73;
+  --color-secondary-rgb: 14, 129, 73;
+  --color-accent-rgb: 4, 120, 87;
   --color-cancel-rgb: 239, 68, 68;
 
   /* Base Semantic Tokens */
@@ -120,45 +118,43 @@ body.light-theme {
   --accent: var(--color-accent);
   --cancel: var(--color-cancel);
 
-  /* Typography Hierarchies */
-  --text-primary: #000000;
-  --text-secondary: rgba(0, 0, 0, 0.75);
-  --text-muted: rgba(0, 0, 0, 0.50);
+  /* Typography Hierarchies (Slate High-Contrast Palette) */
+  --text-primary: #0f172a;
+  --text-secondary: #334155;
+  --text-muted: #64748b;
 
-  /* Surface & Container Tokens */
+  /* Surface & Container Tokens (Crisp Solid White Surfaces) */
   --card-bg: #ffffff;
-  --card-border: rgba(57, 213, 138, 0.35);
+  --card-border: rgba(14, 129, 73, 0.16);
   --input-bg: #ffffff;
-  --input-border: rgba(57, 213, 138, 0.45);
-  --nav-bg: rgba(247, 253, 250, 0.98);
+  --input-border: rgba(14, 129, 73, 0.30);
+  --nav-bg: #ffffff;
 
   /* Interactive Elements */
-  --tab-unselected: rgba(0, 0, 0, 0.45);
-  --tab-hover: #000000;
-  --accent-label: #000000;
-  --accent-text: #000000;
+  --tab-unselected: #64748b;
+  --tab-hover: #0e8149;
+  --accent-label: #0f172a;
+  --accent-text: #0e8149;
   --text-green: #0e8149;
 
-  /* Button Tokens (Black text on bold primary green) */
-  --btn-primary-bg: var(--primary);
-  --btn-primary-text: #000000;
-  --btn-secondary-bg: var(--secondary);
-  --btn-secondary-text: #000000;
+  /* Button Tokens (Crisp White text on Deep Green #0E8149) */
+  --btn-primary-bg: #0e8149;
+  --btn-primary-text: #ffffff;
+  --btn-secondary-bg: rgba(14, 129, 73, 0.10);
+  --btn-secondary-text: #0e8149;
 
   /* Controls & Highlights */
-  --switch-bg: rgba(0, 0, 0, 0.12);
-  --switch-slider: rgba(0, 0, 0, 0.50);
-  --item-bg: rgba(126, 241, 186, 0.18);
-  --item-border: rgba(57, 213, 138, 0.25);
-  --shadow-color: rgba(0, 0, 0, 0.08);
+  --switch-bg: #cbd5e1;
+  --switch-slider: #ffffff;
+  --item-bg: rgba(14, 129, 73, 0.06);
+  --item-border: rgba(14, 129, 73, 0.15);
+  --shadow-color: rgba(15, 23, 42, 0.05);
 
   /* Specialized Cards & Overlays */
-  --focus-card-bg: linear-gradient(135deg, #ffffff 0%, rgba(126, 241, 186, 0.20) 100%);
-  --active-site-bg: rgba(126, 241, 186, 0.25);
-  --scroll-thumb: rgba(0, 0, 0, 0.18);
-  --scroll-thumb-hover: rgba(0, 0, 0, 0.35);
-  --border-header: rgba(57, 213, 138, 0.25);
-  --bg-gradient: radial-gradient(circle at top right, rgba(57, 213, 138, 0.14), transparent 60%),
-    radial-gradient(circle at bottom left, rgba(126, 241, 186, 0.22), transparent 60%),
-    var(--background);
+  --focus-card-bg: #ffffff;
+  --active-site-bg: rgba(14, 129, 73, 0.08);
+  --scroll-thumb: rgba(100, 116, 139, 0.30);
+  --scroll-thumb-hover: rgba(100, 116, 139, 0.60);
+  --border-header: rgba(14, 129, 73, 0.12);
+  --bg-gradient: #f7fdfa;
 }

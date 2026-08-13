@@ -1,5 +1,5 @@
 @import url('colors.css');
-@import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Outfit:wght@400;500;600;700;800;900&display=swap');
 
 * {
   box-sizing: border-box;
@@ -8,7 +8,7 @@
 }
 
 body {
-  font-family: 'Rubik', sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   background: var(--bg-gradient);
   color: var(--text-primary);
       width: 290px;
@@ -135,14 +135,10 @@ body {
       transform: translateY(-1px);
     }
 
-    .card-pomodoro {
-      background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.12) 0%, rgba(79, 70, 229, 0.08) 100%) !important;
-      border: 1px solid rgba(var(--color-primary-rgb), 0.25) !important;
-    }
-
+    .card-pomodoro,
     .card-sync {
-      background: linear-gradient(135deg, rgba(var(--color-primary-rgb), 0.12) 0%, rgba(13, 148, 136, 0.08) 100%) !important;
-      border: 1px solid rgba(var(--color-accent-rgb), 0.25) !important;
+      background: var(--card-bg) !important;
+      border: 1px solid var(--card-border) !important;
     }
 
     .matrix-card-header {
@@ -155,14 +151,16 @@ body {
 
     .matrix-title { color: var(--text-primary); font-size: 11px; font-weight: 700; }
 
-    .card-pomodoro .matrix-title { color: var(--text-primary); font-size: 11px; font-weight: 700; }
-    .card-sync .matrix-title { color: var(--text-primary); font-size: 11px; font-weight: 700; }
-
-    .matrix-badge { color: var(--text-primary); background: rgba(var(--color-primary-rgb), 0.20); border: 1px solid rgba(var(--color-primary-rgb), 0.35); font-size: 8.5px; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
-
-    .card-pomodoro .matrix-badge { color: var(--text-primary); background: rgba(var(--color-primary-rgb), 0.20); border: 1px solid rgba(var(--color-primary-rgb), 0.35); font-size: 8.5px; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
-
-    .card-sync .matrix-badge { color: var(--text-primary); background: rgba(var(--color-primary-rgb), 0.20); border: 1px solid rgba(var(--color-primary-rgb), 0.35); font-size: 8.5px; font-weight: 700; padding: 2px 6px; border-radius: 6px; }
+    .matrix-badge,
+    .sync-pill {
+      color: var(--text-green) !important;
+      background: rgba(var(--color-primary-rgb), 0.08) !important;
+      border: 1px solid rgba(var(--color-primary-rgb), 0.22) !important;
+      font-size: 8.5px;
+      font-weight: 700;
+      padding: 2px 6px;
+      border-radius: 6px;
+    }
 
     .btn-matrix-action {
       width: 100%;
@@ -180,35 +178,19 @@ body {
       justify-content: center;
       gap: 3px;
       flex-shrink: 0;
+      background: var(--primary) !important;
+      color: var(--font-on-primary) !important;
     }
 
     .magic-banner-card {
       padding: 9px 10px !important;
-      background: linear-gradient(135deg, rgba(167, 139, 250, 0.12) 0%, rgba(var(--color-secondary-rgb), 0.08) 100%) !important;
-      border: 1px solid rgba(167, 139, 250, 0.25) !important;
+      background: var(--card-bg) !important;
+      border: 1px solid var(--card-border) !important;
       border-radius: 10px !important;
       margin-bottom: 0;
     }
 
     .card-label { color: var(--text-primary); font-weight: 700; }
-
-    .card-pomodoro .btn-matrix-action {
-      background: var(--primary);
-      color: #ffffff;
-    }
-
-    .card-pomodoro .btn-matrix-action:hover {
-      background: var(--primary);
-    }
-
-    .card-sync .btn-matrix-action {
-      background: var(--primary);
-      color: #ffffff;
-    }
-
-    .card-sync .btn-matrix-action:hover {
-      background: var(--primary);
-    }
 
     .card-magic .btn-matrix-action {
       background: var(--secondary);
@@ -2327,7 +2309,7 @@ body {
    STRICT BLACK & WHITE TYPOGRAPHY & EMERALD BUTTON STYLING
    ========================================================= */
 
-/* All Primary Action Buttons: Solid Black Text on Bold Green */
+/* All Primary Action Buttons: Dynamic Text on Bold Green */
 .btn-matrix-action,
 .btn-add,
 .btn-primary,
@@ -2340,7 +2322,7 @@ body {
 #btn-new-magic,
 #btn-pause-pomodoro {
   background: var(--primary) !important;
-  color: #000000 !important;
+  color: var(--font-on-primary) !important;
   font-weight: 800 !important;
   border: none !important;
 }
@@ -2359,8 +2341,8 @@ body {
 .btn-matrix-action svg,
 .btn-add svg,
 .btn-primary svg {
-  fill: #000000 !important;
-  color: #000000 !important;
+  fill: currentColor !important;
+  color: currentColor !important;
 }
 
 /* Secondary Buttons & Chips: Dark/Neutral Surface with White/Black Text */
@@ -2461,23 +2443,44 @@ body {
 
 
 /* =========================================================
-   STRICT MONOCHROME TEXT ENFORCEMENT
-   All fonts strictly White/Black across all cards & badges.
-   ONLY bottom taskbar .nav-tab.active is green.
+   OUTFIT & INTER TYPOGRAPHY HIERARCHY (MATCHING MOBILE)
    ========================================================= */
+
+.brand-title,
+.matrix-title,
+.card-label,
+.magic-card-title,
+.guard-title,
+.accordion-header .card-label,
+.guard-site-val,
+.project-card-title,
+.modal-title,
+.auth-title,
+.settings-title,
+.btn-matrix-action,
+.btn-add,
+.btn-primary,
+.btn-secondary,
+.btn-auth-chip,
+.btn-sync-chip,
+.duration-chip,
+.tab-btn,
+.nav-tab,
+.matrix-badge,
+.sync-pill,
+.magic-pill-badge,
+.badge-sens,
+.blacklist-badge,
+#completed-projects-count {
+  font-family: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
+}
 
 .matrix-title,
 .card-label,
 .magic-card-title,
 .guard-title,
 .accordion-header .card-label,
-.matrix-badge,
-.sync-pill,
-.magic-pill-badge,
 .guard-site-val,
-.badge-sens,
-.blacklist-badge,
-#completed-projects-count,
 .project-card-title,
 .modal-title,
 .auth-title,
@@ -2485,7 +2488,18 @@ body {
   color: var(--text-primary) !important;
 }
 
-/* Secondary / Muted descriptive text */
+.matrix-badge,
+.sync-pill,
+.magic-pill-badge,
+.badge-sens,
+.blacklist-badge,
+#completed-projects-count {
+  color: var(--text-green) !important;
+  background: rgba(var(--color-primary-rgb), 0.08) !important;
+  border: 1px solid rgba(var(--color-primary-rgb), 0.22) !important;
+}
+
+/* Secondary / Muted descriptive text (Inter) */
 .text-muted-label,
 .guard-site-label,
 .magic-banner-desc,
@@ -2494,27 +2508,34 @@ body {
 .stat-subtext,
 .card-subtitle {
   color: var(--text-muted) !important;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif !important;
 }
 
 /* ONLY Bottom Taskbar Active Tab is Allowed to have Green Font/Icon */
-.nav-tab {
+.nav-tab,
+.tab-btn {
+  color: var(--tab-unselected) !important;
+  font-family: 'Outfit', sans-serif !important;
+}
+
+.nav-tab svg,
+.tab-btn svg {
   color: var(--tab-unselected) !important;
 }
 
-.nav-tab svg {
-  color: var(--tab-unselected) !important;
-}
-
-.nav-tab.active {
+.nav-tab.active,
+.tab-btn.active {
   color: var(--primary) !important;
 }
 
-.nav-tab.active svg {
+.nav-tab.active svg,
+.tab-btn.active svg {
   color: var(--primary) !important;
   stroke: var(--primary) !important;
 }
 
-.nav-tab.active span {
+.nav-tab.active span,
+.tab-btn.active span {
   color: var(--primary) !important;
   font-weight: 700 !important;
 }

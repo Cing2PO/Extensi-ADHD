@@ -51,24 +51,24 @@ export class SoftBlockOverlay {
     const overlayMarkup = document.createElement('div');
     overlayMarkup.className = 'focus-overlay';
 
-    let promptText = "You seem to be caught in a loop. Is this helpful right now?";
+    let promptText = "Sistem mendeteksi aktivitas doomscrolling tanpa sadar. Mari istirahatkan pikiranmu sejenak.";
     if (currentTask.trim().length > 0) {
-      promptText = `You seem to be caught in a loop. You planned to focus on: <strong>"${this.escapeHtml(currentTask)}"</strong>. Is this helpful right now?`;
+      promptText = `Sistem mendeteksi aktivitas browsing di luar fokus. Tugas aktif Anda: <strong>"${this.escapeHtml(currentTask)}"</strong>. Apakah Anda ingin kembali fokus?`;
     }
 
     overlayMarkup.innerHTML = `
       <div class="focus-card">
         <div class="focus-icon-container">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="12" cy="12" r="10"></circle>
-            <path d="M12 8v4m0 4h.01"></path>
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
           </svg>
         </div>
-        <h2 class="focus-title">Focus Check</h2>
+        <h2 class="focus-title">Tarik Napas Sejenak...</h2>
+        <div class="focus-subtitle" style="color: #38bdf8; font-size: 13px; font-weight: 700; margin-bottom: 16px; letter-spacing: 0.5px;">Anti-Doomscroll Shield</div>
         <p class="focus-description" id="focus-desc">${promptText}</p>
         <div class="focus-actions">
-          <button class="focus-btn btn-working" id="btn-working">Yes, I am working</button>
-          <button class="focus-btn btn-exit" id="btn-exit">No, get me out</button>
+          <button class="focus-btn btn-working" id="btn-working">Kembali Fokus</button>
+          <button class="focus-btn btn-exit" id="btn-exit">Tutup Halaman</button>
         </div>
       </div>
     `;
