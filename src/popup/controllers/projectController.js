@@ -89,14 +89,14 @@ export function initProjectController(callbacks = {}) {
     steps.forEach((step, idx) => {
       const isDone = !!(step.isDone || step.completed || project.isDone);
       const itemRow = document.createElement('div');
-      itemRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; background: rgba(255, 255, 255, 0.04); border-radius: 8px; font-size: 10px; gap: 8px;';
+      itemRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 5px 8px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; font-size: 10px; gap: 8px;';
 
       const label = document.createElement('span');
       label.style.cssText = `color: var(--text-primary); font-size: 10px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; flex: 1; ${isDone ? 'text-decoration: line-through; opacity: 0.5;' : ''}`;
       label.textContent = `${idx + 1}. ${step.text}`;
 
       const badge = document.createElement('span');
-      badge.style.cssText = `font-size: 9px; padding: 2px 6px; border-radius: 999px; font-weight: 600; white-space: nowrap; ${isDone ? 'background: rgba(var(--color-primary-rgb), 0.2); color: var(--primary); border: 1px solid rgba(var(--color-primary-rgb), 0.3);' : 'background: rgba(255, 255, 255, 0.08); color: var(--text-muted); border: 1px solid rgba(255, 255, 255, 0.15);'}`;
+      badge.style.cssText = `font-size: 9px; padding: 2px 6px; border-radius: 999px; font-weight: 600; white-space: nowrap; ${isDone ? 'background: rgba(var(--color-primary-rgb), 0.15); color: var(--primary); border: 1px solid rgba(var(--color-primary-rgb), 0.3);' : 'background: var(--input-bg); color: var(--text-muted); border: 1px solid var(--card-border);'}`;
       badge.textContent = isDone ? 'Selesai' : 'Belum';
 
       itemRow.appendChild(label);

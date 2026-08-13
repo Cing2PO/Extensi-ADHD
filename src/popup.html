@@ -241,31 +241,66 @@
 
     <!-- PAGE 3: GUARD -->
     <section id="tab-guard-page" class="subpage hidden">
-      <!-- Master Shield Switch -->
-      <div class="card" style="display: flex; justify-content: space-between; align-items: center; padding: 10px 12px;">
-        <div>
-          <span class="card-label" style="color: var(--primary); display: flex; align-items: center; gap: 6px; font-size: 11.5px;">
-            <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Anti-Doomscroll Shield
-          </span>
-          <span style="font-size: 9.5px; color: var(--text-muted); display: block; margin-top: 2px;">Proteksi otomatis dari distraksi scroll</span>
+      <!-- Master Shield Switch (Mobile Left-Right Layout) -->
+      <div class="card shield-master-card" id="shield-master-card" style="display: flex !important; flex-direction: row !important; align-items: center !important; justify-content: space-between !important; gap: 12px !important; text-align: left !important;">
+        <div class="shield-icon-badge" id="shield-icon-badge">
+          <svg class="shield-badge-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
         </div>
-        <label class="switch">
+        <div class="shield-text-content" style="flex: 1; text-align: left; display: flex; flex-direction: column; align-items: flex-start;">
+          <span class="shield-status-title" id="shield-status-title" style="text-align: left; display: block;">Shield Aktif</span>
+          <span class="shield-status-desc" id="shield-status-desc" style="text-align: left; display: block;">Memantau usapan berlebihan & batas waktu pasif.</span>
+        </div>
+        <label class="switch" style="flex-shrink: 0; margin-left: auto;">
           <input type="checkbox" id="guard-master-toggle" checked>
           <span class="slider"></span>
         </label>
       </div>
 
-      <!-- Sensitivity Pills -->
-      <div class="card slider-group" style="margin-top: 6px;">
-        <div class="slider-header">
-          <span class="card-label" style="color: var(--text-secondary); font-size: 11px;">Sensitivitas Deteksi</span>
-          <span id="slider-val-label" class="slider-value">Balanced</span>
+      <!-- Sensitivity Preset Cards (Mobile 3-Template Preset Layout) -->
+      <div class="card sensitivity-card-group" style="margin-top: 6px;">
+        <div class="sensitivity-header">
+          <span class="card-label" style="color: var(--text-secondary); font-size: 11px; font-weight: 700;">Sensitivitas Deteksi</span>
+          <span id="sensitivity-badge" class="sensitivity-badge">Balanced (Seimbang)</span>
         </div>
-        <input type="range" id="sensitivity-slider" min="1" max="3" value="2" step="1">
-        <div class="slider-labels">
-          <span>Lenient</span>
-          <span>Balanced</span>
-          <span>Strict</span>
+        <div class="sensitivity-cards-row">
+          <button type="button" class="sensitivity-preset-card" data-level="lenient" id="btn-preset-lenient">
+            <svg class="preset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M7 20h10"/>
+              <path d="M10 20c5.5-2.5.8-6.4 3-10"/>
+              <path d="M9.5 9.4c1.1.8 1.8 2.2 2.3 3.7-2 .4-3.5.4-4.8-.3-1.2-.6-2.3-1.9-3-4.2 2.8-.5 4.4 0 5.5.8z"/>
+              <path d="M14.1 6a7 7 0 0 0-1.1 4c1.9-.1 3.3-.6 4.3-1.4 1-1 1.6-2.3 1.7-4.6-2.7.1-4 1-4.9 2z"/>
+            </svg>
+            <span class="preset-title">Lenient</span>
+            <span class="preset-subtitle">25 Layar</span>
+          </button>
+
+          <button type="button" class="sensitivity-preset-card active" data-level="balanced" id="btn-preset-balanced">
+            <svg class="preset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+              <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z"/>
+              <path d="M7 21h10"/>
+              <path d="M12 3v18"/>
+              <path d="M3 7h18"/>
+            </svg>
+            <span class="preset-title">Balanced</span>
+            <span class="preset-subtitle">15 Layar</span>
+          </button>
+
+          <button type="button" class="sensitivity-preset-card" data-level="strict" id="btn-preset-strict">
+            <svg class="preset-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+            <span class="preset-title">Strict</span>
+            <span class="preset-subtitle">8 Layar</span>
+          </button>
+        </div>
+        <div class="sensitivity-info-box" id="sensitivity-info-box">
+          <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/>
+          </svg>
+          <span class="info-text" id="sensitivity-info-text">Pengaturan seimbang (15 Layar Feed / 15 Usapan Reels). Pilihan optimal untuk penggunaan harian penderita ADHD.</span>
         </div>
       </div>
 
@@ -505,7 +540,7 @@
         <span id="resume-modal-title" style="font-size: 12px; font-weight: 700; color: var(--text-primary);">Lanjutkan Proyek</span>
 
         <!-- Preview List To-Do Proyek -->
-        <div id="resume-todos-preview-box" style="background: rgba(0, 0, 0, 0.3); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; padding: 10px;">
+        <div id="resume-todos-preview-box" class="todos-preview-box">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
             <span class="card-label" style="font-size: 10px; color: var(--text-secondary); display: flex; align-items: center; gap: 4px;">
               <svg class="ui-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:12px;height:12px;display:inline-block;vertical-align:middle;margin-right:2px;"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/></svg> Daftar To-Do Proyek
