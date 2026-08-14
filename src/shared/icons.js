@@ -3,7 +3,7 @@
  * 
  * Provides crisp, resolution-independent vector icons that automatically inherit
  * the current theme colors (currentColor / CSS variables) for both Dark and Light modes.
- * 100% harmonized with Mobile ADHD icons.
+ * 100% harmonized with Tether Flow Mobile icons.
  */
 
 export const SVG_ICONS = {
