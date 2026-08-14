@@ -68,7 +68,7 @@ export class SoftBlockOverlay {
         <p class="focus-description" id="focus-desc">${promptText}</p>
         <div class="focus-actions">
           <button class="focus-btn btn-working" id="btn-working">Kembali Fokus</button>
-          <button class="focus-btn btn-exit" id="btn-exit">Tutup Halaman</button>
+          <button class="focus-btn btn-exit" id="btn-exit">Saya Sedang Riset</button>
         </div>
       </div>
     `;
@@ -78,6 +78,7 @@ export class SoftBlockOverlay {
 
     this.shadowRootNode.getElementById('btn-working').addEventListener('click', (e) => {
       e.stopPropagation();
+      this.disableScrollBlock();
       this.hideOverlay();
       if (this.onKeepWorking) this.onKeepWorking();
     });
@@ -85,8 +86,8 @@ export class SoftBlockOverlay {
     this.shadowRootNode.getElementById('btn-exit').addEventListener('click', (e) => {
       e.stopPropagation();
       this.disableScrollBlock();
+      this.hideOverlay();
       if (this.onGetMeOut) this.onGetMeOut();
-      else window.location.href = 'about:blank';
     });
   }
 

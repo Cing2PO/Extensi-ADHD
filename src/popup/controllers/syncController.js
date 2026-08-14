@@ -97,8 +97,8 @@ export function initSyncController(callbacks = {}) {
           text: cleanContent,
           width: 155,
           height: 155,
-          colorDark: '#ffffff',
-          colorLight: '#020805',
+          colorDark: '#000000',
+          colorLight: '#ffffff',
           correctLevel: QRCode.CorrectLevel.M
         });
       } catch (err) {

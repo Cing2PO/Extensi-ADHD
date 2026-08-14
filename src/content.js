@@ -26,10 +26,19 @@ import { getStorageData, setStorageData, parseBlacklist } from './content/module
           const count = items.refocusCount || 0;
           setStorageData({ refocusCount: count + 1 });
         });
+        // Close distracting website tab immediately
+        chrome.runtime.sendMessage({ action: 'closeCurrentTab' }, () => {
+          if (chrome.runtime.lastError) {
+            window.location.href = 'about:blank';
+          }
+        });
+      } else {
+        window.location.href = 'about:blank';
       }
     },
     onGetMeOut: () => {
-      window.location.href = 'about:blank';
+      // User is consciously researching -> reset score
+      heuristicsEngine.resetScore();
     },
     onPomoAction: handlePomoAction
   });

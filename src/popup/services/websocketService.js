@@ -152,7 +152,9 @@ export function disconnectWebSocket() {
  */
 export function sendTimerMessage(message, ackCallback) {
   if (!socket || !socket.connected || !currentRoomId) {
-    console.warn('[WS Service] Cannot send message - socket not connected or no roomId.', { connected: socket?.connected, roomId: currentRoomId });
+    if (currentRoomId) {
+      console.log('[WS Service] Message deferred: socket not connected yet.', { connected: socket?.connected, roomId: currentRoomId });
+    }
     return false;
   }
 
