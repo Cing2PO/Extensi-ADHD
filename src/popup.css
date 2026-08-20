@@ -2426,13 +2426,17 @@ body {
       display: flex;
       justify-content: center;
       align-items: center;
-      border-radius: 8px;
+      background: #ffffff;
+      padding: 10px;
+      border-radius: 12px;
       overflow: hidden;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     }
 
     .sync-qr-canvas img,
     .sync-qr-canvas canvas {
-      border-radius: 8px;
+      border-radius: 4px;
+      display: block;
     }
 
     .btn-disconnect-sync {

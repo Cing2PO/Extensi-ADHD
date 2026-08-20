@@ -43,7 +43,7 @@ function connectBackgroundWebSocket() {
     }
 
     const cleanRoomId = roomId.trim();
-    if (ws && isSocketConnected && currentRoomId === cleanRoomId) {
+    if (ws && isSocketConnected && currentRoomId === cleanRoomId && ws.readyState === WebSocket.OPEN) {
       return;
     }
 
@@ -126,34 +126,66 @@ function sendSyncMessage(message, callback) {
     const cleanRoomId = String(roomId).trim();
     const packet = '42' + JSON.stringify(['sendMessage', { roomId: cleanRoomId, message: String(message) }]);
 
-    if (ws && isSocketConnected) {
+    // Try sending via existing open connection first
+    if (ws && isSocketConnected && ws.readyState === WebSocket.OPEN) {
       console.log(`%c[Background SW] Emitting '${message}' to room '${cleanRoomId}'`, 'color: #ef4444; font-weight: bold;');
-      ws.send(packet);
-      notifyPopupLog('SENT', message, `Room: ${cleanRoomId}`);
-      if (callback) callback(true);
-    } else {
-      console.log(`[Background SW] WebSocket offline. Opening dedicated connection for '${message}'...`);
       try {
-        const tempWs = new WebSocket(SOCKET_SERVER_WS);
-        tempWs.onmessage = (e) => {
-          const d = String(e.data || '');
-          if (d.startsWith('0')) {
-            tempWs.send('40');
-          } else if (d.startsWith('40')) {
-            tempWs.send('42' + JSON.stringify(['joinRoom', { roomId: cleanRoomId }]));
-            tempWs.send(packet);
-            console.log(`%c[Background SW] Dedicated '${message}' successfully delivered!`, 'color: #10b981; font-weight: bold;');
-            notifyPopupLog('SENT', message, `Room: ${cleanRoomId}`);
-            setTimeout(() => tempWs.close(), 1000);
-            if (callback) callback(true);
-          }
-        };
-        tempWs.onerror = () => {
-          if (callback) callback(false);
-        };
-      } catch (e) {
-        if (callback) callback(false);
+        ws.send(packet);
+        notifyPopupLog('SENT', message, `Room: ${cleanRoomId}`);
+        if (callback) callback(true);
+        return;
+      } catch (err) {
+        console.warn('[Background SW] Failed to send via existing socket, opening dedicated connection...', err);
       }
+    }
+
+    // Dedicated fallback connection for 100% reliable delivery
+    console.log(`[Background SW] WebSocket offline/idle. Opening dedicated connection for '${message}'...`);
+    try {
+      const socketServerWs = getSocketServerWsUrl();
+      const tempWs = new WebSocket(socketServerWs);
+      let delivered = false;
+
+      const timeout = setTimeout(() => {
+        if (!delivered) {
+          try { tempWs.close(); } catch (e) {}
+          if (callback) callback(false);
+        }
+      }, 8000);
+
+      tempWs.onopen = () => {
+        console.log('[Background SW] Dedicated WS opened.');
+      };
+
+      tempWs.onmessage = (e) => {
+        const d = String(e.data || '');
+        if (d.startsWith('0')) {
+          tempWs.send('40');
+        } else if (d.startsWith('40')) {
+          tempWs.send('42' + JSON.stringify(['joinRoom', { roomId: cleanRoomId }]));
+          tempWs.send(packet);
+          delivered = true;
+          console.log(`%c[Background SW] Dedicated '${message}' successfully delivered to room '${cleanRoomId}'!`, 'color: #10b981; font-weight: bold;');
+          notifyPopupLog('SENT', message, `Room: ${cleanRoomId}`);
+          clearTimeout(timeout);
+          setTimeout(() => {
+            try { tempWs.close(); } catch (e) {}
+          }, 1500);
+          if (callback) callback(true);
+          // Re-establish background socket for future continuous events
+          connectBackgroundWebSocket();
+        }
+      };
+
+      tempWs.onerror = (err) => {
+        console.warn('[Background SW] Dedicated WS error:', err);
+        clearTimeout(timeout);
+        try { tempWs.close(); } catch (e) {}
+        if (callback) callback(false);
+      };
+    } catch (e) {
+      console.error('[Background SW] Failed to create dedicated WS:', e);
+      if (callback) callback(false);
     }
   });
 }
@@ -213,6 +245,20 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     });
 
     return true; // Keep async response channel open
+  }
+
+  if (message.action === 'closeCurrentTab') {
+    if (sender.tab && sender.tab.id) {
+      chrome.tabs.remove(sender.tab.id, () => {
+        if (chrome.runtime.lastError) {
+          console.warn('[Background SW] Error closing tab:', chrome.runtime.lastError.message);
+        }
+      });
+      sendResponse({ success: true });
+    } else {
+      sendResponse({ success: false });
+    }
+    return true;
   }
 
   if (message.action === 'sendSyncMessage') {
